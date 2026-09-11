@@ -1,0 +1,40 @@
+# dependencies
+/node_modules
+
+# Next.js
+/.next/
+/out/
+tsconfig.tsbuildinfo
+
+# production
+/build
+
+# env
+.env
+.env.local
+.env.*.local
+
+# testing
+/playwright-report/
+/test-results/
+/coverage/
+
+# local SQLite databases
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# misc
+.DS_Store
+*.pem
+
+# local Claude Code settings
+/.claude/settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+dist/
+.venv/

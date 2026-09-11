@@ -1,0 +1,19 @@
+[
+  {
+    "level": 1,
+    "name": "Single Word Focus",
+    "description": "Build concentration and visual rhythm by reading one visible word at a time.",
+    "wordsPerChunk": 1,
+    "minWpm": 60,
+    "maxWpm": 500,
+    "recommendedSessionsPerWeek": 2,
+    "sessionDurationMinutes": 30,
+    "estimatedWeeks": 12,
+    "targetCompletedSessions": 24,
+    "passThreshold": 70,
+    "brandTheme": {
+      "primary": "saffron",
+      "accent": "ashoka-blue"
+    }
+  }
+]

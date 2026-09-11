@@ -1,0 +1,247 @@
+[
+  {
+    "id": "level1_001",
+    "level": 1,
+    "title": "The Honest Shopkeeper",
+    "category": "values",
+    "difficulty": "beginner",
+    "estimatedAgeRange": "7-12",
+    "wordCount": 79,
+    "content": "Ravi visited a small shop near his home after school. He bought a pencil, a notebook, and a packet of biscuits. The shopkeeper was busy helping another customer and gave Ravi extra change by mistake. Ravi counted the money outside the shop and noticed the mistake. He went back immediately and returned the extra coins. The shopkeeper smiled and thanked him for being honest. Ravi felt proud because he had done the right thing even when nobody was watching.",
+    "comprehension": {
+      "minimumResponseWords": 18,
+      "requiredKeywords": [
+        "ravi",
+        "shop",
+        "extra",
+        "money",
+        "honest"
+      ],
+      "concepts": [
+        "Ravi received extra change by mistake",
+        "Ravi returned the extra money",
+        "The story teaches honesty"
+      ],
+      "synonyms": {
+        "shop": [
+          "store"
+        ],
+        "money": [
+          "coins",
+          "change"
+        ],
+        "honest": [
+          "truthful",
+          "right",
+          "fair"
+        ]
+      },
+      "copyLimit": 0.5
+    }
+  },
+  {
+    "id": "level1_002",
+    "level": 1,
+    "title": "Meera's Morning Practice",
+    "category": "habits",
+    "difficulty": "beginner",
+    "estimatedAgeRange": "7-12",
+    "wordCount": 71,
+    "content": "Meera wanted to improve her reading before the school competition. Every morning, she sat near the window and read one page from her storybook. At first she read slowly and lost focus. Her mother asked her to breathe calmly and read each word with attention. After two weeks, Meera noticed that she could finish a page faster and remember more details. She learned that small daily practice can create big improvement.",
+    "comprehension": {
+      "minimumResponseWords": 18,
+      "requiredKeywords": [
+        "meera",
+        "reading",
+        "practice",
+        "faster",
+        "remember"
+      ],
+      "concepts": [
+        "Meera practiced reading every morning",
+        "She improved her speed and focus",
+        "Regular practice helped her remember more"
+      ],
+      "synonyms": {
+        "practice": [
+          "training",
+          "habit"
+        ],
+        "faster": [
+          "quickly",
+          "speed"
+        ],
+        "remember": [
+          "recall",
+          "memory"
+        ]
+      },
+      "copyLimit": 0.5
+    }
+  },
+  {
+    "id": "level1_003",
+    "level": 1,
+    "title": "The Library Card",
+    "category": "school",
+    "difficulty": "beginner",
+    "estimatedAgeRange": "8-13",
+    "wordCount": 75,
+    "content": "Arjun's class visited the town library on Friday. The librarian showed them shelves filled with stories, science books, and biographies. Arjun chose a book about Indian space scientists. He used his new library card to borrow it for one week. At home, he read a few pages every evening and wrote down interesting facts in a small notebook. By the end of the week, Arjun had learned how curiosity can turn reading into an adventure.",
+    "comprehension": {
+      "minimumResponseWords": 18,
+      "requiredKeywords": [
+        "arjun",
+        "library",
+        "book",
+        "space",
+        "learned"
+      ],
+      "concepts": [
+        "Arjun visited the library with his class",
+        "He borrowed a book about Indian space scientists",
+        "Reading helped him learn interesting facts"
+      ],
+      "synonyms": {
+        "library": [
+          "book room"
+        ],
+        "book": [
+          "story",
+          "science book"
+        ],
+        "learned": [
+          "discovered",
+          "understood"
+        ]
+      },
+      "copyLimit": 0.5
+    }
+  },
+  {
+    "id": "level1_004",
+    "level": 1,
+    "title": "The Kite Festival",
+    "category": "festivals",
+    "difficulty": "beginner",
+    "estimatedAgeRange": "7-12",
+    "wordCount": 76,
+    "content": "Sana waited all year for the kite festival in January. On the big day, she climbed to the terrace with her brother and a bright orange kite. The wind was strong, so the kite rose quickly into the clear sky. Sana learned to pull the string gently and let it loose at the right time. By evening, her arms were tired but her heart was happy. She understood that patience and practice make every skill easier.",
+    "comprehension": {
+      "minimumResponseWords": 18,
+      "requiredKeywords": [
+        "sana",
+        "kite",
+        "festival",
+        "wind",
+        "practice"
+      ],
+      "concepts": [
+        "Sana flew a kite at the festival",
+        "The strong wind helped the kite rise",
+        "She learned that patience and practice build skill"
+      ],
+      "synonyms": {
+        "kite": [
+          "kites"
+        ],
+        "festival": [
+          "celebration"
+        ],
+        "wind": [
+          "breeze",
+          "windy"
+        ],
+        "practice": [
+          "practise",
+          "training"
+        ]
+      },
+      "copyLimit": 0.5
+    }
+  },
+  {
+    "id": "level1_005",
+    "level": 1,
+    "title": "The School Garden",
+    "category": "nature",
+    "difficulty": "beginner",
+    "estimatedAgeRange": "7-12",
+    "wordCount": 72,
+    "content": "Kiran's class started a small garden behind the school building. Each student planted one seed and wrote its name on a wooden stick. Kiran chose tomato seeds and watered them every day before class. Some plants grew fast while others needed more time and care. After a month, the garden was full of green leaves and tiny flowers. The teacher said the garden proved that steady care brings slow but certain results.",
+    "comprehension": {
+      "minimumResponseWords": 18,
+      "requiredKeywords": [
+        "kiran",
+        "garden",
+        "seed",
+        "water",
+        "care"
+      ],
+      "concepts": [
+        "The class planted a garden at school",
+        "Kiran watered tomato seeds every day",
+        "Steady care made the garden grow"
+      ],
+      "synonyms": {
+        "seed": [
+          "seeds",
+          "plant",
+          "plants",
+          "tomato"
+        ],
+        "water": [
+          "watered",
+          "watering"
+        ],
+        "care": [
+          "caring",
+          "attention",
+          "effort"
+        ]
+      },
+      "copyLimit": 0.5
+    }
+  },
+  {
+    "id": "level1_006",
+    "level": 1,
+    "title": "The Railway Journey",
+    "category": "travel",
+    "difficulty": "beginner",
+    "estimatedAgeRange": "8-13",
+    "wordCount": 76,
+    "content": "Dev boarded a morning train with his grandmother to visit their village. He sat near the window and watched fields, rivers, and small stations pass by. His grandmother told him stories about her childhood in the village. Dev wrote the names of the stations in his little diary. When they reached the village, his cousins were waiting at the platform with big smiles. Dev realised that a journey becomes special when you notice everything around you.",
+    "comprehension": {
+      "minimumResponseWords": 18,
+      "requiredKeywords": [
+        "dev",
+        "train",
+        "grandmother",
+        "village",
+        "journey"
+      ],
+      "concepts": [
+        "Dev travelled by train with his grandmother",
+        "He watched the scenery and wrote in his diary",
+        "Noticing things made the journey special"
+      ],
+      "synonyms": {
+        "train": [
+          "railway"
+        ],
+        "grandmother": [
+          "grandma"
+        ],
+        "village": [
+          "hometown"
+        ],
+        "journey": [
+          "trip",
+          "travel"
+        ]
+      },
+      "copyLimit": 0.5
+    }
+  }
+]
