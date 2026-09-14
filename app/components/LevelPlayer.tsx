@@ -112,18 +112,19 @@ export default function LevelPlayer({
         <section className={styles.stageCard}>
           <div className={styles.reader} data-testid="reader">
             <div className={styles.contextLine} aria-hidden="true">
-              {words.map((word, index) => (
-                <span
-                  key={`${word}-${index}`}
-                  className={
-                    index >= highlightStart && index < highlightEnd
-                      ? styles.visibleWord
-                      : styles.blurredWord
-                  }
-                >
-                  {word}
-                </span>
-              ))}
+              {words.map((word, index) => {
+                const className =
+                  index >= highlightStart && index < highlightEnd
+                    ? styles.visibleWord
+                    : index < highlightStart
+                      ? styles.readWord
+                      : styles.blurredWord;
+                return (
+                  <span key={`${word}-${index}`} className={className}>
+                    {word}
+                  </span>
+                );
+              })}
             </div>
             <span className={styles.screenReaderOnly} data-testid="active-chunk">
               {activeChunk}

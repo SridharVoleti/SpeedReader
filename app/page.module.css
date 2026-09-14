@@ -316,6 +316,12 @@
   user-select: none;
 }
 
+.readWord {
+  color: var(--ink);
+  filter: none;
+  opacity: 1;
+}
+
 .visibleWord {
   background: var(--saffron);
   border: 2px solid var(--ashoka-blue);
