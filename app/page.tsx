@@ -19,16 +19,35 @@ import styles from "./page.module.css";
 
 const passages = passagesData as unknown as PassageData[];
 
+type LaunchedLearner = { learnerId: string; displayName: string; avatarId: string | null };
+
 function passageForLevel(level: ProgressionLevel): PassageData {
   return passages[(level.id - 1) % passages.length];
+}
+
+// Reads the non-httpOnly `speedreader_learner` cookie set by POST /launch (see
+// docs/app-launch-integration.md). Absent when the app was opened directly rather than from
+// inside BabySteps - that's the normal, fully-supported case too.
+function readLaunchedLearner(): LaunchedLearner | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/(?:^|;\s*)speedreader_learner=([^;]+)/);
+  if (!match) return null;
+  try {
+    return JSON.parse(decodeURIComponent(match[1])) as LaunchedLearner;
+  } catch {
+    return null;
+  }
 }
 
 export default function Home() {
   const [progress, setProgress] = useState<Progress>({});
   const [activeLevelId, setActiveLevelId] = useState<number | null>(null);
+  const [learner, setLearner] = useState<LaunchedLearner | null>(null);
 
   useEffect(() => {
-    setProgress(loadProgress());
+    const launched = readLaunchedLearner();
+    setLearner(launched);
+    setProgress(loadProgress(launched?.learnerId));
   }, []);
 
   const activeLevel = activeLevelId ? levels.find((level) => level.id === activeLevelId) : null;
@@ -44,7 +63,7 @@ export default function Home() {
           worldName={worldName}
           passage={passageForLevel(activeLevel)}
           hasNextLevel={activeLevel.id < levels.length}
-          onRecord={(score) => setProgress(recordResult(progress, activeLevel, score))}
+          onRecord={(score) => setProgress(recordResult(progress, activeLevel, score, learner?.learnerId))}
           onAdvance={() => setActiveLevelId(activeLevel.id + 1)}
           onExit={() => setActiveLevelId(null)}
         />
@@ -56,12 +75,19 @@ export default function Home() {
     <main className={styles.shell}>
       <section className={styles.hero}>
         <div>
-          <p className={styles.eyebrow}>Speed Reading Journey</p>
+          <p className={styles.eyebrow}>
+            {learner ? `Welcome back, ${learner.displayName}` : "Speed Reading Journey"}
+          </p>
           <h1>Climb from 100 to 200 WPM, one level at a time.</h1>
           <p className={styles.lede}>
             Six worlds, thirty-six levels. Each world widens your eye span by one word — read the
             passage at the target speed, pass the comprehension check, and unlock the next level.
           </p>
+          {learner && (
+            <a href="/return" data-testid="return-to-babysteps">
+              Return to BabySteps
+            </a>
+          )}
         </div>
         <div className={styles.sessionBadge}>
           <span>{passedCount(progress)}</span>

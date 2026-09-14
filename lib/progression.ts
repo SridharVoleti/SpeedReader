@@ -29,19 +29,25 @@ export const levels: ProgressionLevel[] = progressionData.levels;
 
 const STORAGE_KEY = "speedreader-progress-v1";
 
-export function loadProgress(): Progress {
+// When Speed Reading is opened from inside BabySteps, progress is namespaced by learnerId so
+// siblings sharing a device (or the browser's own anonymous progress) never collide.
+function storageKey(learnerId?: string): string {
+  return learnerId ? `${STORAGE_KEY}:${learnerId}` : STORAGE_KEY;
+}
+
+export function loadProgress(learnerId?: string): Progress {
   if (typeof window === "undefined") return {};
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(storageKey(learnerId));
     return raw ? (JSON.parse(raw) as Progress) : {};
   } catch {
     return {};
   }
 }
 
-export function saveProgress(progress: Progress): void {
+export function saveProgress(progress: Progress, learnerId?: string): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  window.localStorage.setItem(storageKey(learnerId), JSON.stringify(progress));
 }
 
 export function starsForScore(score: number): number {
@@ -51,7 +57,12 @@ export function starsForScore(score: number): number {
   return 0;
 }
 
-export function recordResult(progress: Progress, level: ProgressionLevel, score: number): Progress {
+export function recordResult(
+  progress: Progress,
+  level: ProgressionLevel,
+  score: number,
+  learnerId?: string
+): Progress {
   const key = String(level.id);
   const previous = progress[key];
   const bestScore = Math.max(previous?.bestScore ?? 0, score);
@@ -64,7 +75,7 @@ export function recordResult(progress: Progress, level: ProgressionLevel, score:
       completedAt: new Date().toISOString()
     }
   };
-  saveProgress(next);
+  saveProgress(next, learnerId);
   return next;
 }
 

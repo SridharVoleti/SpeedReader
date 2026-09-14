@@ -16,7 +16,16 @@ progression: pass each level's comprehension check to unlock the next.
   main ideas, originality, clarity) awards 0–100 points. 70+ passes and
   unlocks the next level; 80+ earns 2 stars, 90+ earns 3 stars.
 - Progress (best score, stars, unlocks) is stored in the browser's
-  localStorage. Auth and payment are intentionally deferred.
+  localStorage. Auth and payment are intentionally deferred, except for the
+  BabySteps launch handoff below.
+
+## BabySteps launch integration
+
+Speed Reading can be opened from inside the BabySteps parent app, with the child already
+signed in — the same `/health`, `/launch`, `/return`, `/identity` protocol BabySteps uses for
+every embedded app. See `docs/app-launch-integration.md` for the full contract and
+`.env.local.example` for the required `APP_LAUNCH_*` / `SESSION_SECRET` environment variables.
+The app works standalone (without any of this configured) exactly as before.
 
 Level data lives in `data/progression.json`, passages in
 `data/passages/level-1.json`. The comprehension scorer exists twice by
