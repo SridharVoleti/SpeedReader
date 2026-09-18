@@ -77,6 +77,75 @@ test("read along highlights the passage one word at a time like a news reader", 
   await expect(page.getByRole("button", { name: "Start reading" })).toBeVisible();
 });
 
+test("speech-to-text lets a student dictate their comprehension answer", async ({ page }) => {
+  test.setTimeout(120_000);
+
+  // Stub the Web Speech API so the test is deterministic and doesn't need a real microphone.
+  await page.addInitScript(() => {
+    class FakeSpeechRecognition {
+      lang = "";
+      continuous = false;
+      interimResults = false;
+      onresult: ((event: unknown) => void) | null = null;
+      onend: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      start() {
+        (window as unknown as { __fakeRecognition: FakeSpeechRecognition }).__fakeRecognition =
+          this;
+      }
+      stop() {
+        this.onend?.();
+      }
+    }
+    (window as unknown as { SpeechRecognition: unknown }).SpeechRecognition =
+      FakeSpeechRecognition;
+    (window as unknown as { webkitSpeechRecognition: unknown }).webkitSpeechRecognition =
+      FakeSpeechRecognition;
+  });
+
+  await page.goto("/");
+  await page.getByTestId("level-node-1").click();
+  await page.getByRole("button", { name: "Start reading" }).click();
+  await expect(page.getByTestId("quiz-answer")).toBeVisible({ timeout: 60_000 });
+
+  await page.getByTestId("speech-to-text-toggle").click();
+  await expect(page.getByTestId("speech-to-text-toggle")).toHaveText("⏹ Stop talking");
+  await expect(page.getByTestId("listening-indicator")).toBeVisible();
+
+  await page.evaluate(() => {
+    const recognition = (
+      window as unknown as { __fakeRecognition: { onresult: (event: unknown) => void } }
+    ).__fakeRecognition;
+    const result = Object.assign([{ transcript: "The boy returned the extra coins." }], {
+      isFinal: true
+    });
+    recognition.onresult({ resultIndex: 0, results: [result] });
+  });
+
+  await expect(page.getByTestId("quiz-answer")).toHaveValue(/The boy returned the extra coins\./);
+
+  await page.getByTestId("speech-to-text-toggle").click();
+  await expect(page.getByTestId("speech-to-text-toggle")).toHaveText("🎤 Speak your answer");
+  await expect(page.getByTestId("listening-indicator")).not.toBeVisible();
+});
+
+test("comprehension check falls back to typing when speech isn't supported", async ({ page }) => {
+  test.setTimeout(120_000);
+
+  await page.addInitScript(() => {
+    delete (window as unknown as { SpeechRecognition?: unknown }).SpeechRecognition;
+    delete (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition;
+  });
+
+  await page.goto("/");
+  await page.getByTestId("level-node-1").click();
+  await page.getByRole("button", { name: "Start reading" }).click();
+  await expect(page.getByTestId("quiz-answer")).toBeVisible({ timeout: 60_000 });
+
+  await expect(page.getByTestId("speech-unsupported-hint")).toBeVisible();
+  await expect(page.getByTestId("speech-to-text-toggle")).toHaveCount(0);
+});
+
 test("a weak answer fails the assessment and keeps the next level locked", async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto("/");

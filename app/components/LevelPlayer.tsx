@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ProgressionLevel } from "../../lib/progression";
 import { PassageData, ScoreResult, scoreComprehension } from "../../lib/scoring";
 import styles from "../page.module.css";
@@ -15,6 +15,40 @@ function readAlongDelay(word: string, baseMs: number) {
   if (/[.!?]$/.test(word)) return baseMs * 1.8;
   if (/[,;:]$/.test(word)) return baseMs * 1.4;
   return baseMs;
+}
+
+// Minimal shape of the browser's (non-standard, unprefixed-or-webkit) SpeechRecognition API -
+// there's no lib.dom.d.ts type for it yet.
+type SpeechRecognitionResultLike = {
+  readonly isFinal: boolean;
+  readonly 0: { readonly transcript: string };
+};
+
+type SpeechRecognitionEventLike = {
+  readonly resultIndex: number;
+  readonly results: ArrayLike<SpeechRecognitionResultLike>;
+};
+
+type SpeechRecognitionLike = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null {
+  if (typeof window === "undefined") return null;
+  const globalWindow = window as unknown as {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  };
+  return globalWindow.SpeechRecognition ?? globalWindow.webkitSpeechRecognition ?? null;
 }
 
 type Props = {
@@ -50,6 +84,10 @@ export default function LevelPlayer({
   const [result, setResult] = useState<ScoreResult | null>(null);
   const [readAlongIndex, setReadAlongIndex] = useState(0);
   const [readAlongPlaying, setReadAlongPlaying] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const answerBeforeListeningRef = useRef("");
 
   const words = useMemo(() => passage.content.split(/\s+/), [passage.content]);
   const totalChunks = Math.ceil(words.length / level.wordsPerChunk);
@@ -81,6 +119,61 @@ export default function LevelPlayer({
     return () => window.clearTimeout(timer);
   }, [phase, readAlongPlaying, readAlongIndex, words]);
 
+  useEffect(() => {
+    setSpeechSupported(getSpeechRecognitionConstructor() !== null);
+  }, []);
+
+  // Leaving the comprehension check (submit, retry, or exit) should always release the
+  // microphone rather than leave it listening in the background.
+  useEffect(() => {
+    if (phase !== "quiz") {
+      recognitionRef.current?.stop();
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
+
+  function toggleListening() {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const SpeechRecognitionCtor = getSpeechRecognitionConstructor();
+    if (!SpeechRecognitionCtor) return;
+
+    const recognition = new SpeechRecognitionCtor();
+    recognition.lang = "en-US";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    answerBeforeListeningRef.current = answer.trim().length > 0 ? `${answer.trim()} ` : "";
+
+    let finalTranscript = "";
+    recognition.onresult = (event) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i += 1) {
+        const result = event.results[i];
+        const transcript = result[0].transcript;
+        if (result.isFinal) {
+          finalTranscript += `${transcript.trim()} `;
+        } else {
+          interim += transcript;
+        }
+      }
+      setAnswer(`${answerBeforeListeningRef.current}${finalTranscript}${interim}`);
+    };
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  }
+
   function startReading() {
     setChunkIndex(0);
     setPhase("reading");
@@ -107,6 +200,7 @@ export default function LevelPlayer({
   }
 
   function submitAnswer() {
+    recognitionRef.current?.stop();
     const scored = scoreComprehension(passage, answer, level.passThreshold);
     setResult(scored);
     onRecord(scored.score);
@@ -292,6 +386,34 @@ export default function LevelPlayer({
             Write the main idea and the important details in your own words (at least{" "}
             {passage.comprehension.minimumResponseWords} words).
           </p>
+          <div className={styles.speechRow}>
+            {speechSupported ? (
+              <button
+                type="button"
+                className={isListening ? styles.primaryButton : styles.secondaryButton}
+                data-testid="speech-to-text-toggle"
+                aria-pressed={isListening}
+                onClick={toggleListening}
+              >
+                {isListening ? "⏹ Stop talking" : "🎤 Speak your answer"}
+              </button>
+            ) : (
+              <p className={styles.stageHint} data-testid="speech-unsupported-hint">
+                Speech input isn&apos;t available in this browser — you can still type your
+                answer below.
+              </p>
+            )}
+            {isListening && (
+              <span
+                className={styles.listeningBadge}
+                data-testid="listening-indicator"
+                aria-live="polite"
+              >
+                <span className={styles.listeningDot} aria-hidden="true" />
+                Listening…
+              </span>
+            )}
+          </div>
           <textarea
             className={styles.quizInput}
             data-testid="quiz-answer"

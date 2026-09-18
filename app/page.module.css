@@ -263,13 +263,25 @@
   margin: 0;
 }
 
+.learnerBadge {
+  background: var(--saffron-soft);
+  border: 1px solid var(--saffron);
+  border-radius: 999px;
+  color: var(--ashoka-blue-dark);
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-left: auto;
+  padding: 6px 14px;
+  white-space: nowrap;
+}
+
 .backButton {
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--ashoka-blue-dark);
   font-weight: 900;
-  min-height: 46px;
+  min-height: 48px;
   padding: 0 14px;
 }
 
@@ -365,7 +377,8 @@
 .secondaryButton {
   border-radius: 8px;
   font-weight: 900;
-  min-height: 46px;
+  /* Section 4 (Buttons): 48px minimum mobile touch target. */
+  min-height: 48px;
   padding: 0 18px;
 }
 
@@ -381,12 +394,54 @@
 }
 
 .secondaryButton {
+  /* Section 4: secondary = white surface with blue border. */
   background: #ffffff;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ashoka-blue);
   color: var(--ashoka-blue-dark);
 }
 
 /* ---------- Quiz & results ---------- */
+
+.speechRow {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.listeningBadge {
+  align-items: center;
+  background: var(--saffron-soft);
+  border: 1px solid var(--saffron);
+  border-radius: 999px;
+  color: var(--ashoka-blue-dark);
+  display: inline-flex;
+  font-size: 0.8rem;
+  font-weight: 800;
+  gap: 8px;
+  padding: 6px 14px;
+}
+
+.listeningDot {
+  animation: listening-pulse 1.2s ease-in-out infinite;
+  background: var(--green);
+  border-radius: 999px;
+  height: 8px;
+  width: 8px;
+}
+
+@keyframes listening-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+}
 
 .quizInput {
   border: 2px solid var(--line);
@@ -472,7 +527,8 @@
 
 @media (max-width: 720px) {
   .shell {
-    padding: 12px;
+    /* Section 6 (Mobile-First Standard): 16px minimum page gutters. */
+    padding: 16px;
   }
 
   .hero {
