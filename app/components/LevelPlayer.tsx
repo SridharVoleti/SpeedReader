@@ -5,13 +5,26 @@ import { ProgressionLevel } from "../../lib/progression";
 import { PassageData, ScoreResult, scoreComprehension } from "../../lib/scoring";
 import styles from "../page.module.css";
 
-type Phase = "intro" | "reading" | "quiz" | "results";
+type Phase = "intro" | "reading" | "readAlong" | "quiz" | "results";
+
+// Read-along is a fluency demo, not a timed drill: every passage plays at the same natural
+// newscaster pace regardless of the level's training WPM, with brief pauses at punctuation.
+const READ_ALONG_WPM = 150;
+
+function readAlongDelay(word: string, baseMs: number) {
+  if (/[.!?]$/.test(word)) return baseMs * 1.8;
+  if (/[,;:]$/.test(word)) return baseMs * 1.4;
+  return baseMs;
+}
 
 type Props = {
   level: ProgressionLevel;
   worldName: string;
   passage: PassageData;
   hasNextLevel: boolean;
+  /** BabySteps interaction principle: always display active learner context. Undefined for a
+   *  standalone (non-BabySteps) visit, where there's no learner identity to show. */
+  learnerName?: string;
   onRecord: (score: number) => void;
   onAdvance: () => void;
   onExit: () => void;
@@ -26,6 +39,7 @@ export default function LevelPlayer({
   worldName,
   passage,
   hasNextLevel,
+  learnerName,
   onRecord,
   onAdvance,
   onExit
@@ -34,6 +48,8 @@ export default function LevelPlayer({
   const [chunkIndex, setChunkIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState<ScoreResult | null>(null);
+  const [readAlongIndex, setReadAlongIndex] = useState(0);
+  const [readAlongPlaying, setReadAlongPlaying] = useState(false);
 
   const words = useMemo(() => passage.content.split(/\s+/), [passage.content]);
   const totalChunks = Math.ceil(words.length / level.wordsPerChunk);
@@ -51,9 +67,43 @@ export default function LevelPlayer({
     return () => window.clearTimeout(timer);
   }, [phase, chunkIndex, totalChunks, level.wpm, level.wordsPerChunk]);
 
+  useEffect(() => {
+    if (phase !== "readAlong" || !readAlongPlaying) return;
+    if (readAlongIndex >= words.length) {
+      setReadAlongPlaying(false);
+      return;
+    }
+    const baseMs = msPerChunk(READ_ALONG_WPM, 1);
+    const timer = window.setTimeout(
+      () => setReadAlongIndex((value) => value + 1),
+      readAlongDelay(words[readAlongIndex], baseMs)
+    );
+    return () => window.clearTimeout(timer);
+  }, [phase, readAlongPlaying, readAlongIndex, words]);
+
   function startReading() {
     setChunkIndex(0);
     setPhase("reading");
+  }
+
+  function startReadAlong() {
+    setReadAlongIndex(0);
+    setReadAlongPlaying(true);
+    setPhase("readAlong");
+  }
+
+  function toggleReadAlongPlaying() {
+    setReadAlongPlaying((value) => !value);
+  }
+
+  function restartReadAlong() {
+    setReadAlongIndex(0);
+    setReadAlongPlaying(true);
+  }
+
+  function exitReadAlong() {
+    setReadAlongPlaying(false);
+    setPhase("intro");
   }
 
   function submitAnswer() {
@@ -90,6 +140,11 @@ export default function LevelPlayer({
             {level.wordsPerChunk === 1 ? "word" : "words"} at {level.wpm} WPM
           </h2>
         </div>
+        {learnerName && (
+          <span className={styles.learnerBadge} data-testid="learner-badge">
+            {learnerName}
+          </span>
+        )}
       </header>
 
       {phase === "intro" && (
@@ -102,9 +157,99 @@ export default function LevelPlayer({
             minute. Read carefully — a comprehension check follows, and you need{" "}
             {level.passThreshold} points to unlock the next level.
           </p>
-          <button className={styles.primaryButton} onClick={startReading}>
-            Start reading
-          </button>
+          <div className={styles.actions}>
+            <button className={styles.primaryButton} onClick={startReading}>
+              Start reading
+            </button>
+            <button
+              className={styles.secondaryButton}
+              data-testid="read-along-start"
+              onClick={startReadAlong}
+            >
+              Read along like a news reader
+            </button>
+          </div>
+        </section>
+      )}
+
+      {phase === "readAlong" && (
+        <section className={styles.stageCard} data-testid="read-along">
+          <p className={styles.kicker}>Read along</p>
+          <h3>{passage.title}</h3>
+          <div className={styles.reader} data-testid="reader">
+            <div className={styles.contextLine} aria-hidden="true">
+              {words.map((word, index) => (
+                <span
+                  key={`read-along-${word}-${index}`}
+                  className={index === readAlongIndex ? styles.visibleWord : styles.readWord}
+                >
+                  {word}
+                </span>
+              ))}
+            </div>
+            <span
+              className={styles.screenReaderOnly}
+              aria-live="polite"
+              data-testid="read-along-active-word"
+            >
+              {words[Math.min(readAlongIndex, words.length - 1)]}
+            </span>
+          </div>
+          <div className={styles.progressTrack} aria-hidden="true">
+            <div
+              className={styles.progressFill}
+              style={{ width: `${Math.min(100, Math.round((readAlongIndex / words.length) * 100))}%` }}
+            />
+          </div>
+          {readAlongIndex < words.length ? (
+            <>
+              <p className={styles.stageHint}>
+                Read each highlighted word aloud as it lights up, like a news anchor following a
+                teleprompter. Keep going even if you fall a little behind — the highlight won&apos;t
+                wait.
+              </p>
+              <div className={styles.actions}>
+                <button
+                  className={styles.primaryButton}
+                  data-testid="read-along-toggle"
+                  onClick={toggleReadAlongPlaying}
+                >
+                  {readAlongPlaying ? "Pause" : "Resume"}
+                </button>
+                <button
+                  className={styles.secondaryButton}
+                  data-testid="read-along-restart"
+                  onClick={restartReadAlong}
+                >
+                  Restart
+                </button>
+                <button className={styles.secondaryButton} onClick={exitReadAlong}>
+                  Exit read along
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className={styles.stageHint} data-testid="read-along-done">
+                Nice reading! Try it again for more fluency, or move on to the timed level.
+              </p>
+              <div className={styles.actions}>
+                <button className={styles.primaryButton} onClick={startReading}>
+                  Start timed level
+                </button>
+                <button
+                  className={styles.secondaryButton}
+                  data-testid="read-along-restart"
+                  onClick={restartReadAlong}
+                >
+                  Read along again
+                </button>
+                <button className={styles.secondaryButton} onClick={exitReadAlong}>
+                  Back
+                </button>
+              </div>
+            </>
+          )}
         </section>
       )}
 
@@ -179,12 +324,14 @@ export default function LevelPlayer({
             <span>/ 100</span>
           </div>
           <div className={styles.resultStars} aria-label="Stars earned">
+            {/* Accessibility baseline: on/off stars differ by shape, not color alone. */}
             {[70, 80, 90].map((threshold) => (
               <span
                 key={threshold}
                 className={result.score >= threshold ? styles.starOnBig : styles.starOffBig}
+                aria-hidden="true"
               >
-                ★
+                {result.score >= threshold ? "★" : "☆"}
               </span>
             ))}
           </div>

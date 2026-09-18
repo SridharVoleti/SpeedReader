@@ -56,6 +56,27 @@ test("passing the comprehension check unlocks the next level", async ({ page }) 
   await expect(page.getByTestId("level-node-2")).toBeEnabled();
 });
 
+test("read along highlights the passage one word at a time like a news reader", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("level-node-1").click();
+  await page.getByRole("button", { name: "Read along like a news reader" }).click();
+
+  await expect(page.getByTestId("read-along")).toBeVisible();
+  await expect(page.getByTestId("read-along-active-word")).toHaveText("Ravi");
+  // 150 WPM = 400 ms per word; after ~1.2 s the highlight should have moved on.
+  await page.waitForTimeout(1200);
+  await expect(page.getByTestId("read-along-active-word")).not.toHaveText("Ravi");
+
+  await page.getByTestId("read-along-toggle").click();
+  await expect(page.getByTestId("read-along-toggle")).toHaveText("Resume");
+
+  await page.getByTestId("read-along-restart").click();
+  await expect(page.getByTestId("read-along-active-word")).toHaveText("Ravi");
+
+  await page.getByRole("button", { name: "Exit read along" }).click();
+  await expect(page.getByRole("button", { name: "Start reading" })).toBeVisible();
+});
+
 test("a weak answer fails the assessment and keeps the next level locked", async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto("/");
