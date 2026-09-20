@@ -12,11 +12,14 @@ export type ConstructId = "main_idea" | "detail" | "sequence_relationship";
 
 // SR-R1-007: Mandatory gates. A mandatory item is non-compensable: failing it blocks PASS no
 // matter how high the aggregate score is.
+// SR-R1-010: Question non-contamination. revealRisk lists the itemIds whose evidence this
+// item's prompt/feedback would reveal - those items must be answered earlier in item_order.
 export type SingleChoiceItem = {
   itemId: string;
   itemType: "single_choice";
   constructId: ConstructId;
   mandatory: boolean;
+  revealRisk?: string[];
   prompt: string;
   options: Option[];
   correctOptionId: string;
@@ -27,6 +30,7 @@ export type OrderingItem = {
   itemType: "ordering";
   constructId: ConstructId;
   mandatory: boolean;
+  revealRisk?: string[];
   prompt: string;
   items: Option[];
   correctOrderIds: string[];
@@ -37,6 +41,7 @@ export type MatchingItem = {
   itemType: "matching";
   constructId: ConstructId;
   mandatory: boolean;
+  revealRisk?: string[];
   prompt: string;
   left: Option[];
   right: Option[];
@@ -48,6 +53,7 @@ export type ConstrainedShortAnswerItem = {
   itemType: "constrained_short_answer";
   constructId: ConstructId;
   mandatory: boolean;
+  revealRisk?: string[];
   prompt: string;
   minimumResponseWords: number;
   requiredKeywords: string[];
@@ -349,4 +355,31 @@ export function evaluateComprehension(
     comprehensionState: passed ? "PASS" : "FAIL",
     reasonCode: passed ? "PASS" : "AGGREGATE_BELOW_THRESHOLD"
   };
+}
+
+// SR-R1-010: Question non-contamination.
+// "Assessment items shall not reveal answers needed by later scored items."
+// "Reveal-risk dependency is rejected or dependent evidence is collected before reveal/feedback."
+export type SequenceViolation = { revealingItemId: string; revealedItemId: string; reason: string };
+export type SequenceValidationResult = { valid: boolean; violations: SequenceViolation[] };
+
+export function validateItemSequence(items: AssessmentItem[]): SequenceValidationResult {
+  const positionById = new Map(items.map((item, index) => [item.itemId, index]));
+  const violations: SequenceViolation[] = [];
+
+  items.forEach((item, index) => {
+    for (const revealedId of item.revealRisk ?? []) {
+      const revealedPosition = positionById.get(revealedId);
+      if (revealedPosition === undefined) continue; // no such item in this sequence - nothing to contaminate
+      if (revealedPosition >= index) {
+        violations.push({
+          revealingItemId: item.itemId,
+          revealedItemId: revealedId,
+          reason: `"${item.itemId}" (position ${index}) reveals evidence needed by "${revealedId}" (position ${revealedPosition}), which has not been answered yet`
+        });
+      }
+    }
+  });
+
+  return { valid: violations.length === 0, violations };
 }

@@ -7,10 +7,42 @@
 
 import { useState } from "react";
 import AssessmentItemView from "../components/AssessmentItemView";
-import { AssessmentItem, evaluateComprehension, ItemScoreResult } from "../../lib/item-types";
+import {
+  AssessmentItem,
+  evaluateComprehension,
+  ItemScoreResult,
+  validateItemSequence
+} from "../../lib/item-types";
 import styles from "../page.module.css";
 
 const PASS_THRESHOLD_PERCENT = 70;
+
+// SR-R1-010: Question non-contamination.
+// A deliberately contaminated authoring example - "reveals-answer" comes before the item whose
+// evidence it reveals - shown alongside the same pair reordered so validation passes. These are
+// static authoring examples only, never rendered/answered like the main demo items above.
+const contaminatedSequence: AssessmentItem[] = [
+  {
+    itemId: "reveals-the-twist",
+    itemType: "single_choice",
+    constructId: "detail",
+    mandatory: false,
+    revealRisk: ["what-happens-next"],
+    prompt: "The ending reveals that the coins were returned - true or false?",
+    options: [{ id: "a", label: "True" }],
+    correctOptionId: "a"
+  },
+  {
+    itemId: "what-happens-next",
+    itemType: "single_choice",
+    constructId: "sequence_relationship",
+    mandatory: false,
+    prompt: "What do you predict happens next?",
+    options: [{ id: "a", label: "The coins get returned" }],
+    correctOptionId: "a"
+  }
+];
+const correctedSequence: AssessmentItem[] = [contaminatedSequence[1], contaminatedSequence[0]];
 
 const items: AssessmentItem[] = [
   {
@@ -102,6 +134,19 @@ export default function ItemTypesDemoPage() {
           <p data-testid="reason-code">{evaluation.reasonCode}</p>
         </section>
       )}
+
+      <section className={styles.stageCard} data-testid="sequence-validation">
+        <p className={styles.kicker}>Question non-contamination (SR-R1-010)</p>
+        <p className={styles.stageHint}>
+          An item that reveals another item&apos;s answer must come after it in item_order.
+        </p>
+        <p data-testid="contaminated-sequence-result">
+          {validateItemSequence(contaminatedSequence).valid ? "valid" : "invalid"}
+        </p>
+        <p data-testid="corrected-sequence-result">
+          {validateItemSequence(correctedSequence).valid ? "valid" : "invalid"}
+        </p>
+      </section>
     </main>
   );
 }

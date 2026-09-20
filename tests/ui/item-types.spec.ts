@@ -157,3 +157,13 @@ test("PASSes overall when every item, including the mandatory one, is answered c
   await expect(evaluation.getByTestId("comprehension-state")).toHaveText("PASS");
   await expect(evaluation.getByTestId("reason-code")).toHaveText("PASS");
 });
+
+// SR-R1-010: Question non-contamination (TC-R1-010-B: "Earlier question reveals later answer").
+// "Reveal-risk dependency is rejected or dependent evidence is collected before reveal/feedback."
+test("a contaminated item sequence is rejected, and the reordered sequence is accepted", async ({ page }) => {
+  await page.goto("/item-types-demo");
+  const panel = page.getByTestId("sequence-validation");
+
+  await expect(panel.getByTestId("contaminated-sequence-result")).toHaveText("invalid");
+  await expect(panel.getByTestId("corrected-sequence-result")).toHaveText("valid");
+});
