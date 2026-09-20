@@ -96,8 +96,15 @@ export function recordResult(
   level: ProgressionLevel,
   score: number,
   learnerId?: string,
-  readingTiming?: ReadingTimingRecord
+  readingTiming?: ReadingTimingRecord,
+  attemptOutcome?: "PASS" | "HOLD" | "INVALID"
 ): Progress {
+  // SR-R1-012: Outcome separation - technical/content invalidity must never lower (or otherwise
+  // change) learner state the way a genuine comprehension failure (HOLD) does.
+  if (attemptOutcome === "INVALID") {
+    return progress;
+  }
+
   const key = String(level.id);
   const previous = progress[key];
   const bestScore = Math.max(previous?.bestScore ?? 0, score);

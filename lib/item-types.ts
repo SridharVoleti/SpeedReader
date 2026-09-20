@@ -383,3 +383,38 @@ export function validateItemSequence(items: AssessmentItem[]): SequenceValidatio
 
   return { valid: violations.length === 0, violations };
 }
+
+// SR-R1-012: Outcome separation.
+// "Produce PASS, HOLD/FAIL and INVALID/INSUFFICIENT_EVIDENCE without conflation."
+// "Technical/content invalidity does not lower learner state; comprehension failure does;
+//  reason code stored."
+export type AttemptOutcome = "PASS" | "HOLD" | "INVALID";
+
+export type AttemptEvaluation = {
+  attemptOutcome: AttemptOutcome;
+  reasonCode: string;
+  comprehension: ComprehensionEvaluation | null;
+};
+
+export function deriveAttemptOutcome(
+  items: AssessmentItem[],
+  results: ItemScoreResult[],
+  passThresholdPercent: number,
+  options: { interrupted?: boolean } = {}
+): AttemptEvaluation {
+  // Technical/content invalidity is never conflated with a genuine comprehension failure - it
+  // gets its own outcome, so it never lowers the learner's state the way a real HOLD does.
+  if (options.interrupted) {
+    return { attemptOutcome: "INVALID", reasonCode: "TECHNICAL_INTERRUPTION", comprehension: null };
+  }
+  if (results.some((result) => result.itemResult === "invalid_response")) {
+    return { attemptOutcome: "INVALID", reasonCode: "INSUFFICIENT_EVIDENCE", comprehension: null };
+  }
+
+  const comprehension = evaluateComprehension(items, results, passThresholdPercent);
+  return {
+    attemptOutcome: comprehension.comprehensionState === "PASS" ? "PASS" : "HOLD",
+    reasonCode: comprehension.reasonCode,
+    comprehension
+  };
+}

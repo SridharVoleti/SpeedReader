@@ -9,6 +9,7 @@ import { useState } from "react";
 import AssessmentItemView from "../components/AssessmentItemView";
 import {
   AssessmentItem,
+  deriveAttemptOutcome,
   evaluateComprehension,
   ItemScoreResult,
   validateItemSequence
@@ -102,6 +103,7 @@ const items: AssessmentItem[] = [
 
 export default function ItemTypesDemoPage() {
   const [results, setResults] = useState<Record<string, ItemScoreResult>>({});
+  const [interrupted, setInterrupted] = useState(false);
 
   function handleScored(result: ItemScoreResult) {
     setResults((previous) => ({ ...previous, [result.itemId]: result }));
@@ -110,6 +112,11 @@ export default function ItemTypesDemoPage() {
   const allAnswered = items.every((item) => results[item.itemId]);
   const evaluation = allAnswered
     ? evaluateComprehension(items, Object.values(results), PASS_THRESHOLD_PERCENT)
+    : null;
+  // SR-R1-012: Outcome separation - a technically interrupted attempt is its own INVALID
+  // outcome, never conflated with a genuine PASS/HOLD comprehension result.
+  const attemptOutcome = allAnswered
+    ? deriveAttemptOutcome(items, Object.values(results), PASS_THRESHOLD_PERCENT, { interrupted })
     : null;
 
   return (
@@ -121,6 +128,16 @@ export default function ItemTypesDemoPage() {
         gate: getting it wrong blocks an overall PASS even if the aggregate score clears the
         threshold (SR-R1-007).
       </p>
+      <label style={{ display: "block", margin: "12px 0" }}>
+        <input
+          type="checkbox"
+          data-testid="simulate-interruption"
+          checked={interrupted}
+          onChange={(event) => setInterrupted(event.target.checked)}
+        />{" "}
+        Simulate a technical interruption (SR-R1-012)
+      </label>
+
       {items.map((item) => (
         <section className={styles.stageCard} key={item.itemId}>
           <AssessmentItemView item={item} onScored={handleScored} />
@@ -132,6 +149,13 @@ export default function ItemTypesDemoPage() {
           <p data-testid="aggregate-score">Aggregate score: {evaluation.aggregateScore}%</p>
           <p data-testid="comprehension-state">{evaluation.comprehensionState}</p>
           <p data-testid="reason-code">{evaluation.reasonCode}</p>
+        </section>
+      )}
+      {attemptOutcome && (
+        <section className={styles.stageCard} data-testid="attempt-outcome">
+          <p className={styles.kicker}>Attempt outcome (SR-R1-012)</p>
+          <p data-testid="attempt-outcome-value">{attemptOutcome.attemptOutcome}</p>
+          <p data-testid="attempt-outcome-reason">{attemptOutcome.reasonCode}</p>
         </section>
       )}
 

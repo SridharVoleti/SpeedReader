@@ -167,3 +167,32 @@ test("a contaminated item sequence is rejected, and the reordered sequence is ac
   await expect(panel.getByTestId("contaminated-sequence-result")).toHaveText("invalid");
   await expect(panel.getByTestId("corrected-sequence-result")).toHaveText("valid");
 });
+
+// SR-R1-012: Outcome separation (TC-R1-012-B: technical interruption -> INVALID).
+// "Produce PASS, HOLD/FAIL and INVALID/INSUFFICIENT_EVIDENCE without conflation."
+test("a simulated technical interruption produces INVALID, not a comprehension PASS or HOLD", async ({ page }) => {
+  await page.goto("/item-types-demo");
+
+  await page.getByTestId("item-demo-single-choice").getByTestId("option-a").check();
+  await page.getByTestId("item-demo-single-choice").getByTestId("check-demo-single-choice").click();
+
+  await page.getByTestId("item-demo-ordering").getByTestId("order-select-1").selectOption("1");
+  await page.getByTestId("item-demo-ordering").getByTestId("order-select-2").selectOption("2");
+  await page.getByTestId("item-demo-ordering").getByTestId("order-select-3").selectOption("3");
+  await page.getByTestId("item-demo-ordering").getByTestId("check-demo-ordering").click();
+
+  await page.getByTestId("item-demo-matching").getByTestId("match-select-l1").selectOption("r1");
+  await page.getByTestId("item-demo-matching").getByTestId("match-select-l2").selectOption("r2");
+  await page.getByTestId("item-demo-matching").getByTestId("check-demo-matching").click();
+
+  await page.getByTestId("item-demo-short-answer").getByTestId("short-answer-text").fill("He returned the extra coins.");
+  await page.getByTestId("item-demo-short-answer").getByTestId("check-demo-short-answer").click();
+
+  // Without the interruption toggle, this exact set of correct answers is a genuine PASS.
+  const outcome = page.getByTestId("attempt-outcome");
+  await expect(outcome.getByTestId("attempt-outcome-value")).toHaveText("PASS");
+
+  await page.getByTestId("simulate-interruption").check();
+  await expect(outcome.getByTestId("attempt-outcome-value")).toHaveText("INVALID");
+  await expect(outcome.getByTestId("attempt-outcome-reason")).toHaveText("TECHNICAL_INTERRUPTION");
+});
