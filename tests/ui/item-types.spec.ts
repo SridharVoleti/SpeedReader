@@ -62,3 +62,14 @@ test("the check-answer button stays disabled until a response is given", async (
   await item.getByTestId("option-a").check();
   await expect(item.getByTestId("check-demo-single-choice")).toBeEnabled();
 });
+
+// SR-R1-006: Basic constructs.
+// "Identify main idea, explicit detail and sequence/relationship in item metadata."
+test("every item declares and displays its primary R1 construct", async ({ page }) => {
+  await page.goto("/item-types-demo");
+
+  await expect(page.getByTestId("construct-demo-single-choice")).toHaveText("detail");
+  await expect(page.getByTestId("construct-demo-ordering")).toHaveText("sequence relationship");
+  await expect(page.getByTestId("construct-demo-matching")).toHaveText("detail");
+  await expect(page.getByTestId("construct-demo-short-answer")).toHaveText("main idea");
+});

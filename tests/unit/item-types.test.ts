@@ -11,6 +11,7 @@ import {
 const singleChoice: AssessmentItem = {
   itemId: "sc1",
   itemType: "single_choice",
+  constructId: "detail",
   prompt: "Who returned the extra change?",
   options: [
     { id: "a", label: "Ravi" },
@@ -23,6 +24,7 @@ const singleChoice: AssessmentItem = {
 const ordering: AssessmentItem = {
   itemId: "or1",
   itemType: "ordering",
+  constructId: "sequence_relationship",
   prompt: "Put the events in order.",
   items: [
     { id: "1", label: "Ravi buys items" },
@@ -35,6 +37,7 @@ const ordering: AssessmentItem = {
 const matching: AssessmentItem = {
   itemId: "ma1",
   itemType: "matching",
+  constructId: "detail",
   prompt: "Match the character to their role.",
   left: [
     { id: "l1", label: "Ravi" },
@@ -50,6 +53,7 @@ const matching: AssessmentItem = {
 const shortAnswer: AssessmentItem = {
   itemId: "sa1",
   itemType: "constrained_short_answer",
+  constructId: "main_idea",
   prompt: "What did Ravi do?",
   minimumResponseWords: 3,
   requiredKeywords: ["returned"]

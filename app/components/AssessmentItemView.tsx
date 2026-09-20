@@ -30,8 +30,11 @@ export default function AssessmentItemView({ item, onScored }: Props) {
   }
 
   return (
-    <div data-testid={`item-${item.itemId}`} data-item-type={item.itemType}>
+    <div data-testid={`item-${item.itemId}`} data-item-type={item.itemType} data-construct-id={item.constructId}>
       <p className={styles.stageHint}>{item.prompt}</p>
+      <p className={styles.kicker} data-testid={`construct-${item.itemId}`}>
+        {item.constructId.replace("_", " ")}
+      </p>
 
       {item.itemType === "single_choice" && (
         <fieldset data-testid="single-choice-options">

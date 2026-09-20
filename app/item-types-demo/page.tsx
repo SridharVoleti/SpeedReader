@@ -13,6 +13,7 @@ const items: AssessmentItem[] = [
   {
     itemId: "demo-single-choice",
     itemType: "single_choice",
+    constructId: "detail",
     prompt: "Who returned the extra change in the story?",
     options: [
       { id: "a", label: "Ravi" },
@@ -24,6 +25,7 @@ const items: AssessmentItem[] = [
   {
     itemId: "demo-ordering",
     itemType: "ordering",
+    constructId: "sequence_relationship",
     prompt: "Put these events in the order they happened.",
     items: [
       { id: "1", label: "Ravi buys items at the shop" },
@@ -35,6 +37,7 @@ const items: AssessmentItem[] = [
   {
     itemId: "demo-matching",
     itemType: "matching",
+    constructId: "detail",
     prompt: "Match each character to their role.",
     left: [
       { id: "l1", label: "Ravi" },
@@ -49,6 +52,7 @@ const items: AssessmentItem[] = [
   {
     itemId: "demo-short-answer",
     itemType: "constrained_short_answer",
+    constructId: "main_idea",
     prompt: "In a few words, what did Ravi do when he noticed the mistake?",
     minimumResponseWords: 3,
     requiredKeywords: ["returned"]

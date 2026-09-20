@@ -6,9 +6,14 @@
 
 export type Option = { id: string; label: string };
 
+// SR-R1-006: Basic constructs. R1's construct ontology - every item declares exactly one of
+// these as its primary construct, so results can be reported per construct, not just overall.
+export type ConstructId = "main_idea" | "detail" | "sequence_relationship";
+
 export type SingleChoiceItem = {
   itemId: string;
   itemType: "single_choice";
+  constructId: ConstructId;
   prompt: string;
   options: Option[];
   correctOptionId: string;
@@ -17,6 +22,7 @@ export type SingleChoiceItem = {
 export type OrderingItem = {
   itemId: string;
   itemType: "ordering";
+  constructId: ConstructId;
   prompt: string;
   items: Option[];
   correctOrderIds: string[];
@@ -25,6 +31,7 @@ export type OrderingItem = {
 export type MatchingItem = {
   itemId: string;
   itemType: "matching";
+  constructId: ConstructId;
   prompt: string;
   left: Option[];
   right: Option[];
@@ -34,6 +41,7 @@ export type MatchingItem = {
 export type ConstrainedShortAnswerItem = {
   itemId: string;
   itemType: "constrained_short_answer";
+  constructId: ConstructId;
   prompt: string;
   minimumResponseWords: number;
   requiredKeywords: string[];
@@ -119,6 +127,7 @@ export function validateResponseShape(item: AssessmentItem, response: unknown): 
 
 export type ItemScoreResult = {
   itemId: string;
+  constructId: ConstructId;
   itemResult: "correct" | "incorrect" | "invalid_response";
   points: number;
 };
@@ -131,27 +140,42 @@ function normalizeWords(text: string): string[] {
 export function scoreItem(item: AssessmentItem, response: unknown): ItemScoreResult {
   const shape = validateResponseShape(item, response);
   if (!shape.valid) {
-    return { itemId: item.itemId, itemResult: "invalid_response", points: 0 };
+    return { itemId: item.itemId, constructId: item.constructId, itemResult: "invalid_response", points: 0 };
   }
 
   switch (item.itemType) {
     case "single_choice": {
       const r = response as SingleChoiceResponse;
       const correct = r.selectedOptionId === item.correctOptionId;
-      return { itemId: item.itemId, itemResult: correct ? "correct" : "incorrect", points: correct ? 1 : 0 };
+      return {
+        itemId: item.itemId,
+        constructId: item.constructId,
+        itemResult: correct ? "correct" : "incorrect",
+        points: correct ? 1 : 0
+      };
     }
     case "ordering": {
       const r = response as OrderingResponse;
       const correct =
         r.orderedItemIds.length === item.correctOrderIds.length &&
         r.orderedItemIds.every((id, index) => id === item.correctOrderIds[index]);
-      return { itemId: item.itemId, itemResult: correct ? "correct" : "incorrect", points: correct ? 1 : 0 };
+      return {
+        itemId: item.itemId,
+        constructId: item.constructId,
+        itemResult: correct ? "correct" : "incorrect",
+        points: correct ? 1 : 0
+      };
     }
     case "matching": {
       const r = response as MatchingResponse;
       const correctPairs = item.correctPairs;
       const correct = Object.entries(correctPairs).every(([leftId, rightId]) => r.pairs[leftId] === rightId);
-      return { itemId: item.itemId, itemResult: correct ? "correct" : "incorrect", points: correct ? 1 : 0 };
+      return {
+        itemId: item.itemId,
+        constructId: item.constructId,
+        itemResult: correct ? "correct" : "incorrect",
+        points: correct ? 1 : 0
+      };
     }
     case "constrained_short_answer": {
       const r = response as ConstrainedShortAnswerResponse;
@@ -159,7 +183,31 @@ export function scoreItem(item: AssessmentItem, response: unknown): ItemScoreRes
       const hasEnoughWords = words.length >= item.minimumResponseWords;
       const hasKeywords = item.requiredKeywords.every((keyword) => words.includes(keyword.toLowerCase()));
       const correct = hasEnoughWords && hasKeywords;
-      return { itemId: item.itemId, itemResult: correct ? "correct" : "incorrect", points: correct ? 1 : 0 };
+      return {
+        itemId: item.itemId,
+        constructId: item.constructId,
+        itemResult: correct ? "correct" : "incorrect",
+        points: correct ? 1 : 0
+      };
     }
   }
+}
+
+export type ConstructOutcome = { constructId: ConstructId; correct: number; total: number };
+
+// SR-R1-006: "result reports construct outcomes" - aggregate correct/total per construct across
+// a set of scored items, so a learner's outcome can be reported by construct, not just overall.
+export function summarizeConstructOutcomes(results: ItemScoreResult[]): ConstructOutcome[] {
+  const byConstruct = new Map<ConstructId, ConstructOutcome>();
+  for (const result of results) {
+    const existing = byConstruct.get(result.constructId) ?? {
+      constructId: result.constructId,
+      correct: 0,
+      total: 0
+    };
+    existing.total += 1;
+    if (result.itemResult === "correct") existing.correct += 1;
+    byConstruct.set(result.constructId, existing);
+  }
+  return [...byConstruct.values()];
 }
