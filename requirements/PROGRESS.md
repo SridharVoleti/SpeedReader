@@ -18,7 +18,7 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R1-010 | Question non-contamination | Done | 2cd70b9 |
 | SR-R1-011 | Configurable WPM ladder | Done | 4364069 |
 | SR-R1-012 | Outcome separation | Done | bb93f2c |
-| SR-R1-013 | Persist learner progress | In progress | |
-| SR-R1-014 | Raw attempt ledger | Not started | |
+| SR-R1-013 | Persist learner progress | Done | 9275c91 |
+| SR-R1-014 | Raw attempt ledger | In progress | |
 | SR-R1-015 | Zero paid-AI runtime dependency | Not started | |
 | SR-R1-016 | Game path continuity | Not started | |
