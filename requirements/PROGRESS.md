@@ -20,5 +20,5 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R1-012 | Outcome separation | Done | bb93f2c |
 | SR-R1-013 | Persist learner progress | Done | 9275c91 |
 | SR-R1-014 | Raw attempt ledger | Done | 7c3f90c |
-| SR-R1-015 | Zero paid-AI runtime dependency | In progress | |
-| SR-R1-016 | Game path continuity | Not started | |
+| SR-R1-015 | Zero paid-AI runtime dependency | Done | f19cf96 |
+| SR-R1-016 | Game path continuity | In progress | |
