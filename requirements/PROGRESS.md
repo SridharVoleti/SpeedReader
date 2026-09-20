@@ -11,8 +11,8 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R1-003 | Approved-file-only content | Done | a720264 |
 | SR-R1-004 | Deterministic item scoring | Done | c82ee08 |
 | SR-R1-005 | Structured response types | Done | 6a749cc |
-| SR-R1-006 | Basic constructs | In progress | |
-| SR-R1-007 | Mandatory gates | Not started | |
+| SR-R1-006 | Basic constructs | Done | 9ab90e9 |
+| SR-R1-007 | Mandatory gates | In progress | |
 | SR-R1-008 | No grammar penalty | Not started | |
 | SR-R1-009 | Negation safety | Not started | |
 | SR-R1-010 | Question non-contamination | Not started | |
