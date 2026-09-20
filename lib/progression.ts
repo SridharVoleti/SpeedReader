@@ -150,6 +150,19 @@ export function nextPlayableLevel(progress: Progress): ProgressionLevel | null {
   return null;
 }
 
+// SR-R1-016: Game path continuity.
+// "Retain simple locked/unlocked/completed progression with clear next action."
+// "PASS unlocks correct next node; HOLD/FAIL/INVALID does not." A HOLD (failing) attempt leaves
+// a level "unlocked" (retryable), never "completed"; an INVALID attempt never reaches here at
+// all, since recordResult leaves progress - and therefore every node's state - untouched.
+export type NodeState = "locked" | "unlocked" | "completed";
+
+export function nodeState(progress: Progress, level: ProgressionLevel): NodeState {
+  if (isPassed(progress, level.id)) return "completed";
+  if (isUnlocked(progress, level)) return "unlocked";
+  return "locked";
+}
+
 // SR-R1-011: current_rate/next_rate - the WPM the learner is eligible to train at right now,
 // and the rate one step ahead on the ladder, derived from the same configured ladder.
 export function currentRate(progress: Progress): number | null {

@@ -5,6 +5,7 @@ import {
   isUnlocked,
   levels,
   nextPlayableLevel,
+  nodeState,
   Progress,
   ProgressionLevel,
   WorldInfo,
@@ -94,15 +95,19 @@ function LevelNode({
   isCurrent: boolean;
   onSelect: (level: ProgressionLevel) => void;
 }) {
-  const unlocked = isUnlocked(progress, level);
+  // SR-R1-016: Game path continuity - "locked" | "unlocked" | "completed" is the single source
+  // of truth for how this node renders, derived the same way whether this is a fresh visit, a
+  // reload, or right after a PASS/HOLD attempt.
+  const state = nodeState(progress, level);
+  const unlocked = state !== "locked";
   const result = progress[String(level.id)];
   const stars = result?.stars ?? 0;
 
   const nodeClass = [
     styles.node,
-    result?.passed ? styles.nodePassed : "",
+    state === "completed" ? styles.nodePassed : "",
     isCurrent ? styles.nodeCurrent : "",
-    !unlocked ? styles.nodeLocked : ""
+    state === "locked" ? styles.nodeLocked : ""
   ]
     .filter(Boolean)
     .join(" ");
