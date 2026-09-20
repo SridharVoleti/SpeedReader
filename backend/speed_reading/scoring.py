@@ -8,6 +8,10 @@ from .models import Passage, ScoreResult
 
 WORD_RE = re.compile(r"[a-zA-Z']+")
 
+# SR-R1-004: Deterministic item scoring - bump whenever scoring rules change. Keep in sync with
+# SCORER_VERSION in lib/scoring.ts.
+SCORER_VERSION = "1.0"
+
 
 def normalize_words(text: str) -> list[str]:
     return [word.lower().strip("'") for word in WORD_RE.findall(text)]
@@ -56,6 +60,7 @@ def score_comprehension(passage: Passage, response: str, pass_threshold: int = 7
         originality_points=originality_points,
         coherence_points=coherence_points,
         feedback=feedback,
+        scorer_version=SCORER_VERSION,
     )
 
 

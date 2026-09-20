@@ -53,3 +53,4 @@ class ScoreResult:
     originality_points: int
     coherence_points: int
     feedback: list[str]
+    scorer_version: str

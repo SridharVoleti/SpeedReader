@@ -25,6 +25,10 @@ export type PassageData = {
   comprehension: ComprehensionConfig;
 };
 
+// SR-R1-004: Deterministic item scoring - bump this whenever scoring rules change, so a stored
+// attempt's scorer_version always identifies exactly which deterministic rules produced it.
+export const SCORER_VERSION = "1.0";
+
 export type ScoreResult = {
   score: number;
   passed: boolean;
@@ -34,6 +38,7 @@ export type ScoreResult = {
   originalityPoints: number;
   coherencePoints: number;
   feedback: string[];
+  scorerVersion: string;
 };
 
 const WORD_RE = /[a-zA-Z']+/g;
@@ -81,7 +86,8 @@ export function scoreComprehension(
       conceptPoints,
       originalityPoints,
       coherencePoints
-    )
+    ),
+    scorerVersion: SCORER_VERSION
   };
 }
 

@@ -1,5 +1,27 @@
 from speed_reading.content import load_passages
-from speed_reading.scoring import score_comprehension
+from speed_reading.scoring import SCORER_VERSION, score_comprehension
+
+
+# SR-R1-004: Deterministic item scoring.
+# "Same content/scorer version + response always yields same result; no network AI/LLM call."
+def test_result_is_tagged_with_the_scorer_version():
+    passage = load_passages(1)[0]
+
+    result = score_comprehension(passage, "Ravi returned the extra coins to the shopkeeper.")
+
+    assert result.scorer_version == SCORER_VERSION
+
+
+def test_100_identical_scoring_runs_produce_the_same_result():
+    passage = load_passages(1)[0]
+    response = (
+        "Ravi went to the shop and got extra money by mistake. "
+        "He returned the change to the shopkeeper. The story teaches honesty."
+    )
+
+    first = score_comprehension(passage, response)
+    for _ in range(100):
+        assert score_comprehension(passage, response) == first
 
 
 def test_good_response_passes_without_ai():
