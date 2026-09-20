@@ -21,6 +21,9 @@ export type LevelResult = {
   stars: number;
   passed: boolean;
   completedAt: string;
+  // SR-R1-013: uniquely identifies the most recent attempt, alongside the learner_id (storage
+  // key) and level_id (this record's key) required to persist learner progress unambiguously.
+  attemptId: string;
   // SR-R1-001: raw evidence for the most recent attempt's reading phase - planned timing is
   // deterministic from target_wpm/word_count/chunks; actual_duration_ms is the real elapsed time.
   lastReadingTiming?: ReadingTimingRecord;
@@ -115,11 +118,19 @@ export function recordResult(
       stars: starsForScore(bestScore),
       passed: bestScore >= level.passThreshold,
       completedAt: new Date().toISOString(),
+      attemptId: generateAttemptId(),
       lastReadingTiming: readingTiming ?? previous?.lastReadingTiming
     }
   };
   saveProgress(next, learnerId);
   return next;
+}
+
+function generateAttemptId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `attempt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 export function isPassed(progress: Progress, levelId: number): boolean {

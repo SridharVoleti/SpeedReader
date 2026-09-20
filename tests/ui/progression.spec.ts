@@ -10,6 +10,50 @@ test("home page shows the level map with six worlds", async ({ page }) => {
   await expect(page.getByTestId("levels-cleared")).toHaveText("0/36");
 });
 
+// SR-R1-013: Persist learner progress.
+// "Reload restores same learner state/history and never exposes another learner's state."
+test("learner progress is scoped by BabySteps identity and never leaks between learners", async ({ page }) => {
+  await page.goto("/");
+
+  async function setLearnerCookie(learnerId: string, displayName: string) {
+    await page.evaluate(
+      ({ learnerId, displayName }) => {
+        const value = encodeURIComponent(JSON.stringify({ learnerId, displayName, avatarId: null }));
+        document.cookie = `speedreader_learner=${value}; path=/`;
+      },
+      { learnerId, displayName }
+    );
+  }
+
+  await setLearnerCookie("learner-a", "Aanya");
+  await page.reload();
+  await expect(page.getByTestId("levels-cleared")).toHaveText("0/36");
+
+  // Simulate learner-a having already passed level 1 on a prior visit.
+  await page.evaluate(() => {
+    window.localStorage.setItem(
+      "speedreader-progress-v1:learner-a",
+      JSON.stringify({
+        "1": { bestScore: 100, stars: 3, passed: true, completedAt: new Date().toISOString(), attemptId: "test-a" }
+      })
+    );
+  });
+  await page.reload();
+  await expect(page.getByTestId("levels-cleared")).toHaveText("1/36");
+  await expect(page.getByTestId("level-node-2")).toBeEnabled();
+
+  // A different learner identity on the same device must never see learner-a's progress.
+  await setLearnerCookie("learner-b", "Bilal");
+  await page.reload();
+  await expect(page.getByTestId("levels-cleared")).toHaveText("0/36");
+  await expect(page.getByTestId("level-node-2")).toBeDisabled();
+
+  // Switching back to learner-a restores exactly their own state.
+  await setLearnerCookie("learner-a", "Aanya");
+  await page.reload();
+  await expect(page.getByTestId("levels-cleared")).toHaveText("1/36");
+});
+
 test("only the first level starts unlocked", async ({ page }) => {
   await page.goto("/");
 
@@ -65,8 +109,21 @@ test("passing the comprehension check unlocks the next level", async ({ page }) 
   expect(timing.planned_duration_ms).toBeGreaterThan(0);
   expect(timing.actual_duration_ms).toBeGreaterThan(0);
 
+  // SR-R1-013: every recorded attempt carries a unique attempt_id.
+  const attemptId = await page.evaluate(() => {
+    const raw = window.localStorage.getItem("speedreader-progress-v1");
+    return raw ? JSON.parse(raw)["1"]?.attemptId : null;
+  });
+  expect(attemptId).toBeTruthy();
+
   await page.getByRole("button", { name: "Back to level map" }).click();
   await expect(page.getByTestId("level-node-2")).toBeEnabled();
+
+  // SR-R1-013: reload restores the same learner state - level 2 stays unlocked and the pass
+  // record survives, without replaying the reading/quiz flow.
+  await page.reload();
+  await expect(page.getByTestId("level-node-2")).toBeEnabled();
+  await expect(page.getByTestId("levels-cleared")).toHaveText("1/36");
 });
 
 test("read along highlights the passage one word at a time like a news reader", async ({ page }) => {
