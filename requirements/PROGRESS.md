@@ -21,4 +21,6 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R1-013 | Persist learner progress | Done | 9275c91 |
 | SR-R1-014 | Raw attempt ledger | Done | 7c3f90c |
 | SR-R1-015 | Zero paid-AI runtime dependency | Done | f19cf96 |
-| SR-R1-016 | Game path continuity | In progress | |
+| SR-R1-016 | Game path continuity | Done | 0b2ea79 |
+
+**R1 MVP: all 16 requirements implemented, tested, pushed and live-validated.**
