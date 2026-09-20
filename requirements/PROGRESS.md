@@ -14,8 +14,8 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R1-006 | Basic constructs | Done | 9ab90e9 |
 | SR-R1-007 | Mandatory gates | Done | c7ce12f |
 | SR-R1-008 | No grammar penalty | Done | d397daf |
-| SR-R1-009 | Negation safety | In progress | |
-| SR-R1-010 | Question non-contamination | Not started | |
+| SR-R1-009 | Negation safety | Done | bd1d1a4 |
+| SR-R1-010 | Question non-contamination | In progress | |
 | SR-R1-011 | Configurable WPM ladder | Not started | |
 | SR-R1-012 | Outcome separation | Not started | |
 | SR-R1-013 | Persist learner progress | Not started | |
