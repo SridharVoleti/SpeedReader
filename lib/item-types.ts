@@ -51,6 +51,10 @@ export type ConstrainedShortAnswerItem = {
   prompt: string;
   minimumResponseWords: number;
   requiredKeywords: string[];
+  // SR-R1-008: No grammar penalty - authored, file-defined spelling/regional variants that count
+  // as the same evidence as the keyword itself (e.g. "honourable" for "honest"). Deliberately not
+  // fuzzy-matched: only explicitly approved variants earn credit, keeping scoring deterministic.
+  acceptedSpellingVariants?: Record<string, string[]>;
 };
 
 export type AssessmentItem = SingleChoiceItem | OrderingItem | MatchingItem | ConstrainedShortAnswerItem;
@@ -131,11 +135,19 @@ export function validateResponseShape(item: AssessmentItem, response: unknown): 
   return reasons.length > 0 ? { valid: false, reasons } : { valid: true };
 }
 
+// SR-R1-008: No grammar penalty - the normalized words the scorer actually matched against, and
+// which required keywords were found (matched_evidence), so credit can be audited/replayed.
+export type EvidenceReport = {
+  normalizationResult: string[];
+  matchedEvidence: string[];
+};
+
 export type ItemScoreResult = {
   itemId: string;
   constructId: ConstructId;
   itemResult: "correct" | "incorrect" | "invalid_response";
   points: number;
+  evidence?: EvidenceReport;
 };
 
 const WORD_RE = /[a-zA-Z']+/g;
@@ -186,14 +198,21 @@ export function scoreItem(item: AssessmentItem, response: unknown): ItemScoreRes
     case "constrained_short_answer": {
       const r = response as ConstrainedShortAnswerResponse;
       const words = normalizeWords(r.text);
+      // SR-R1-008: case/punctuation variation is already erased by normalizeWords; spelling
+      // variation is honored only via explicitly authored acceptedSpellingVariants - never guessed.
+      const matchedEvidence = item.requiredKeywords.filter((keyword) => {
+        const acceptedTerms = [keyword.toLowerCase(), ...(item.acceptedSpellingVariants?.[keyword] ?? []).map((v) => v.toLowerCase())];
+        return acceptedTerms.some((term) => words.includes(term));
+      });
       const hasEnoughWords = words.length >= item.minimumResponseWords;
-      const hasKeywords = item.requiredKeywords.every((keyword) => words.includes(keyword.toLowerCase()));
+      const hasKeywords = matchedEvidence.length === item.requiredKeywords.length;
       const correct = hasEnoughWords && hasKeywords;
       return {
         itemId: item.itemId,
         constructId: item.constructId,
         itemResult: correct ? "correct" : "incorrect",
-        points: correct ? 1 : 0
+        points: correct ? 1 : 0,
+        evidence: { normalizationResult: words, matchedEvidence }
       };
     }
   }

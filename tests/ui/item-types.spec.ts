@@ -54,6 +54,22 @@ test("constrained short answer item can be rendered, answered and scored", async
   await expect(item.getByTestId("result-demo-short-answer")).toHaveText("incorrect");
 });
 
+// SR-R1-008: No grammar penalty.
+// "Responses mapped to same evidence get equal credit despite allowed case/punctuation/spelling
+//  variation."
+test("case and punctuation variation on the short-answer item earn the same credit", async ({ page }) => {
+  await page.goto("/item-types-demo");
+  const item = page.getByTestId("item-demo-short-answer");
+
+  await item.getByTestId("short-answer-text").fill("HE RETURNED the extra coins");
+  await item.getByTestId("check-demo-short-answer").click();
+  await expect(item.getByTestId("result-demo-short-answer")).toHaveText("correct");
+
+  await item.getByTestId("short-answer-text").fill("he, returned!! the extra coins...");
+  await item.getByTestId("check-demo-short-answer").click();
+  await expect(item.getByTestId("result-demo-short-answer")).toHaveText("correct");
+});
+
 test("the check-answer button stays disabled until a response is given", async ({ page }) => {
   await page.goto("/item-types-demo");
   const item = page.getByTestId("item-demo-single-choice");
