@@ -33,18 +33,30 @@ def load_progression(path: Path | None = None) -> tuple[list[World], list[Progre
         World(world=item["world"], words_per_chunk=item["wordsPerChunk"], name=item["name"])
         for item in raw["worlds"]
     ]
-    levels = [
-        ProgressionLevel(
-            id=item["id"],
-            world=item["world"],
-            step=item["step"],
-            words_per_chunk=item["wordsPerChunk"],
-            wpm=item["wpm"],
-            pass_threshold=item["passThreshold"],
-        )
-        for item in raw["levels"]
-    ]
+    # SR-R1-011: the level ladder is derived from the speedSteps/passThreshold configuration,
+    # not read from a separately hard-coded/duplicated levels list - change the config, and the
+    # eligible speeds change with it, no code change required.
+    levels = build_levels_from_ladder(worlds, raw["speedSteps"], raw["passThreshold"])
     return worlds, levels
+
+
+def build_levels_from_ladder(
+    worlds: list[World], speed_steps: list[int], pass_threshold: int
+) -> list[ProgressionLevel]:
+    levels: list[ProgressionLevel] = []
+    for world in worlds:
+        for step_index, wpm in enumerate(speed_steps, start=1):
+            levels.append(
+                ProgressionLevel(
+                    id=len(levels) + 1,
+                    world=world.world,
+                    step=step_index,
+                    words_per_chunk=world.words_per_chunk,
+                    wpm=wpm,
+                    pass_threshold=pass_threshold,
+                )
+            )
+    return levels
 
 
 def build_expected_levels(

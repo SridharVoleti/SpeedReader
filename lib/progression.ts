@@ -29,7 +29,37 @@ export type LevelResult = {
 export type Progress = Record<string, LevelResult>;
 
 export const worlds: WorldInfo[] = progressionData.worlds;
-export const levels: ProgressionLevel[] = progressionData.levels;
+
+// SR-R1-011: Configurable WPM ladder.
+// "Use a file/config-based WPM ladder rather than hard-coded values." The level ladder is
+// derived from worlds/speedSteps/passThreshold at load time - never a separately hard-coded or
+// duplicated list - so changing the config changes eligible speeds without a code change.
+export function buildLevelsFromLadder(
+  ladderWorlds: WorldInfo[],
+  speedSteps: number[],
+  passThreshold: number
+): ProgressionLevel[] {
+  const built: ProgressionLevel[] = [];
+  for (const world of ladderWorlds) {
+    speedSteps.forEach((wpm, index) => {
+      built.push({
+        id: built.length + 1,
+        world: world.world,
+        step: index + 1,
+        wordsPerChunk: world.wordsPerChunk,
+        wpm,
+        passThreshold
+      });
+    });
+  }
+  return built;
+}
+
+export const levels: ProgressionLevel[] = buildLevelsFromLadder(
+  progressionData.worlds,
+  progressionData.speedSteps,
+  progressionData.passThreshold
+);
 
 const STORAGE_KEY = "speedreader-progress-v1";
 
@@ -100,6 +130,18 @@ export function nextPlayableLevel(progress: Progress): ProgressionLevel | null {
     }
   }
   return null;
+}
+
+// SR-R1-011: current_rate/next_rate - the WPM the learner is eligible to train at right now,
+// and the rate one step ahead on the ladder, derived from the same configured ladder.
+export function currentRate(progress: Progress): number | null {
+  return nextPlayableLevel(progress)?.wpm ?? null;
+}
+
+export function nextRate(progress: Progress): number | null {
+  const current = nextPlayableLevel(progress);
+  if (!current) return null;
+  return levels.find((level) => level.id === current.id + 1)?.wpm ?? null;
 }
 
 export function passedCount(progress: Progress): number {
