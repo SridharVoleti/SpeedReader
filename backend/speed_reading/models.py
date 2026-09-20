@@ -28,7 +28,11 @@ class ComprehensionConfig:
 
 @dataclass(frozen=True)
 class Passage:
-    id: str
+    # SR-R1-003: approved-file-only content - every passage declares these.
+    content_id: str
+    content_version: str
+    schema_version: str
+    approval_status: str
     level: int
     title: str
     category: str

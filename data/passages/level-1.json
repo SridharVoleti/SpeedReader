@@ -1,6 +1,9 @@
 [
   {
-    "id": "level1_001",
+    "content_id": "level1_001",
+    "content_version": "1.0",
+    "schema_version": "1.0",
+    "approval_status": "APPROVED",
     "level": 1,
     "title": "The Honest Shopkeeper",
     "category": "values",
@@ -40,7 +43,10 @@
     }
   },
   {
-    "id": "level1_002",
+    "content_id": "level1_002",
+    "content_version": "1.0",
+    "schema_version": "1.0",
+    "approval_status": "APPROVED",
     "level": 1,
     "title": "Meera's Morning Practice",
     "category": "habits",
@@ -80,7 +86,10 @@
     }
   },
   {
-    "id": "level1_003",
+    "content_id": "level1_003",
+    "content_version": "1.0",
+    "schema_version": "1.0",
+    "approval_status": "APPROVED",
     "level": 1,
     "title": "The Library Card",
     "category": "school",
@@ -119,7 +128,10 @@
     }
   },
   {
-    "id": "level1_004",
+    "content_id": "level1_004",
+    "content_version": "1.0",
+    "schema_version": "1.0",
+    "approval_status": "APPROVED",
     "level": 1,
     "title": "The Kite Festival",
     "category": "festivals",
@@ -161,7 +173,10 @@
     }
   },
   {
-    "id": "level1_005",
+    "content_id": "level1_005",
+    "content_version": "1.0",
+    "schema_version": "1.0",
+    "approval_status": "APPROVED",
     "level": 1,
     "title": "The School Garden",
     "category": "nature",
@@ -204,7 +219,10 @@
     }
   },
   {
-    "id": "level1_006",
+    "content_id": "level1_006",
+    "content_version": "1.0",
+    "schema_version": "1.0",
+    "approval_status": "APPROVED",
     "level": 1,
     "title": "The Railway Journey",
     "category": "travel",

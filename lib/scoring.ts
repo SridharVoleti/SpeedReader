@@ -10,7 +10,11 @@ export type ComprehensionConfig = {
 };
 
 export type PassageData = {
-  id: string;
+  // SR-R1-003: approved-file-only content - every passage must declare these to be loadable.
+  content_id: string;
+  content_version: string;
+  schema_version: string;
+  approval_status: "WIP" | "APPROVED" | "RETIRED";
   level: number;
   title: string;
   category: string;

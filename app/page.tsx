@@ -4,6 +4,7 @@ import passagesData from "../data/passages/level-1.json";
 import { useEffect, useState } from "react";
 import LevelMap from "./components/LevelMap";
 import LevelPlayer from "./components/LevelPlayer";
+import { loadApprovedContent } from "../lib/content-gate";
 import {
   levels,
   loadProgress,
@@ -17,7 +18,9 @@ import {
 import { PassageData } from "../lib/scoring";
 import styles from "./page.module.css";
 
-const passages = passagesData as unknown as PassageData[];
+// SR-R1-003: approved-file-only content - anything missing approval/version/schema validity is
+// blocked here, before it can ever reach a learner, and logged as CONTENT_INVALID.
+const passages = loadApprovedContent(passagesData as unknown as PassageData[]);
 
 type LaunchedLearner = { learnerId: string; displayName: string; avatarId: string | null };
 
