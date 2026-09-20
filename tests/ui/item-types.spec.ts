@@ -70,6 +70,21 @@ test("case and punctuation variation on the short-answer item earn the same cred
   await expect(item.getByTestId("result-demo-short-answer")).toHaveText("correct");
 });
 
+// SR-R1-009: Negation safety (TC-R1-009-B: "Keyword-stuffed negation").
+// "Expected keywords inside a negated/contradictory claim cannot earn full credit."
+test("stuffing the required keyword into a negated claim does not earn credit on the short-answer item", async ({
+  page
+}) => {
+  await page.goto("/item-types-demo");
+  const item = page.getByTestId("item-demo-short-answer");
+
+  await item
+    .getByTestId("short-answer-text")
+    .fill("He never returned the coins and kept everything for himself.");
+  await item.getByTestId("check-demo-short-answer").click();
+  await expect(item.getByTestId("result-demo-short-answer")).toHaveText("incorrect");
+});
+
 test("the check-answer button stays disabled until a response is given", async ({ page }) => {
   await page.goto("/item-types-demo");
   const item = page.getByTestId("item-demo-single-choice");

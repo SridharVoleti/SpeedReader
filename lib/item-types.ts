@@ -137,9 +137,15 @@ export function validateResponseShape(item: AssessmentItem, response: unknown): 
 
 // SR-R1-008: No grammar penalty - the normalized words the scorer actually matched against, and
 // which required keywords were found (matched_evidence), so credit can be audited/replayed.
+// SR-R1-009: Negation safety - the per-keyword outcome, distinguishing a genuine match from one
+// that only ever appeared inside a negated/contradictory claim.
+export type PropositionResult = { keyword: string; result: "matched" | "negated" | "absent" };
+
 export type EvidenceReport = {
   normalizationResult: string[];
   matchedEvidence: string[];
+  negationDetected: boolean;
+  propositionResults: PropositionResult[];
 };
 
 export type ItemScoreResult = {
@@ -153,6 +159,55 @@ export type ItemScoreResult = {
 const WORD_RE = /[a-zA-Z']+/g;
 function normalizeWords(text: string): string[] {
   return (text.match(WORD_RE) ?? []).map((word) => word.toLowerCase());
+}
+
+// SR-R1-009: Negation safety - a keyword occurrence immediately preceded (within this many
+// words) by one of these cues is treated as denied, not evidence of the proposition.
+const NEGATION_CUES = new Set([
+  "not",
+  "never",
+  "no",
+  "n't",
+  "didn't",
+  "isn't",
+  "wasn't",
+  "aren't",
+  "weren't",
+  "doesn't",
+  "don't",
+  "won't",
+  "cannot",
+  "can't",
+  "couldn't",
+  "shouldn't",
+  "wouldn't"
+]);
+const NEGATION_WINDOW = 3;
+
+function isNegatedAt(words: string[], index: number): boolean {
+  const start = Math.max(0, index - NEGATION_WINDOW);
+  for (let i = start; i < index; i += 1) {
+    if (NEGATION_CUES.has(words[i])) return true;
+  }
+  return false;
+}
+
+// Finds whether any occurrence of one of `terms` in `words` is a genuine (non-negated) match,
+// and whether any occurrence was negated - a keyword said only inside a denial doesn't count.
+function findProposition(words: string[], terms: string[]): { matched: boolean; negationDetected: boolean } {
+  let negationDetected = false;
+  for (const term of terms) {
+    let index = words.indexOf(term);
+    while (index !== -1) {
+      if (isNegatedAt(words, index)) {
+        negationDetected = true;
+      } else {
+        return { matched: true, negationDetected };
+      }
+      index = words.indexOf(term, index + 1);
+    }
+  }
+  return { matched: false, negationDetected };
 }
 
 export function scoreItem(item: AssessmentItem, response: unknown): ItemScoreResult {
@@ -200,10 +255,21 @@ export function scoreItem(item: AssessmentItem, response: unknown): ItemScoreRes
       const words = normalizeWords(r.text);
       // SR-R1-008: case/punctuation variation is already erased by normalizeWords; spelling
       // variation is honored only via explicitly authored acceptedSpellingVariants - never guessed.
-      const matchedEvidence = item.requiredKeywords.filter((keyword) => {
+      // SR-R1-009: a keyword said only inside a negated/contradictory claim is not genuine evidence.
+      let negationDetected = false;
+      const propositionResults: PropositionResult[] = [];
+      const matchedEvidence: string[] = [];
+      for (const keyword of item.requiredKeywords) {
         const acceptedTerms = [keyword.toLowerCase(), ...(item.acceptedSpellingVariants?.[keyword] ?? []).map((v) => v.toLowerCase())];
-        return acceptedTerms.some((term) => words.includes(term));
-      });
+        const { matched, negationDetected: keywordNegated } = findProposition(words, acceptedTerms);
+        if (keywordNegated) negationDetected = true;
+        if (matched) {
+          matchedEvidence.push(keyword);
+          propositionResults.push({ keyword, result: "matched" });
+        } else {
+          propositionResults.push({ keyword, result: keywordNegated ? "negated" : "absent" });
+        }
+      }
       const hasEnoughWords = words.length >= item.minimumResponseWords;
       const hasKeywords = matchedEvidence.length === item.requiredKeywords.length;
       const correct = hasEnoughWords && hasKeywords;
@@ -212,7 +278,7 @@ export function scoreItem(item: AssessmentItem, response: unknown): ItemScoreRes
         constructId: item.constructId,
         itemResult: correct ? "correct" : "incorrect",
         points: correct ? 1 : 0,
-        evidence: { normalizationResult: words, matchedEvidence }
+        evidence: { normalizationResult: words, matchedEvidence, negationDetected, propositionResults }
       };
     }
   }
