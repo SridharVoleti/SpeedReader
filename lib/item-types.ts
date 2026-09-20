@@ -10,10 +10,13 @@ export type Option = { id: string; label: string };
 // these as its primary construct, so results can be reported per construct, not just overall.
 export type ConstructId = "main_idea" | "detail" | "sequence_relationship";
 
+// SR-R1-007: Mandatory gates. A mandatory item is non-compensable: failing it blocks PASS no
+// matter how high the aggregate score is.
 export type SingleChoiceItem = {
   itemId: string;
   itemType: "single_choice";
   constructId: ConstructId;
+  mandatory: boolean;
   prompt: string;
   options: Option[];
   correctOptionId: string;
@@ -23,6 +26,7 @@ export type OrderingItem = {
   itemId: string;
   itemType: "ordering";
   constructId: ConstructId;
+  mandatory: boolean;
   prompt: string;
   items: Option[];
   correctOrderIds: string[];
@@ -32,6 +36,7 @@ export type MatchingItem = {
   itemId: string;
   itemType: "matching";
   constructId: ConstructId;
+  mandatory: boolean;
   prompt: string;
   left: Option[];
   right: Option[];
@@ -42,6 +47,7 @@ export type ConstrainedShortAnswerItem = {
   itemId: string;
   itemType: "constrained_short_answer";
   constructId: ConstructId;
+  mandatory: boolean;
   prompt: string;
   minimumResponseWords: number;
   requiredKeywords: string[];
@@ -210,4 +216,52 @@ export function summarizeConstructOutcomes(results: ItemScoreResult[]): Construc
     byConstruct.set(result.constructId, existing);
   }
   return [...byConstruct.values()];
+}
+
+// SR-R1-007: Mandatory gates.
+// "Passage comprehension is not solely an average percentage."
+// "Configured mandatory gate failure prevents PASS even if aggregate threshold is exceeded;
+//  reason is recorded."
+export type ComprehensionEvaluation = {
+  aggregateScore: number;
+  mandatoryGateFailed: boolean;
+  failedMandatoryItemIds: string[];
+  comprehensionState: "PASS" | "FAIL";
+  reasonCode: "PASS" | "AGGREGATE_BELOW_THRESHOLD" | "MANDATORY_GATE_FAILED";
+};
+
+export function evaluateComprehension(
+  items: AssessmentItem[],
+  results: ItemScoreResult[],
+  passThresholdPercent: number
+): ComprehensionEvaluation {
+  const resultByItemId = new Map(results.map((result) => [result.itemId, result]));
+
+  const failedMandatoryItemIds = items
+    .filter((item) => item.mandatory)
+    .filter((item) => resultByItemId.get(item.itemId)?.itemResult !== "correct")
+    .map((item) => item.itemId);
+  const mandatoryGateFailed = failedMandatoryItemIds.length > 0;
+
+  const correctCount = results.filter((result) => result.itemResult === "correct").length;
+  const aggregateScore = results.length > 0 ? Math.round((correctCount / results.length) * 100) : 0;
+
+  if (mandatoryGateFailed) {
+    return {
+      aggregateScore,
+      mandatoryGateFailed,
+      failedMandatoryItemIds,
+      comprehensionState: "FAIL",
+      reasonCode: "MANDATORY_GATE_FAILED"
+    };
+  }
+
+  const passed = aggregateScore >= passThresholdPercent;
+  return {
+    aggregateScore,
+    mandatoryGateFailed,
+    failedMandatoryItemIds,
+    comprehensionState: passed ? "PASS" : "FAIL",
+    reasonCode: passed ? "PASS" : "AGGREGATE_BELOW_THRESHOLD"
+  };
 }

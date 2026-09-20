@@ -73,3 +73,56 @@ test("every item declares and displays its primary R1 construct", async ({ page 
   await expect(page.getByTestId("construct-demo-matching")).toHaveText("detail");
   await expect(page.getByTestId("construct-demo-short-answer")).toHaveText("main idea");
 });
+
+// SR-R1-007: Mandatory gates (TC-R1-007-B: "High aggregate but main idea fails").
+// "Configured mandatory gate failure prevents PASS even if aggregate threshold is exceeded;
+//  reason is recorded."
+test("failing the mandatory main-idea item blocks PASS even with a high aggregate score", async ({ page }) => {
+  await page.goto("/item-types-demo");
+
+  // Answer the three non-mandatory detail/sequence items correctly...
+  await page.getByTestId("item-demo-single-choice").getByTestId("option-a").check();
+  await page.getByTestId("item-demo-single-choice").getByTestId("check-demo-single-choice").click();
+
+  await page.getByTestId("item-demo-ordering").getByTestId("order-select-1").selectOption("1");
+  await page.getByTestId("item-demo-ordering").getByTestId("order-select-2").selectOption("2");
+  await page.getByTestId("item-demo-ordering").getByTestId("order-select-3").selectOption("3");
+  await page.getByTestId("item-demo-ordering").getByTestId("check-demo-ordering").click();
+
+  await page.getByTestId("item-demo-matching").getByTestId("match-select-l1").selectOption("r1");
+  await page.getByTestId("item-demo-matching").getByTestId("match-select-l2").selectOption("r2");
+  await page.getByTestId("item-demo-matching").getByTestId("check-demo-matching").click();
+
+  // ...but get the mandatory main-idea short answer wrong.
+  await page.getByTestId("item-demo-short-answer").getByTestId("short-answer-text").fill("He did nothing much.");
+  await page.getByTestId("item-demo-short-answer").getByTestId("check-demo-short-answer").click();
+
+  const evaluation = page.getByTestId("comprehension-evaluation");
+  await expect(evaluation).toBeVisible();
+  await expect(evaluation.getByTestId("aggregate-score")).toHaveText("Aggregate score: 75%");
+  await expect(evaluation.getByTestId("comprehension-state")).toHaveText("FAIL");
+  await expect(evaluation.getByTestId("reason-code")).toHaveText("MANDATORY_GATE_FAILED");
+});
+
+test("PASSes overall when every item, including the mandatory one, is answered correctly", async ({ page }) => {
+  await page.goto("/item-types-demo");
+
+  await page.getByTestId("item-demo-single-choice").getByTestId("option-a").check();
+  await page.getByTestId("item-demo-single-choice").getByTestId("check-demo-single-choice").click();
+
+  await page.getByTestId("item-demo-ordering").getByTestId("order-select-1").selectOption("1");
+  await page.getByTestId("item-demo-ordering").getByTestId("order-select-2").selectOption("2");
+  await page.getByTestId("item-demo-ordering").getByTestId("order-select-3").selectOption("3");
+  await page.getByTestId("item-demo-ordering").getByTestId("check-demo-ordering").click();
+
+  await page.getByTestId("item-demo-matching").getByTestId("match-select-l1").selectOption("r1");
+  await page.getByTestId("item-demo-matching").getByTestId("match-select-l2").selectOption("r2");
+  await page.getByTestId("item-demo-matching").getByTestId("check-demo-matching").click();
+
+  await page.getByTestId("item-demo-short-answer").getByTestId("short-answer-text").fill("He returned the extra coins.");
+  await page.getByTestId("item-demo-short-answer").getByTestId("check-demo-short-answer").click();
+
+  const evaluation = page.getByTestId("comprehension-evaluation");
+  await expect(evaluation.getByTestId("comprehension-state")).toHaveText("PASS");
+  await expect(evaluation.getByTestId("reason-code")).toHaveText("PASS");
+});

@@ -8,6 +8,7 @@ const mainIdeaItem: AssessmentItem = {
   itemId: "mi1",
   itemType: "single_choice",
   constructId: "main_idea",
+  mandatory: false,
   prompt: "What is this story mainly about?",
   options: [
     { id: "a", label: "Honesty" },
@@ -20,6 +21,7 @@ const detailItem: AssessmentItem = {
   itemId: "d1",
   itemType: "constrained_short_answer",
   constructId: "detail",
+  mandatory: false,
   prompt: "What did the shopkeeper give Ravi by mistake?",
   minimumResponseWords: 2,
   requiredKeywords: ["change"]
@@ -29,6 +31,7 @@ const sequenceItem: AssessmentItem = {
   itemId: "s1",
   itemType: "ordering",
   constructId: "sequence_relationship",
+  mandatory: false,
   prompt: "Order the events.",
   items: [
     { id: "1", label: "Ravi buys items" },

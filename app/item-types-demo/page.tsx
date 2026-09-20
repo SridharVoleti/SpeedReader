@@ -5,15 +5,19 @@
 // "authored/rendered/answered/scored" acceptance criteria can be exercised end to end in a real
 // browser, independent of the main reading/comprehension flow.
 
+import { useState } from "react";
 import AssessmentItemView from "../components/AssessmentItemView";
-import { AssessmentItem } from "../../lib/item-types";
+import { AssessmentItem, evaluateComprehension, ItemScoreResult } from "../../lib/item-types";
 import styles from "../page.module.css";
+
+const PASS_THRESHOLD_PERCENT = 70;
 
 const items: AssessmentItem[] = [
   {
     itemId: "demo-single-choice",
     itemType: "single_choice",
     constructId: "detail",
+    mandatory: false,
     prompt: "Who returned the extra change in the story?",
     options: [
       { id: "a", label: "Ravi" },
@@ -26,6 +30,7 @@ const items: AssessmentItem[] = [
     itemId: "demo-ordering",
     itemType: "ordering",
     constructId: "sequence_relationship",
+    mandatory: false,
     prompt: "Put these events in the order they happened.",
     items: [
       { id: "1", label: "Ravi buys items at the shop" },
@@ -38,6 +43,7 @@ const items: AssessmentItem[] = [
     itemId: "demo-matching",
     itemType: "matching",
     constructId: "detail",
+    mandatory: false,
     prompt: "Match each character to their role.",
     left: [
       { id: "l1", label: "Ravi" },
@@ -53,6 +59,9 @@ const items: AssessmentItem[] = [
     itemId: "demo-short-answer",
     itemType: "constrained_short_answer",
     constructId: "main_idea",
+    // SR-R1-007: mandatory gate - this main-idea item is non-compensable, matching TC-R1-007-B
+    // ("mandatory main idea; easy details available").
+    mandatory: true,
     prompt: "In a few words, what did Ravi do when he noticed the mistake?",
     minimumResponseWords: 3,
     requiredKeywords: ["returned"]
@@ -60,18 +69,39 @@ const items: AssessmentItem[] = [
 ];
 
 export default function ItemTypesDemoPage() {
+  const [results, setResults] = useState<Record<string, ItemScoreResult>>({});
+
+  function handleScored(result: ItemScoreResult) {
+    setResults((previous) => ({ ...previous, [result.itemId]: result }));
+  }
+
+  const allAnswered = items.every((item) => results[item.itemId]);
+  const evaluation = allAnswered
+    ? evaluateComprehension(items, Object.values(results), PASS_THRESHOLD_PERCENT)
+    : null;
+
   return (
     <main className={styles.shell} data-testid="item-types-demo">
       <h1>Structured response types</h1>
       <p className={styles.lede}>
         Single choice, ordering, matching and constrained short answer - each authored,
-        rendered, answered and scored deterministically.
+        rendered, answered and scored deterministically. The short-answer item is a mandatory
+        gate: getting it wrong blocks an overall PASS even if the aggregate score clears the
+        threshold (SR-R1-007).
       </p>
       {items.map((item) => (
         <section className={styles.stageCard} key={item.itemId}>
-          <AssessmentItemView item={item} />
+          <AssessmentItemView item={item} onScored={handleScored} />
         </section>
       ))}
+      {evaluation && (
+        <section className={styles.stageCard} data-testid="comprehension-evaluation">
+          <p className={styles.kicker}>Overall comprehension</p>
+          <p data-testid="aggregate-score">Aggregate score: {evaluation.aggregateScore}%</p>
+          <p data-testid="comprehension-state">{evaluation.comprehensionState}</p>
+          <p data-testid="reason-code">{evaluation.reasonCode}</p>
+        </section>
+      )}
     </main>
   );
 }
