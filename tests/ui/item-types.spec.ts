@@ -196,3 +196,41 @@ test("a simulated technical interruption produces INVALID, not a comprehension P
   await expect(outcome.getByTestId("attempt-outcome-value")).toHaveText("INVALID");
   await expect(outcome.getByTestId("attempt-outcome-reason")).toHaveText("TECHNICAL_INTERRUPTION");
 });
+
+// SR-R1-014: Raw attempt ledger.
+// "Store raw evidence required for future re-evaluation, not only final scores."
+test("completing an attempt appends an entry to the raw attempt ledger, which only grows", async ({ page }) => {
+  await page.goto("/item-types-demo");
+  const ledger = page.getByTestId("attempt-ledger");
+  await expect(ledger.getByTestId("ledger-count")).toHaveText("Ledger entries: 0");
+
+  async function answerAllCorrectly() {
+    await page.getByTestId("item-demo-single-choice").getByTestId("option-a").check();
+    await page.getByTestId("item-demo-single-choice").getByTestId("check-demo-single-choice").click();
+
+    await page.getByTestId("item-demo-ordering").getByTestId("order-select-1").selectOption("1");
+    await page.getByTestId("item-demo-ordering").getByTestId("order-select-2").selectOption("2");
+    await page.getByTestId("item-demo-ordering").getByTestId("order-select-3").selectOption("3");
+    await page.getByTestId("item-demo-ordering").getByTestId("check-demo-ordering").click();
+
+    await page.getByTestId("item-demo-matching").getByTestId("match-select-l1").selectOption("r1");
+    await page.getByTestId("item-demo-matching").getByTestId("match-select-l2").selectOption("r2");
+    await page.getByTestId("item-demo-matching").getByTestId("check-demo-matching").click();
+
+    await page.getByTestId("item-demo-short-answer").getByTestId("short-answer-text").fill("He returned the extra coins.");
+    await page.getByTestId("item-demo-short-answer").getByTestId("check-demo-short-answer").click();
+  }
+
+  await answerAllCorrectly();
+  await expect(ledger.getByTestId("ledger-count")).toHaveText("Ledger entries: 1");
+  await expect(ledger.getByTestId("ledger-latest-decision")).toHaveText("Latest decision: PASS");
+
+  // Re-answering (a second attempt) appends rather than overwrites the first entry.
+  await page.getByTestId("item-demo-single-choice").getByTestId("option-b").check();
+  await page.getByTestId("item-demo-single-choice").getByTestId("check-demo-single-choice").click();
+  await expect(ledger.getByTestId("ledger-count")).toHaveText("Ledger entries: 2");
+
+  // The ledger survives a reload - it is persisted raw evidence, not transient UI state.
+  await page.reload();
+  await expect(page.getByTestId("attempt-ledger").getByTestId("ledger-count")).toHaveText("Ledger entries: 2");
+});

@@ -5,8 +5,14 @@
 // "authored/rendered/answered/scored" acceptance criteria can be exercised end to end in a real
 // browser, independent of the main reading/comprehension flow.
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AssessmentItemView from "../components/AssessmentItemView";
+import {
+  appendAttemptLedgerEntry,
+  AttemptLedgerEntry,
+  buildAttemptLedgerEntry,
+  loadAttemptLedger
+} from "../../lib/attempt-ledger";
 import {
   AssessmentItem,
   deriveAttemptOutcome,
@@ -104,6 +110,11 @@ const items: AssessmentItem[] = [
 export default function ItemTypesDemoPage() {
   const [results, setResults] = useState<Record<string, ItemScoreResult>>({});
   const [interrupted, setInterrupted] = useState(false);
+  const [ledger, setLedger] = useState<AttemptLedgerEntry[]>([]);
+
+  useEffect(() => {
+    setLedger(loadAttemptLedger());
+  }, []);
 
   function handleScored(result: ItemScoreResult) {
     setResults((previous) => ({ ...previous, [result.itemId]: result }));
@@ -115,9 +126,31 @@ export default function ItemTypesDemoPage() {
     : null;
   // SR-R1-012: Outcome separation - a technically interrupted attempt is its own INVALID
   // outcome, never conflated with a genuine PASS/HOLD comprehension result.
-  const attemptOutcome = allAnswered
-    ? deriveAttemptOutcome(items, Object.values(results), PASS_THRESHOLD_PERCENT, { interrupted })
-    : null;
+  const attemptOutcome = useMemo(
+    () =>
+      allAnswered
+        ? deriveAttemptOutcome(items, Object.values(results), PASS_THRESHOLD_PERCENT, { interrupted })
+        : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [allAnswered, results, interrupted]
+  );
+
+  // SR-R1-014: Raw attempt ledger - every completed attempt (including invalid ones) is
+  // appended as its own immutable entry, never overwriting or summarizing away raw evidence.
+  useEffect(() => {
+    if (!attemptOutcome) return;
+    const entry = buildAttemptLedgerEntry({
+      attemptId: typeof crypto !== "undefined" ? crypto.randomUUID() : `demo-${Date.now()}`,
+      contentId: "item-types-demo",
+      contentVersion: "1.0",
+      mode: "structured-items",
+      rawResponses: results,
+      itemOutcomes: Object.values(results),
+      attemptEvaluation: attemptOutcome
+    });
+    setLedger(appendAttemptLedgerEntry(entry));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attemptOutcome]);
 
   return (
     <main className={styles.shell} data-testid="item-types-demo">
@@ -158,6 +191,14 @@ export default function ItemTypesDemoPage() {
           <p data-testid="attempt-outcome-reason">{attemptOutcome.reasonCode}</p>
         </section>
       )}
+
+      <section className={styles.stageCard} data-testid="attempt-ledger">
+        <p className={styles.kicker}>Raw attempt ledger (SR-R1-014)</p>
+        <p data-testid="ledger-count">Ledger entries: {ledger.length}</p>
+        {ledger.length > 0 && (
+          <p data-testid="ledger-latest-decision">Latest decision: {ledger[ledger.length - 1].decision}</p>
+        )}
+      </section>
 
       <section className={styles.stageCard} data-testid="sequence-validation">
         <p className={styles.kicker}>Question non-contamination (SR-R1-010)</p>
