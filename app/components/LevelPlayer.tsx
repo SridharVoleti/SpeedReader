@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { chunkWords } from "../../lib/chunking";
 import { ProgressionLevel } from "../../lib/progression";
 import { planReadingTiming, recordActualDuration, ReadingTimingRecord } from "../../lib/reading-timing";
 import { PassageData, ScoreResult, scoreComprehension } from "../../lib/scoring";
@@ -93,13 +94,16 @@ export default function LevelPlayer({
   const [readingTiming, setReadingTiming] = useState<ReadingTimingRecord | null>(null);
 
   const words = useMemo(() => passage.content.split(/\s+/), [passage.content]);
+  // SR-R1-002: chunkWords guarantees every source token is presented exactly once, in source
+  // order - no omission/duplication - regardless of chunk size.
+  const chunks = useMemo(() => chunkWords(words, level.wordsPerChunk), [words, level.wordsPerChunk]);
   // SR-R1-001: planned timing is a pure function of word count/target WPM/chunk size, so the
   // same passage/WPM/chunks combination always plans identically.
   const timingPlan = useMemo(
     () => planReadingTiming(words.length, level.wpm, level.wordsPerChunk),
     [words.length, level.wpm, level.wordsPerChunk]
   );
-  const totalChunks = timingPlan.chunk_count;
+  const totalChunks = chunks.length;
 
   useEffect(() => {
     if (phase !== "reading") return;
@@ -229,9 +233,10 @@ export default function LevelPlayer({
     setPhase("intro");
   }
 
-  const highlightStart = Math.min(chunkIndex, totalChunks - 1) * level.wordsPerChunk;
-  const highlightEnd = highlightStart + level.wordsPerChunk;
-  const activeChunk = words.slice(highlightStart, highlightEnd).join(" ");
+  const activeChunkIndex = Math.min(chunkIndex, chunks.length - 1);
+  const highlightStart = activeChunkIndex * level.wordsPerChunk;
+  const highlightEnd = highlightStart + (chunks[activeChunkIndex]?.length ?? 0);
+  const activeChunk = (chunks[activeChunkIndex] ?? []).join(" ");
   const readingProgress = Math.min(100, Math.round((chunkIndex / totalChunks) * 100));
 
   return (
