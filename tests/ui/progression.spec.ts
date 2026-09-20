@@ -52,6 +52,19 @@ test("passing the comprehension check unlocks the next level", async ({ page }) 
   await expect(page.getByTestId("level-results")).toBeVisible();
   await expect(page.getByTestId("next-level")).toBeVisible();
 
+  // SR-R1-001: the deterministic plan and the actually-elapsed reading time are both recorded.
+  const timing = await page.evaluate(() => {
+    const raw = window.localStorage.getItem("speedreader-progress-v1");
+    return raw ? JSON.parse(raw)["1"]?.lastReadingTiming : null;
+  });
+  expect(timing).toMatchObject({
+    target_wpm: 100,
+    words_per_chunk: 1,
+    ms_per_chunk: 600
+  });
+  expect(timing.planned_duration_ms).toBeGreaterThan(0);
+  expect(timing.actual_duration_ms).toBeGreaterThan(0);
+
   await page.getByRole("button", { name: "Back to level map" }).click();
   await expect(page.getByTestId("level-node-2")).toBeEnabled();
 });

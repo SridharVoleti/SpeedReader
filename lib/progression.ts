@@ -1,4 +1,5 @@
 import progressionData from "../data/progression.json";
+import { ReadingTimingRecord } from "./reading-timing";
 
 export type ProgressionLevel = {
   id: number;
@@ -20,6 +21,9 @@ export type LevelResult = {
   stars: number;
   passed: boolean;
   completedAt: string;
+  // SR-R1-001: raw evidence for the most recent attempt's reading phase - planned timing is
+  // deterministic from target_wpm/word_count/chunks; actual_duration_ms is the real elapsed time.
+  lastReadingTiming?: ReadingTimingRecord;
 };
 
 export type Progress = Record<string, LevelResult>;
@@ -61,7 +65,8 @@ export function recordResult(
   progress: Progress,
   level: ProgressionLevel,
   score: number,
-  learnerId?: string
+  learnerId?: string,
+  readingTiming?: ReadingTimingRecord
 ): Progress {
   const key = String(level.id);
   const previous = progress[key];
@@ -72,7 +77,8 @@ export function recordResult(
       bestScore,
       stars: starsForScore(bestScore),
       passed: bestScore >= level.passThreshold,
-      completedAt: new Date().toISOString()
+      completedAt: new Date().toISOString(),
+      lastReadingTiming: readingTiming ?? previous?.lastReadingTiming
     }
   };
   saveProgress(next, learnerId);

@@ -63,7 +63,11 @@ export default function Home() {
           worldName={worldName}
           passage={passageForLevel(activeLevel)}
           hasNextLevel={activeLevel.id < levels.length}
-          onRecord={(score) => setProgress(recordResult(progress, activeLevel, score, learner?.learnerId))}
+          onRecord={(score, readingTiming) =>
+            setProgress(
+              recordResult(progress, activeLevel, score, learner?.learnerId, readingTiming ?? undefined)
+            )
+          }
           onAdvance={() => setActiveLevelId(activeLevel.id + 1)}
           onExit={() => setActiveLevelId(null)}
         />

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ProgressionLevel } from "../../lib/progression";
+import { planReadingTiming, recordActualDuration, ReadingTimingRecord } from "../../lib/reading-timing";
 import { PassageData, ScoreResult, scoreComprehension } from "../../lib/scoring";
 import styles from "../page.module.css";
 
@@ -59,7 +60,7 @@ type Props = {
   /** BabySteps interaction principle: always display active learner context. Undefined for a
    *  standalone (non-BabySteps) visit, where there's no learner identity to show. */
   learnerName?: string;
-  onRecord: (score: number) => void;
+  onRecord: (score: number, readingTiming: ReadingTimingRecord | null) => void;
   onAdvance: () => void;
   onExit: () => void;
 };
@@ -88,22 +89,34 @@ export default function LevelPlayer({
   const [speechSupported, setSpeechSupported] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const answerBeforeListeningRef = useRef("");
+  const readingStartedAtRef = useRef<number | null>(null);
+  const [readingTiming, setReadingTiming] = useState<ReadingTimingRecord | null>(null);
 
   const words = useMemo(() => passage.content.split(/\s+/), [passage.content]);
-  const totalChunks = Math.ceil(words.length / level.wordsPerChunk);
+  // SR-R1-001: planned timing is a pure function of word count/target WPM/chunk size, so the
+  // same passage/WPM/chunks combination always plans identically.
+  const timingPlan = useMemo(
+    () => planReadingTiming(words.length, level.wpm, level.wordsPerChunk),
+    [words.length, level.wpm, level.wordsPerChunk]
+  );
+  const totalChunks = timingPlan.chunk_count;
 
   useEffect(() => {
     if (phase !== "reading") return;
     if (chunkIndex >= totalChunks) {
+      if (readingStartedAtRef.current !== null) {
+        setReadingTiming(recordActualDuration(timingPlan, readingStartedAtRef.current, Date.now()));
+        readingStartedAtRef.current = null;
+      }
       setPhase("quiz");
       return;
     }
     const timer = window.setTimeout(
       () => setChunkIndex((value) => value + 1),
-      msPerChunk(level.wpm, level.wordsPerChunk)
+      timingPlan.ms_per_chunk
     );
     return () => window.clearTimeout(timer);
-  }, [phase, chunkIndex, totalChunks, level.wpm, level.wordsPerChunk]);
+  }, [phase, chunkIndex, totalChunks, timingPlan]);
 
   useEffect(() => {
     if (phase !== "readAlong" || !readAlongPlaying) return;
@@ -176,6 +189,7 @@ export default function LevelPlayer({
 
   function startReading() {
     setChunkIndex(0);
+    readingStartedAtRef.current = Date.now();
     setPhase("reading");
   }
 
@@ -203,7 +217,7 @@ export default function LevelPlayer({
     recognitionRef.current?.stop();
     const scored = scoreComprehension(passage, answer, level.passThreshold);
     setResult(scored);
-    onRecord(scored.score);
+    onRecord(scored.score, readingTiming);
     setPhase("results");
   }
 
@@ -211,6 +225,7 @@ export default function LevelPlayer({
     setChunkIndex(0);
     setAnswer("");
     setResult(null);
+    setReadingTiming(null);
     setPhase("intro");
   }
 
