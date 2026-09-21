@@ -67,7 +67,9 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 |---|---|---|---|
 | SR-R5-001 | RS competency integration | Done | d80e34f |
 | SR-R5-002 | Bottleneck reason codes | Done | 2e7c406 |
-| SR-R5-003 | Independent oral/comprehension gates | In progress | |
+| SR-R5-003 | Independent oral/comprehension gates | Done | 79ca881 |
+
+**R5: all 3 requirements implemented, tested, pushed and live-validated.**
 
 ## R6: Intelligent Training
 
