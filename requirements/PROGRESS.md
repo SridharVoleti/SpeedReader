@@ -97,4 +97,6 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 |---|---|---|---|
 | SR-R8-001 | Delayed recall evidence | Done | 27b8583 |
 | SR-R8-002 | Retained comprehension | Done | e8f060f |
-| SR-R8-003 | Unfamiliar-content transfer | Not started | |
+| SR-R8-003 | Unfamiliar-content transfer | Done | 7a2c04d |
+
+**R8: all 3 requirements implemented, tested, pushed and live-validated.**
