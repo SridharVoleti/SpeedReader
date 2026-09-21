@@ -36,3 +36,14 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R2-005 | Rate states | Done | e0b28ba |
 
 **R2: all 5 requirements implemented, tested, pushed and live-validated.**
+
+## R3: Comprehension Engine v2
+
+| Requirement | Title | Status | Commit |
+|---|---|---|---|
+| SR-R3-001 | Evidence proposition schema | In progress | |
+| SR-R3-002 | File-based semantic equivalence | Not started | |
+| SR-R3-003 | Partial evidence classes | Not started | |
+| SR-R3-004 | Interpretability safety | Not started | |
+| SR-R3-005 | Expanded construct ontology | Not started | |
+| SR-R3-006 | Scorer gold corpus | Not started | |
