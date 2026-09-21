@@ -11,11 +11,13 @@ import {
   deriveScoringOutcome,
   EquivalenceGroup,
   EvidenceClassificationConfig,
+  GoldCase,
   matchProposition,
   matchPropositionWithGroups,
   normalizeEvidenceText,
   Proposition,
-  summarizePropositionConstructs
+  summarizePropositionConstructs,
+  validateContentForApproval
 } from "../../lib/evidence-scoring";
 import styles from "../page.module.css";
 
@@ -58,6 +60,26 @@ const CLASSIFICATION_CONFIG: EvidenceClassificationConfig = {
   minimumWords: 5,
   ambiguityMarkers: ["i don't know", "not sure", "maybe something happened"]
 };
+
+// SR-R3-006: Scorer gold corpus.
+const PASSING_GOLD_CASES: GoldCase[] = [
+  {
+    goldCaseId: "gc-valid",
+    responseText: "He returned the extra change because the shopkeeper made a mistake.",
+    expectedEvidenceClass: "complete"
+  },
+  { goldCaseId: "gc-partial", responseText: "He returned the extra change but nothing else.", expectedEvidenceClass: "partial" },
+  { goldCaseId: "gc-contradiction", responseText: "He kept the extra change and said nothing.", expectedEvidenceClass: "contradicted" },
+  {
+    goldCaseId: "gc-keyword-stuffed",
+    responseText: "extra change extra change shopkeeper change",
+    expectedEvidenceClass: "irrelevant"
+  },
+  { goldCaseId: "gc-ambiguous", responseText: "I don't know what happened here.", expectedEvidenceClass: "uninterpretable" }
+];
+const MISMATCHED_GOLD_CASES: GoldCase[] = PASSING_GOLD_CASES.map((goldCase) =>
+  goldCase.goldCaseId === "gc-contradiction" ? { ...goldCase, expectedEvidenceClass: "complete" } : goldCase
+);
 
 export default function EvidenceDemoPage() {
   const [responseText, setResponseText] = useState("");
@@ -137,6 +159,31 @@ export default function EvidenceDemoPage() {
                 {goldResult.matched === childResult.matched && goldResult.matchedGroupId === childResult.matchedGroupId
                   ? "equivalent credit"
                   : "different credit"}
+              </p>
+            </>
+          );
+        })()}
+      </section>
+
+      <section className={styles.stageCard} data-testid="gold-corpus-demo">
+        <p className={styles.kicker}>Scorer gold corpus (SR-R3-006)</p>
+        <p className={styles.stageHint}>
+          Content can only become APPROVED once every required gold case (valid, partial,
+          contradiction, keyword-stuffed-wrong, ambiguous) matches its expected scorer outcome.
+        </p>
+        {(() => {
+          const passing = validateContentForApproval(PASSING_GOLD_CASES, CLASSIFICATION_CONFIG);
+          const mismatched = validateContentForApproval(MISMATCHED_GOLD_CASES, CLASSIFICATION_CONFIG);
+          return (
+            <>
+              <p data-testid="gold-corpus-passing-result">
+                Full gold corpus: {passing.approved ? "APPROVED" : "blocked"}
+              </p>
+              <p data-testid="gold-corpus-mismatched-result">
+                Corpus with one deliberate mismatch:{" "}
+                {mismatched.approved
+                  ? "APPROVED"
+                  : `blocked (failing: ${mismatched.failingCases.map((c) => c.goldCaseId).join(", ")})`}
               </p>
             </>
           );

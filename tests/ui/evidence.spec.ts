@@ -100,3 +100,17 @@ test("construct-level reporting shows matched/total per construct as the respons
   await expect(page.getByTestId("construct-summary-main_idea")).toHaveText("main_idea: 1/1");
   await expect(page.getByTestId("construct-summary-detail")).toHaveText("detail: 0/1");
 });
+
+// SR-R3-006: Scorer gold corpus (TC-R3-006-B: "Gold mismatch").
+// "Content cannot become APPROVED unless all required gold cases match expected scorer outcomes."
+test("a full gold corpus approves content, and one deliberate mismatch blocks approval and reports the failing case", async ({
+  page
+}) => {
+  await page.goto("/evidence-demo");
+  const demo = page.getByTestId("gold-corpus-demo");
+
+  await expect(demo.getByTestId("gold-corpus-passing-result")).toHaveText("Full gold corpus: APPROVED");
+  await expect(demo.getByTestId("gold-corpus-mismatched-result")).toHaveText(
+    "Corpus with one deliberate mismatch: blocked (failing: gc-contradiction)"
+  );
+});

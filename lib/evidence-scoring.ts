@@ -216,3 +216,62 @@ export function deriveScoringOutcome(evidenceClass: EvidenceClass): ScoringOutco
     needsReassessment: false
   };
 }
+
+// SR-R3-006: Scorer gold corpus.
+// "Each text item ships QA cases: valid variants, partials, contradictions, keyword-stuffed
+//  wrong and ambiguous answers." "Content cannot become APPROVED unless all required gold cases
+//  match expected scorer outcomes." A keyword-stuffed-wrong case is exactly a gold case expected
+// to classify "irrelevant" - phrase matching (not raw keyword presence) means stuffed keywords
+// alone never earn a match.
+export type GoldCase = {
+  goldCaseId: string;
+  responseText: string;
+  expectedEvidenceClass: EvidenceClass;
+};
+
+export type GoldCaseResult = {
+  goldCaseId: string;
+  expectedEvidenceClass: EvidenceClass;
+  actualEvidenceClass: EvidenceClass;
+  passed: boolean;
+};
+
+export function runGoldCase(goldCase: GoldCase, config: EvidenceClassificationConfig): GoldCaseResult {
+  const actualEvidenceClass = classifyEvidence(normalizeEvidenceText(goldCase.responseText), config);
+  return {
+    goldCaseId: goldCase.goldCaseId,
+    expectedEvidenceClass: goldCase.expectedEvidenceClass,
+    actualEvidenceClass,
+    passed: actualEvidenceClass === goldCase.expectedEvidenceClass
+  };
+}
+
+// The five required gold-case categories: valid/complete variants, partials, contradictions,
+// keyword-stuffed-wrong (-> irrelevant) and ambiguous answers (-> uninterpretable).
+export const REQUIRED_GOLD_CASE_CLASSES: EvidenceClass[] = [
+  "complete",
+  "partial",
+  "contradicted",
+  "irrelevant",
+  "uninterpretable"
+];
+
+export type GoldCorpusValidationResult =
+  | { approved: true }
+  | { approved: false; failingCases: GoldCaseResult[]; missingClasses: EvidenceClass[] };
+
+export function validateContentForApproval(
+  goldCases: GoldCase[],
+  config: EvidenceClassificationConfig
+): GoldCorpusValidationResult {
+  const presentClasses = new Set(goldCases.map((goldCase) => goldCase.expectedEvidenceClass));
+  const missingClasses = REQUIRED_GOLD_CASE_CLASSES.filter((required) => !presentClasses.has(required));
+
+  const results = goldCases.map((goldCase) => runGoldCase(goldCase, config));
+  const failingCases = results.filter((result) => !result.passed);
+
+  if (missingClasses.length > 0 || failingCases.length > 0) {
+    return { approved: false, failingCases, missingClasses };
+  }
+  return { approved: true };
+}
