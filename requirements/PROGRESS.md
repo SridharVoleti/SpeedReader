@@ -41,8 +41,8 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 
 | Requirement | Title | Status | Commit |
 |---|---|---|---|
-| SR-R3-001 | Evidence proposition schema | In progress | |
-| SR-R3-002 | File-based semantic equivalence | Not started | |
+| SR-R3-001 | Evidence proposition schema | Done | 792fe7f |
+| SR-R3-002 | File-based semantic equivalence | In progress | |
 | SR-R3-003 | Partial evidence classes | Not started | |
 | SR-R3-004 | Interpretability safety | Not started | |
 | SR-R3-005 | Expanded construct ontology | Not started | |
