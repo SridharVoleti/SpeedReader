@@ -17,3 +17,27 @@ test("attempt evidence attributes to the correct RS competency for two unrelated
     "world3_042-q7 -> RS-FLUENCY (phrase-recognition-speed): matched"
   );
 });
+
+// SR-R5-002: Bottleneck reason codes (TC-R5-002-B: "Insufficient diagnosis evidence").
+// "Below minimum returns INSUFFICIENT_EVIDENCE; sufficient pattern returns deterministic
+//  bottleneck code."
+test("diagnosis returns INSUFFICIENT_EVIDENCE below the minimum, then a deterministic bottleneck code once sufficient", async ({
+  page
+}) => {
+  await page.goto("/rs-diagnosis-demo");
+
+  await expect(page.getByTestId("evidence-count")).toHaveText("Evidence count: 0");
+  await expect(page.getByTestId("bottleneck-code")).toHaveText("Bottleneck code: INSUFFICIENT_EVIDENCE");
+
+  await page.getByTestId("add-failed-evidence").click();
+  await page.getByTestId("add-failed-evidence").click();
+  await expect(page.getByTestId("bottleneck-code")).toHaveText("Bottleneck code: INSUFFICIENT_EVIDENCE");
+
+  // Reach the minimum of 5 with 3 failed / 2 matched -> 60% failure rate.
+  await page.getByTestId("add-failed-evidence").click();
+  await page.getByTestId("add-matched-evidence").click();
+  await page.getByTestId("add-matched-evidence").click();
+
+  await expect(page.getByTestId("evidence-count")).toHaveText("Evidence count: 5");
+  await expect(page.getByTestId("bottleneck-code")).toHaveText("Bottleneck code: BOTTLENECK_DETECTED");
+});

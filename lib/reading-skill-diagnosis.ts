@@ -37,3 +37,33 @@ export function attributeEvidenceToRs<T extends { itemId: string; matched: boole
 
   return attributed;
 }
+
+// SR-R5-002: Bottleneck reason codes.
+// "Diagnose bottleneck only when configured evidence minimums are satisfied." "Below minimum
+// returns INSUFFICIENT_EVIDENCE; sufficient pattern returns deterministic bottleneck code."
+export type BottleneckCode = "INSUFFICIENT_EVIDENCE" | "BOTTLENECK_DETECTED" | "NO_BOTTLENECK";
+
+export type BottleneckDiagnosis = {
+  rsId: string;
+  evidenceCount: number;
+  bottleneckCode: BottleneckCode;
+};
+
+export function diagnoseBottleneck(
+  evidence: RsAttributedEvidence[],
+  rsId: string,
+  minimumEvidenceCount: number,
+  failureRateThreshold: number
+): BottleneckDiagnosis {
+  const relevant = evidence.filter((item) => item.rsId === rsId);
+  const evidenceCount = relevant.length;
+
+  if (evidenceCount < minimumEvidenceCount) {
+    return { rsId, evidenceCount, bottleneckCode: "INSUFFICIENT_EVIDENCE" };
+  }
+
+  const failedCount = relevant.filter((item) => !item.matched).length;
+  const failureRate = failedCount / evidenceCount;
+  const bottleneckCode: BottleneckCode = failureRate >= failureRateThreshold ? "BOTTLENECK_DETECTED" : "NO_BOTTLENECK";
+  return { rsId, evidenceCount, bottleneckCode };
+}

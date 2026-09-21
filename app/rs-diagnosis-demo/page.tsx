@@ -4,7 +4,13 @@
 // A reachable demo proving attribution is purely data-driven: two entirely different content
 // sets (different passage/item IDs) both attribute correctly using the same generic function.
 
-import { attributeEvidenceToRs, RsTaggedItem } from "../../lib/reading-skill-diagnosis";
+import { useState } from "react";
+import {
+  attributeEvidenceToRs,
+  diagnoseBottleneck,
+  RsAttributedEvidence,
+  RsTaggedItem
+} from "../../lib/reading-skill-diagnosis";
 import styles from "../page.module.css";
 
 const CONTENT_SET_A_TAGS: RsTaggedItem[] = [
@@ -21,9 +27,24 @@ const CONTENT_SET_B_TAGS: RsTaggedItem[] = [
 ];
 const CONTENT_SET_B_RESULTS = [{ itemId: "world3_042-q7", matched: true }];
 
+const MINIMUM_EVIDENCE_COUNT = 5;
+const FAILURE_RATE_THRESHOLD = 0.5;
+
 export default function RsDiagnosisDemoPage() {
   const attributedA = attributeEvidenceToRs(CONTENT_SET_A_RESULTS, CONTENT_SET_A_TAGS);
   const attributedB = attributeEvidenceToRs(CONTENT_SET_B_RESULTS, CONTENT_SET_B_TAGS);
+
+  // SR-R5-002: Bottleneck reason codes.
+  const [inferenceEvidence, setInferenceEvidence] = useState<RsAttributedEvidence[]>([]);
+
+  function addEvidence(matched: boolean) {
+    setInferenceEvidence((previous) => [
+      ...previous,
+      { rsId: "RS-INFERENCE", evidenceTag: "cause-effect-reasoning", itemId: `attempt-${previous.length}`, matched }
+    ]);
+  }
+
+  const diagnosis = diagnoseBottleneck(inferenceEvidence, "RS-INFERENCE", MINIMUM_EVIDENCE_COUNT, FAILURE_RATE_THRESHOLD);
 
   return (
     <main className={styles.shell} data-testid="rs-diagnosis-demo">
@@ -52,6 +73,34 @@ export default function RsDiagnosisDemoPage() {
             {evidence.matched ? "matched" : "not matched"}
           </p>
         ))}
+      </section>
+
+      <section className={styles.stageCard} data-testid="bottleneck-diagnosis">
+        <p className={styles.kicker}>Bottleneck reason codes (SR-R5-002)</p>
+        <p className={styles.stageHint}>
+          Diagnosis requires at least {MINIMUM_EVIDENCE_COUNT} pieces of evidence for RS-INFERENCE
+          before returning anything but INSUFFICIENT_EVIDENCE.
+        </p>
+        <p data-testid="evidence-count">Evidence count: {diagnosis.evidenceCount}</p>
+        <p data-testid="bottleneck-code">Bottleneck code: {diagnosis.bottleneckCode}</p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="add-failed-evidence"
+            onClick={() => addEvidence(false)}
+          >
+            Add failed attempt
+          </button>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            data-testid="add-matched-evidence"
+            onClick={() => addEvidence(true)}
+          >
+            Add matched attempt
+          </button>
+        </div>
       </section>
     </main>
   );
