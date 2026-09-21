@@ -36,3 +36,29 @@ test("a passing training attempt is excluded from independent confirmation, but 
   await expect(reassessment.getByTestId("confirmation-count")).toHaveText("Confirmations: 1/1");
   await expect(reassessment.getByTestId("confirmed-forms")).toHaveText("Confirmed forms: assessment-form-1");
 });
+
+// SR-R6-003: No meaningless repetition.
+// "Immediate duplicate form reuse is rejected when alternatives exist; unavoidable reuse logs
+//  reason."
+test("rejects immediate duplicate form reuse while alternatives exist, but logs a reason when the pool is exhausted to one form", async ({
+  page
+}) => {
+  await page.goto("/training-demo");
+  const repetition = page.getByTestId("no-meaningless-repetition");
+
+  await expect(repetition.getByTestId("selected-form")).toHaveText("Selected form: form-a");
+  await expect(repetition.getByTestId("reuse-reason")).toHaveText("Reuse reason: none");
+
+  await repetition.getByTestId("use-next-form").click();
+  await expect(repetition.getByTestId("selected-form")).not.toHaveText("Selected form: form-a");
+  await expect(repetition.getByTestId("reuse-reason")).toHaveText("Reuse reason: none");
+
+  await expect(repetition.getByTestId("solo-selected-form")).toHaveText("Selected form: form-solo");
+  await expect(repetition.getByTestId("solo-reuse-reason")).toHaveText("Reuse reason: none");
+
+  await repetition.getByTestId("use-next-form-solo").click();
+  await expect(repetition.getByTestId("solo-selected-form")).toHaveText("Selected form: form-solo");
+  await expect(repetition.getByTestId("solo-reuse-reason")).toHaveText(
+    "Reuse reason: NO_ALTERNATIVE_FORM_AVAILABLE"
+  );
+});

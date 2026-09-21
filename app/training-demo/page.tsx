@@ -11,9 +11,14 @@ import {
   ReassessmentForm,
   recordConfirmationRespectingFormPurpose,
   selectNextActivity,
+  selectNextForm,
   TrainingActivity
 } from "../../lib/training";
 import styles from "../page.module.css";
+
+// SR-R6-003: No meaningless repetition.
+const MULTI_FORM_POOL = ["form-a", "form-b", "form-c"];
+const SOLO_FORM_POOL = ["form-solo"];
 
 const CATALOG: TrainingActivity[] = [
   { activityId: "act-wip", targetsRsId: "RS-INFERENCE", approvalStatus: "WIP", prerequisiteActivityIds: [] },
@@ -51,6 +56,13 @@ export default function TrainingDemoPage() {
       recordConfirmationRespectingFormPurpose(previous, form, ALL_PASSING_GATES)
     );
   }
+
+  // SR-R6-003: No meaningless repetition.
+  const [lastMultiFormId, setLastMultiFormId] = useState<string | null>(null);
+  const multiFormSelection = selectNextForm(MULTI_FORM_POOL, lastMultiFormId);
+
+  const [lastSoloFormId, setLastSoloFormId] = useState<string | null>(null);
+  const soloFormSelection = selectNextForm(SOLO_FORM_POOL, lastSoloFormId);
 
   return (
     <main className={styles.shell} data-testid="training-demo">
@@ -103,6 +115,40 @@ export default function TrainingDemoPage() {
             onClick={() => submitForm("assessment")}
           >
             Submit passing assessment attempt
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="no-meaningless-repetition">
+        <p className={styles.kicker}>No meaningless repetition (SR-R6-003)</p>
+        <p className={styles.stageHint}>
+          The immediately-prior form is never reused while an alternative exists. Only when the
+          pool is exhausted to a single form is reuse allowed, and only with a logged reason.
+        </p>
+
+        <p data-testid="selected-form">Selected form: {multiFormSelection.formId ?? "none"}</p>
+        <p data-testid="reuse-reason">Reuse reason: {multiFormSelection.reuseReason ?? "none"}</p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="use-next-form"
+            onClick={() => setLastMultiFormId(multiFormSelection.formId)}
+          >
+            Use next form (3-form pool)
+          </button>
+        </div>
+
+        <p data-testid="solo-selected-form">Selected form: {soloFormSelection.formId ?? "none"}</p>
+        <p data-testid="solo-reuse-reason">Reuse reason: {soloFormSelection.reuseReason ?? "none"}</p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            data-testid="use-next-form-solo"
+            onClick={() => setLastSoloFormId(soloFormSelection.formId)}
+          >
+            Use next form (1-form pool)
           </button>
         </div>
       </section>

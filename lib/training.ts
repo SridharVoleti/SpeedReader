@@ -68,3 +68,27 @@ export function recordConfirmationRespectingFormPurpose(
   if (!canCountAsIndependentConfirmation(form)) return tracker;
   return recordConfirmationWithGates(tracker, form.formId, gates);
 }
+
+// SR-R6-003: No meaningless repetition.
+// "Repeated activities vary evidence/form while preserving target skill." "Immediate duplicate
+// form reuse is rejected when alternatives exist; unavoidable reuse logs reason." The same form
+// is never chosen again while a genuine alternative exists; only when it's the sole available
+// form does reuse happen, and only with an explicit reason recorded.
+export type FormSelection = {
+  formId: string | null;
+  reuseReason: string | null;
+};
+
+export function selectNextForm(availableFormIds: string[], lastUsedFormId: string | null): FormSelection {
+  if (availableFormIds.length === 0) {
+    return { formId: null, reuseReason: null };
+  }
+
+  const alternatives = availableFormIds.filter((formId) => formId !== lastUsedFormId);
+  if (alternatives.length > 0) {
+    return { formId: alternatives[0], reuseReason: null };
+  }
+
+  // The only available form is the one just used - reuse is unavoidable, and logged as such.
+  return { formId: lastUsedFormId, reuseReason: "NO_ALTERNATIVE_FORM_AVAILABLE" };
+}
