@@ -40,3 +40,23 @@ test("maintains the sustainable rate separately from the short-passage CRR", asy
   await expect(rate.getByTestId("sustainable-wpm-value")).toHaveText("Sustainable rate: 260");
   await expect(rate.getByTestId("crr-value")).toHaveText("Short-passage CRR: 300");
 });
+
+// SR-R7-003: Fatigue/stability indicators.
+// "Synthetic histories crossing thresholds produce FATIGUE_RISK/STABILITY_DROP; stable
+//  histories do not."
+test("a stable history produces no fatigue signals, and a degrading history produces both FATIGUE_RISK and STABILITY_DROP", async ({
+  page
+}) => {
+  await page.goto("/sustained-reading-demo");
+  const fatigue = page.getByTestId("fatigue-stability-indicators");
+
+  await expect(fatigue.getByTestId("fatigue-risk")).toHaveText("Fatigue risk: none");
+  await expect(fatigue.getByTestId("stability-drop")).toHaveText("Stability drop: none");
+  await expect(fatigue.getByTestId("fatigue-signals")).toHaveText("Signals: none");
+
+  await fatigue.getByTestId("toggle-degrading-history").click();
+
+  await expect(fatigue.getByTestId("fatigue-risk")).toHaveText("Fatigue risk: FATIGUE_RISK");
+  await expect(fatigue.getByTestId("stability-drop")).toHaveText("Stability drop: STABILITY_DROP");
+  await expect(fatigue.getByTestId("fatigue-signals")).toHaveText("Signals: FATIGUE_RISK, STABILITY_DROP");
+});

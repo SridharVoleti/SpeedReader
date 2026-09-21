@@ -8,9 +8,11 @@
 import { useState } from "react";
 import { recordChallengeAttempt, CertificationRateState } from "../../lib/certification";
 import {
+  detectFatigueSignals,
   measureSustainedPerformance,
   ReadingSegment,
   recordSustainedAttempt,
+  SegmentMetric,
   startSustainableRate,
   SustainedEvidenceGates
 } from "../../lib/sustained-reading";
@@ -32,6 +34,19 @@ const INTERRUPTION_SEGMENT: ReadingSegment = {
 
 const PASSING_SUSTAINED_GATES: SustainedEvidenceGates = { durationBandMet: true, comprehensionPassed: true };
 
+// SR-R7-003: Fatigue/stability indicators.
+const STABLE_SEGMENT_HISTORY: SegmentMetric[] = [
+  { segmentIndex: 0, wpm: 200, comprehensionRate: 0.9 },
+  { segmentIndex: 1, wpm: 195, comprehensionRate: 0.9 },
+  { segmentIndex: 2, wpm: 198, comprehensionRate: 0.85 }
+];
+
+const DEGRADING_SEGMENT_HISTORY: SegmentMetric[] = [
+  { segmentIndex: 0, wpm: 240, comprehensionRate: 0.95 },
+  { segmentIndex: 1, wpm: 180, comprehensionRate: 0.7 },
+  { segmentIndex: 2, wpm: 140, comprehensionRate: 0.55 }
+];
+
 export default function SustainedReadingDemoPage() {
   const [hasInterruption, setHasInterruption] = useState(false);
 
@@ -44,6 +59,10 @@ export default function SustainedReadingDemoPage() {
   const [sustainableState, setSustainableState] = useState(() =>
     recordSustainedAttempt(startSustainableRate(), 240, PASSING_SUSTAINED_GATES)
   );
+
+  // SR-R7-003: Fatigue/stability indicators.
+  const [historyIsDegrading, setHistoryIsDegrading] = useState(false);
+  const fatigueState = detectFatigueSignals(historyIsDegrading ? DEGRADING_SEGMENT_HISTORY : STABLE_SEGMENT_HISTORY);
 
   return (
     <main className={styles.shell} data-testid="sustained-reading-demo">
@@ -100,6 +119,27 @@ export default function SustainedReadingDemoPage() {
             onClick={() => setSustainableState((previous) => recordSustainedAttempt(previous, 260, PASSING_SUSTAINED_GATES))}
           >
             Record passing sustained attempt at 260
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="fatigue-stability-indicators">
+        <p className={styles.kicker}>Fatigue/stability indicators (SR-R7-003)</p>
+        <p className={styles.stageHint}>
+          Within-session degradation is detected by comparing each comparable segment's peak
+          value in the session to its final segment - a stable history produces no signals.
+        </p>
+        <p data-testid="fatigue-risk">Fatigue risk: {fatigueState.fatigueRisk ? "FATIGUE_RISK" : "none"}</p>
+        <p data-testid="stability-drop">Stability drop: {fatigueState.stabilityDrop ? "STABILITY_DROP" : "none"}</p>
+        <p data-testid="fatigue-signals">Signals: {fatigueState.signals.join(", ") || "none"}</p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="toggle-degrading-history"
+            onClick={() => setHistoryIsDegrading((previous) => !previous)}
+          >
+            {historyIsDegrading ? "Use stable history" : "Use degrading history"}
           </button>
         </div>
       </section>

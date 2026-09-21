@@ -85,3 +85,56 @@ export function recordSustainedAttempt(
   // Like CRR, the sustainable rate only ever moves up on a qualifying attempt.
   return { sustainableWpm: Math.max(state.sustainableWpm, measuredWpm) };
 }
+
+// SR-R7-003: Fatigue/stability indicators.
+// "Detect configured within-session degradation across comparable segments."
+// "Synthetic histories crossing thresholds produce FATIGUE_RISK/STABILITY_DROP; stable
+//  histories do not." Each signal compares the session's peak value to its final comparable
+// segment, so a drop is judged against the learner's own best showing in the session - not an
+// external baseline.
+export type SegmentMetric = {
+  segmentIndex: number;
+  wpm: number;
+  comprehensionRate: number;
+};
+
+export type FatigueDetectionConfig = {
+  wpmDropRatioThreshold: number;
+  comprehensionDropThreshold: number;
+};
+
+export type FatigueState = {
+  fatigueRisk: boolean;
+  stabilityDrop: boolean;
+  signals: ("FATIGUE_RISK" | "STABILITY_DROP")[];
+};
+
+export const DEFAULT_FATIGUE_CONFIG: FatigueDetectionConfig = {
+  wpmDropRatioThreshold: 0.3,
+  comprehensionDropThreshold: 0.2
+};
+
+export function detectFatigueSignals(
+  segments: SegmentMetric[],
+  config: FatigueDetectionConfig = DEFAULT_FATIGUE_CONFIG
+): FatigueState {
+  if (segments.length < 2) {
+    return { fatigueRisk: false, stabilityDrop: false, signals: [] };
+  }
+
+  const peakWpm = Math.max(...segments.map((segment) => segment.wpm));
+  const lastWpm = segments[segments.length - 1].wpm;
+  const wpmDropRatio = peakWpm > 0 ? (peakWpm - lastWpm) / peakWpm : 0;
+  const fatigueRisk = wpmDropRatio >= config.wpmDropRatioThreshold;
+
+  const peakComprehension = Math.max(...segments.map((segment) => segment.comprehensionRate));
+  const lastComprehension = segments[segments.length - 1].comprehensionRate;
+  const comprehensionDrop = peakComprehension - lastComprehension;
+  const stabilityDrop = comprehensionDrop >= config.comprehensionDropThreshold;
+
+  const signals: FatigueState["signals"] = [];
+  if (fatigueRisk) signals.push("FATIGUE_RISK");
+  if (stabilityDrop) signals.push("STABILITY_DROP");
+
+  return { fatigueRisk, stabilityDrop, signals };
+}
