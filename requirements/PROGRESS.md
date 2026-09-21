@@ -54,8 +54,8 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 
 | Requirement | Title | Status | Commit |
 |---|---|---|---|
-| SR-R4-001 | Adaptive speed governor | In progress | |
-| SR-R4-002 | Frontier search | Not started | |
+| SR-R4-001 | Adaptive speed governor | Done | 45bc690 |
+| SR-R4-002 | Frontier search | In progress | |
 | SR-R4-003 | Invalid attempts do not penalize | Not started | |
 | SR-R4-004 | Comprehension dominates speed | Not started | |
 
