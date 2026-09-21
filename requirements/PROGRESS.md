@@ -44,6 +44,6 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R3-001 | Evidence proposition schema | Done | 792fe7f |
 | SR-R3-002 | File-based semantic equivalence | Done | a1f9c39 |
 | SR-R3-003 | Partial evidence classes | Done | 7cfdffa |
-| SR-R3-004 | Interpretability safety | In progress | |
-| SR-R3-005 | Expanded construct ontology | Not started | |
+| SR-R3-004 | Interpretability safety | Done | 6d0e451 |
+| SR-R3-005 | Expanded construct ontology | In progress | |
 | SR-R3-006 | Scorer gold corpus | Not started | |
