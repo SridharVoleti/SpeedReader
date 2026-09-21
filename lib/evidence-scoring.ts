@@ -151,3 +151,34 @@ export function classifyEvidence(normalizedWords: string[], config: EvidenceClas
   if (matchedCount === config.propositions.length) return "complete";
   return "partial";
 }
+
+// SR-R3-004: Interpretability safety.
+// "Uninterpretable response must not silently become comprehension failure." An uninterpretable
+// evidence class routes to its own SCORING_UNCERTAIN decision with reassessment flagged - never
+// folded into a genuine failure (contradicted/irrelevant/no_evidence), matching D-004.
+export type ScoringDecision = "SCORED" | "SCORING_UNCERTAIN";
+export type InterpretabilityState = "interpretable" | "uninterpretable";
+
+export type ScoringOutcome = {
+  evidenceClass: EvidenceClass;
+  decision: ScoringDecision;
+  interpretabilityState: InterpretabilityState;
+  needsReassessment: boolean;
+};
+
+export function deriveScoringOutcome(evidenceClass: EvidenceClass): ScoringOutcome {
+  if (evidenceClass === "uninterpretable") {
+    return {
+      evidenceClass,
+      decision: "SCORING_UNCERTAIN",
+      interpretabilityState: "uninterpretable",
+      needsReassessment: true
+    };
+  }
+  return {
+    evidenceClass,
+    decision: "SCORED",
+    interpretabilityState: "interpretable",
+    needsReassessment: false
+  };
+}

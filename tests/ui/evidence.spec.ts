@@ -67,3 +67,21 @@ test("the live evidence class reflects each gold case as the response text chang
   await responseText.fill("I don't know what happened in the story honestly.");
   await expect(evidenceClass).toHaveText("Evidence class (SR-R3-003): uninterpretable");
 });
+
+// SR-R3-004: Interpretability safety (TC-R3-004-B: "Ambiguous answer").
+// "Configured ambiguous/uninterpretable response returns SCORING_UNCERTAIN/UNINTERPRETABLE and
+//  reassessment."
+test("an ambiguous response is scored SCORING_UNCERTAIN with reassessment needed, never a plain failure", async ({
+  page
+}) => {
+  await page.goto("/evidence-demo");
+  const responseText = page.getByTestId("response-text");
+  const decision = page.getByTestId("scoring-decision");
+
+  await responseText.fill("I don't know what happened in the story honestly.");
+  await expect(decision).toHaveText("Scoring decision (SR-R3-004): SCORING_UNCERTAIN (reassessment needed)");
+
+  // A genuine failure (contradiction) is scored normally, not flagged uncertain.
+  await responseText.fill("Ravi kept the extra change and said nothing.");
+  await expect(decision).toHaveText("Scoring decision (SR-R3-004): SCORED");
+});

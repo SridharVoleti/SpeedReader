@@ -8,6 +8,7 @@
 import { useState } from "react";
 import {
   classifyEvidence,
+  deriveScoringOutcome,
   EquivalenceGroup,
   EvidenceClassificationConfig,
   matchProposition,
@@ -60,6 +61,7 @@ export default function EvidenceDemoPage() {
   const words = normalizeEvidenceText(responseText);
   const result = matchProposition(PROPOSITION, words);
   const evidenceClass = classifyEvidence(words, CLASSIFICATION_CONFIG);
+  const scoringOutcome = deriveScoringOutcome(evidenceClass);
 
   return (
     <main className={styles.shell} data-testid="evidence-demo">
@@ -91,6 +93,10 @@ export default function EvidenceDemoPage() {
         </p>
         <p data-testid="evidence-class" className={styles.stageHint}>
           Evidence class (SR-R3-003): {evidenceClass}
+        </p>
+        <p data-testid="scoring-decision" className={styles.stageHint}>
+          Scoring decision (SR-R3-004): {scoringOutcome.decision}
+          {scoringOutcome.needsReassessment ? " (reassessment needed)" : ""}
         </p>
       </section>
 
