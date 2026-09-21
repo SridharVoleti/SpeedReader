@@ -11,8 +11,10 @@ import {
   FrontierEvidence,
   FrontierState,
   nextFrontierState,
+  resolveChallengeAttempt,
   SpeedDecisionInput
 } from "../../lib/adaptive-speed";
+import { CertificationRateState } from "../../lib/certification";
 import styles from "../page.module.css";
 
 const CERTIFIED_WPM = 150;
@@ -31,6 +33,19 @@ export default function AdaptiveSpeedDemoPage() {
       setStepHistory((history) => [...history, next.stepSize]);
       return next;
     });
+  }
+
+  // SR-R4-003: Invalid attempts do not penalize (TC-R4-003-B: CRR=200, challenge=220).
+  const [invalidDemoCrr, setInvalidDemoCrr] = useState<CertificationRateState>({
+    certifiedWpm: 200,
+    challengeWpm: 220
+  });
+  const [invalidDemoReasonCode, setInvalidDemoReasonCode] = useState<string | null>(null);
+
+  function submitInvalidDemoAttempt(outcome: AttemptOutcome) {
+    const result = resolveChallengeAttempt(invalidDemoCrr, outcome, 20);
+    setInvalidDemoCrr(result.crrState);
+    setInvalidDemoReasonCode(result.decision.reasonCode);
   }
 
   const input: SpeedDecisionInput = {
@@ -103,6 +118,36 @@ export default function AdaptiveSpeedDemoPage() {
             onClick={() => submitEvidence("fail")}
           >
             Fail
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="invalid-attempts-demo">
+        <p className={styles.kicker}>Invalid attempts do not penalize (SR-R4-003)</p>
+        <p className={styles.stageHint}>
+          An injected technical interruption never lowers the CRR and is never treated as a
+          comprehension failure - it selects a retry instead.
+        </p>
+        <p data-testid="invalid-demo-crr">Certified Reading Rate: {invalidDemoCrr.certifiedWpm} WPM</p>
+        {invalidDemoReasonCode && (
+          <p data-testid="invalid-demo-reason">Last decision reason: {invalidDemoReasonCode}</p>
+        )}
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            data-testid="invalid-demo-submit-invalid"
+            onClick={() => submitInvalidDemoAttempt("INVALID")}
+          >
+            Inject technical interruption
+          </button>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            data-testid="invalid-demo-submit-pass"
+            onClick={() => submitInvalidDemoAttempt("PASS")}
+          >
+            Submit a genuine PASS
           </button>
         </div>
       </section>

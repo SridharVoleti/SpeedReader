@@ -4,6 +4,8 @@
 // attempted, and the comprehension outcome of that attempt - never randomized, never dependent
 // on anything else.
 
+import { CertificationRateState, recordChallengeAttempt } from "./certification";
+
 // Bump whenever the governor's decision rule changes, so a stored decision always identifies
 // exactly which rule produced it (mirrors SCORER_VERSION/ITEM_SCORER_VERSION elsewhere).
 export const DECISION_RULE_VERSION = "1.0";
@@ -69,4 +71,27 @@ export function nextFrontierState(state: FrontierState, evidence: FrontierEviden
 
   // borderline_pass or fail: shrink toward the frontier.
   return { ...state, stepSize: Math.max(state.minStepSize, Math.floor(state.stepSize / 2)) };
+}
+
+// SR-R4-003: Invalid attempts do not penalize.
+// "Invalid/technical/insufficient attempts shall not lower CRR or count as comprehension
+//  failure." "Injected invalid attempt leaves CRR unchanged and selects retry/reassessment."
+// Composes the CRR store (lib/certification.ts) with the speed governor above: an INVALID
+// attemptOutcome never reaches recordChallengeAttempt's certifying path, so the CRR is
+// structurally untouched, while the governor's own INVALID_RETRY branch selects a retry rather
+// than a comprehension-failure retreat.
+export function resolveChallengeAttempt(
+  crrState: CertificationRateState,
+  attemptOutcome: AttemptOutcome,
+  incrementWpm: number
+): { crrState: CertificationRateState; decision: SpeedDecision } {
+  const challengeWpm = crrState.challengeWpm ?? crrState.certifiedWpm;
+  const decision = decideNextTargetWpm({
+    certifiedWpm: crrState.certifiedWpm,
+    challengeWpm,
+    attemptOutcome,
+    incrementWpm
+  });
+  const nextCrrState = recordChallengeAttempt(crrState, challengeWpm, attemptOutcome === "PASS");
+  return { crrState: nextCrrState, decision };
 }
