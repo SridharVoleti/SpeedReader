@@ -118,3 +118,30 @@ test("a CRR change is recorded as an auditable history entry with old/new CRR an
     "History entries: 1"
   );
 });
+
+// SR-R2-005: Rate states.
+// "Distinguish certified, training and challenge rates."
+// "UI/API never labels unconfirmed challenge rate certified; challenge failure preserves CRR."
+// (TC-R2-005-A)
+test("rate states distinguish training, certified and challenge, and never mislabel an unconfirmed challenge", async ({
+  page
+}) => {
+  await page.goto("/certification-demo");
+  const rates = page.getByTestId("rate-states");
+
+  await expect(rates.getByTestId("rate-state-training")).toHaveText("80 WPM: training");
+  await expect(rates.getByTestId("rate-state-certified")).toHaveText("100 WPM: certified");
+  await expect(rates.getByTestId("rate-state-challenge")).toHaveText("150 WPM: challenge");
+
+  // A failing confirmation never relabels the challenge rate as certified, and preserves the CRR.
+  await submitWith(page, "form-a", { comprehensionPassed: false });
+  await expect(rates.getByTestId("rate-state-challenge")).toHaveText("150 WPM: challenge");
+  await expect(rates.getByTestId("rate-state-certified")).toHaveText("100 WPM: certified");
+
+  // Once certification genuinely completes, the challenge rate reclassifies to certified.
+  await submitWith(page, "form-a", {});
+  await submitWith(page, "form-b", {});
+  await submitWith(page, "form-c", {});
+
+  await expect(rates.getByTestId("rate-state-certified")).toHaveText("150 WPM: certified");
+});

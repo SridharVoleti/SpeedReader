@@ -15,6 +15,7 @@ import {
   buildCertificationHistoryEntry,
   CertificationHistoryEntry,
   CertificationRateState,
+  classifyRate,
   ConfirmationTracker,
   GateResults,
   isReadyToCertify,
@@ -80,6 +81,13 @@ export default function CertificationDemoPage() {
           Confirmations: {tracker.confirmedFormIds.length}/{tracker.requiredConfirmations}
         </p>
         <p data-testid="confirmed-forms">Confirmed forms: {tracker.confirmedFormIds.join(", ") || "none"}</p>
+      </section>
+
+      <section className={styles.stageCard} data-testid="rate-states">
+        <p className={styles.kicker}>Rate states (SR-R2-005)</p>
+        <p data-testid="rate-state-training">80 WPM: {classifyRate(80, crr)}</p>
+        <p data-testid="rate-state-certified">{crr.certifiedWpm} WPM: {classifyRate(crr.certifiedWpm, crr)}</p>
+        <p data-testid="rate-state-challenge">{CHALLENGE_WPM} WPM: {classifyRate(CHALLENGE_WPM, crr)}</p>
       </section>
 
       <section className={styles.stageCard}>

@@ -22,6 +22,21 @@ export function recordChallengeAttempt(
   return { certifiedWpm: Math.max(state.certifiedWpm, challengeWpm), challengeWpm };
 }
 
+// SR-R2-005: Rate states.
+// "Distinguish certified, training and challenge rates."
+// "UI/API never labels unconfirmed challenge rate certified; challenge failure preserves CRR."
+// A rate above the CRR is always "challenge" - by construction it can never be classified
+// "certified" until an actual passing certification (recordChallengeAttempt) raises the CRR to
+// meet it, and a failed challenge attempt never touches certifiedWpm, so the classification of
+// every rate at or below the CRR is unaffected by it.
+export type RateState = "certified" | "training" | "challenge";
+
+export function classifyRate(wpm: number, state: CertificationRateState): RateState {
+  if (wpm === state.certifiedWpm) return "certified";
+  if (wpm < state.certifiedWpm) return "training";
+  return "challenge";
+}
+
 // SR-R2-002: Independent confirmation.
 // "Require configurable valid independent forms before certifying WPM."
 // "One success cannot certify when confirmations>1; same form/version cannot count repeatedly as
