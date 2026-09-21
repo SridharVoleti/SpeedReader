@@ -46,4 +46,6 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R3-003 | Partial evidence classes | Done | 7cfdffa |
 | SR-R3-004 | Interpretability safety | Done | 6d0e451 |
 | SR-R3-005 | Expanded construct ontology | Done | 618eb1e |
-| SR-R3-006 | Scorer gold corpus | In progress | |
+| SR-R3-006 | Scorer gold corpus | Done | e3b85d9 |
+
+**R3: all 6 requirements implemented, tested, pushed and live-validated.**
