@@ -46,3 +46,27 @@ export function decideNextTargetWpm(input: SpeedDecisionInput): SpeedDecision {
     decisionRuleVersion: DECISION_RULE_VERSION
   };
 }
+
+// SR-R4-002: Frontier search.
+// "Allow configurable increments that shrink near comprehension frontier." Binary-search-like
+// convergence: the step size doubles (bounded) while comfortably below the frontier, and halves
+// (bounded) the moment evidence turns borderline or fails, so search narrows in on the true
+// frontier instead of overshooting it repeatedly at a fixed increment.
+export type FrontierState = {
+  stepSize: number;
+  minStepSize: number;
+  maxStepSize: number;
+};
+
+export type FrontierEvidence = "comfortable_pass" | "borderline_pass" | "fail" | "invalid";
+
+export function nextFrontierState(state: FrontierState, evidence: FrontierEvidence): FrontierState {
+  if (evidence === "invalid") return state;
+
+  if (evidence === "comfortable_pass") {
+    return { ...state, stepSize: Math.min(state.maxStepSize, state.stepSize * 2) };
+  }
+
+  // borderline_pass or fail: shrink toward the frontier.
+  return { ...state, stepSize: Math.max(state.minStepSize, Math.floor(state.stepSize / 2)) };
+}
