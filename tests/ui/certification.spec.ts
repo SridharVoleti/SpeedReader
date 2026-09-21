@@ -90,3 +90,31 @@ test("certifies once enough distinct forms clear every gate", async ({ page }) =
   await expect(page.getByTestId("confirmation-count")).toHaveText("Confirmations: 3/3");
   await expect(page.getByTestId("certified-wpm")).toHaveText("Certified Reading Rate: 150 WPM");
 });
+
+// SR-R2-004: Certification history.
+// "Make every CRR change auditable." "History stores old/new CRR, qualifying attempts, rule
+//  version and timestamp."
+test("a CRR change is recorded as an auditable history entry with old/new CRR and qualifying forms", async ({
+  page
+}) => {
+  await page.goto("/certification-demo");
+  const history = page.getByTestId("certification-history");
+  await expect(history.getByTestId("history-count")).toHaveText("History entries: 0");
+
+  await submitWith(page, "form-a", {});
+  await submitWith(page, "form-b", {});
+  await expect(history.getByTestId("history-count")).toHaveText("History entries: 0");
+
+  await submitWith(page, "form-c", {});
+
+  await expect(history.getByTestId("history-count")).toHaveText("History entries: 1");
+  await expect(history.getByTestId("history-entry-0")).toHaveText(
+    "100 → 150 WPM (rule 1.0, qualifying: form-a, form-b, form-c)"
+  );
+
+  // The history survives a reload - it is a persisted audit trail, not transient UI state.
+  await page.reload();
+  await expect(page.getByTestId("certification-history").getByTestId("history-count")).toHaveText(
+    "History entries: 1"
+  );
+});

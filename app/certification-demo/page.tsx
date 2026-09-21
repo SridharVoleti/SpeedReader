@@ -8,13 +8,17 @@
 // any one gate failing (including a technically invalid exposure) blocks that confirmation, and
 // the CRR only moves once enough distinct forms have cleared every gate.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   allGatesPassed,
+  appendCertificationHistory,
+  buildCertificationHistoryEntry,
+  CertificationHistoryEntry,
   CertificationRateState,
   ConfirmationTracker,
   GateResults,
   isReadyToCertify,
+  loadCertificationHistory,
   recordChallengeAttempt,
   recordConfirmationWithGates,
   startConfirmationTracker
@@ -35,13 +39,27 @@ export default function CertificationDemoPage() {
     comprehensionPassed: true,
     evidenceSufficient: true
   });
+  const [history, setHistory] = useState<CertificationHistoryEntry[]>([]);
+
+  useEffect(() => {
+    setHistory(loadCertificationHistory());
+  }, []);
 
   function submitConfirmation() {
     const nextTracker = recordConfirmationWithGates(tracker, formId, gates);
     setTracker(nextTracker);
 
     if (isReadyToCertify(nextTracker) && !isReadyToCertify(tracker)) {
-      setCrr((previous) => recordChallengeAttempt(previous, nextTracker.challengeWpm, true));
+      const nextCrr = recordChallengeAttempt(crr, nextTracker.challengeWpm, true);
+      setCrr(nextCrr);
+
+      // SR-R2-004: every CRR change is recorded as its own auditable history entry.
+      const entry = buildCertificationHistoryEntry({
+        oldCertifiedWpm: crr.certifiedWpm,
+        newCertifiedWpm: nextCrr.certifiedWpm,
+        qualifyingFormIds: nextTracker.confirmedFormIds
+      });
+      setHistory(appendCertificationHistory(entry));
     }
   }
 
@@ -117,6 +135,17 @@ export default function CertificationDemoPage() {
             Submit confirmation attempt
           </button>
         </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="certification-history">
+        <p className={styles.kicker}>Certification history (SR-R2-004)</p>
+        <p data-testid="history-count">History entries: {history.length}</p>
+        {history.map((entry, index) => (
+          <p key={index} data-testid={`history-entry-${index}`}>
+            {entry.oldCertifiedWpm} → {entry.newCertifiedWpm} WPM (rule {entry.ruleVersion}, qualifying:{" "}
+            {entry.qualifyingFormIds.join(", ")})
+          </p>
+        ))}
       </section>
     </main>
   );
