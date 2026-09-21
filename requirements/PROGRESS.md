@@ -49,3 +49,44 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R3-006 | Scorer gold corpus | Done | e3b85d9 |
 
 **R3: all 6 requirements implemented, tested, pushed and live-validated.**
+
+## R4: Adaptive Speed
+
+| Requirement | Title | Status | Commit |
+|---|---|---|---|
+| SR-R4-001 | Adaptive speed governor | In progress | |
+| SR-R4-002 | Frontier search | Not started | |
+| SR-R4-003 | Invalid attempts do not penalize | Not started | |
+| SR-R4-004 | Comprehension dominates speed | Not started | |
+
+## R5: Reading Skill Diagnosis
+
+| Requirement | Title | Status | Commit |
+|---|---|---|---|
+| SR-R5-001 | RS competency integration | Not started | |
+| SR-R5-002 | Bottleneck reason codes | Not started | |
+| SR-R5-003 | Independent oral/comprehension gates | Not started | |
+
+## R6: Intelligent Training
+
+| Requirement | Title | Status | Commit |
+|---|---|---|---|
+| SR-R6-001 | Evidence-driven next activity | Not started | |
+| SR-R6-002 | Remediation then independent reassessment | Not started | |
+| SR-R6-003 | No meaningless repetition | Not started | |
+
+## R7: Sustainable Reading
+
+| Requirement | Title | Status | Commit |
+|---|---|---|---|
+| SR-R7-001 | Duration-band measurement | Not started | |
+| SR-R7-002 | Sustainable Reading Rate | Not started | |
+| SR-R7-003 | Fatigue/stability indicators | Not started | |
+
+## R8: Retention & Transfer
+
+| Requirement | Title | Status | Commit |
+|---|---|---|---|
+| SR-R8-001 | Delayed recall evidence | Not started | |
+| SR-R8-002 | Retained comprehension | Not started | |
+| SR-R8-003 | Unfamiliar-content transfer | Not started | |
