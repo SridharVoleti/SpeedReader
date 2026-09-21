@@ -53,3 +53,27 @@ export function recordConfirmation(
 export function isReadyToCertify(tracker: ConfirmationTracker): boolean {
   return tracker.confirmedFormIds.length >= tracker.requiredConfirmations;
 }
+
+// SR-R2-003: Certification gate composition.
+// "Require exposure validity + comprehension PASS + evidence sufficiency for every required
+//  confirmation." "Any required gate failure blocks certification; INVALID does not count as
+//  learner failure." All three gates are required - never averaged or majority-voted - and a
+//  failed exposureValid gate (a technically INVALID attempt) is treated exactly like any other
+//  non-passing attempt: it simply doesn't count, with no extra penalty.
+export type GateResults = {
+  exposureValid: boolean;
+  comprehensionPassed: boolean;
+  evidenceSufficient: boolean;
+};
+
+export function allGatesPassed(gates: GateResults): boolean {
+  return gates.exposureValid && gates.comprehensionPassed && gates.evidenceSufficient;
+}
+
+export function recordConfirmationWithGates(
+  tracker: ConfirmationTracker,
+  formId: string,
+  gates: GateResults
+): ConfirmationTracker {
+  return recordConfirmation(tracker, formId, allGatesPassed(gates));
+}

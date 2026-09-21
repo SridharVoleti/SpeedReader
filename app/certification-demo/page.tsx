@@ -2,17 +2,21 @@
 
 // SR-R2-001: Certified Reading Rate.
 // SR-R2-002: Independent confirmation.
-// A reachable demo composing both: a challenge WPM only certifies once enough distinct forms
-// have each independently passed - the same form/version passed repeatedly never counts twice,
-// and the CRR only moves once that independent-confirmation bar is actually cleared.
+// SR-R2-003: Certification gate composition.
+// A reachable demo composing all three: a submitted form only counts toward independent
+// confirmation once exposure validity, comprehension PASS and evidence sufficiency all pass -
+// any one gate failing (including a technically invalid exposure) blocks that confirmation, and
+// the CRR only moves once enough distinct forms have cleared every gate.
 
 import { useState } from "react";
 import {
+  allGatesPassed,
   CertificationRateState,
   ConfirmationTracker,
+  GateResults,
   isReadyToCertify,
   recordChallengeAttempt,
-  recordConfirmation,
+  recordConfirmationWithGates,
   startConfirmationTracker
 } from "../../lib/certification";
 import styles from "../page.module.css";
@@ -26,9 +30,14 @@ export default function CertificationDemoPage() {
     startConfirmationTracker(CHALLENGE_WPM, REQUIRED_CONFIRMATIONS)
   );
   const [formId, setFormId] = useState("form-a");
+  const [gates, setGates] = useState<GateResults>({
+    exposureValid: true,
+    comprehensionPassed: true,
+    evidenceSufficient: true
+  });
 
-  function submitConfirmation(passed: boolean) {
-    const nextTracker = recordConfirmation(tracker, formId, passed);
+  function submitConfirmation() {
+    const nextTracker = recordConfirmationWithGates(tracker, formId, gates);
     setTracker(nextTracker);
 
     if (isReadyToCertify(nextTracker) && !isReadyToCertify(tracker)) {
@@ -41,8 +50,10 @@ export default function CertificationDemoPage() {
       <h1>Certified Reading Rate</h1>
       <p className={styles.lede}>
         Certifying {CHALLENGE_WPM} WPM requires {REQUIRED_CONFIRMATIONS} independent confirming
-        forms (SR-R2-002). Attempting - even passing - never certifies the CRR by itself, and
-        passing the same form repeatedly never counts as more than one confirmation (SR-R2-001).
+        forms (SR-R2-002), and every confirmation must itself clear all three gates - exposure
+        validity, comprehension PASS and evidence sufficiency (SR-R2-003). Any one gate failing
+        blocks that confirmation; a passing attempt on the same form repeatedly still only
+        counts once, and the CRR never moves until certification genuinely completes (SR-R2-001).
       </p>
 
       <section className={styles.stageCard} data-testid="certification-state">
@@ -63,22 +74,47 @@ export default function CertificationDemoPage() {
             onChange={(event) => setFormId(event.target.value)}
           />
         </label>
+
+        <label style={{ display: "block", marginBottom: 6 }}>
+          <input
+            type="checkbox"
+            data-testid="gate-exposure-valid"
+            checked={gates.exposureValid}
+            onChange={(event) => setGates({ ...gates, exposureValid: event.target.checked })}
+          />{" "}
+          Exposure valid (not a technical interruption)
+        </label>
+        <label style={{ display: "block", marginBottom: 6 }}>
+          <input
+            type="checkbox"
+            data-testid="gate-comprehension-passed"
+            checked={gates.comprehensionPassed}
+            onChange={(event) => setGates({ ...gates, comprehensionPassed: event.target.checked })}
+          />{" "}
+          Comprehension PASS
+        </label>
+        <label style={{ display: "block", marginBottom: 12 }}>
+          <input
+            type="checkbox"
+            data-testid="gate-evidence-sufficient"
+            checked={gates.evidenceSufficient}
+            onChange={(event) => setGates({ ...gates, evidenceSufficient: event.target.checked })}
+          />{" "}
+          Evidence sufficient
+        </label>
+
+        <p data-testid="gates-summary" className={styles.stageHint}>
+          {allGatesPassed(gates) ? "All gates pass" : "At least one gate fails"}
+        </p>
+
         <div className={styles.actions}>
           <button
             type="button"
-            className={styles.secondaryButton}
-            data-testid="confirmation-fail"
-            onClick={() => submitConfirmation(false)}
-          >
-            Submit failing attempt on this form
-          </button>
-          <button
-            type="button"
             className={styles.primaryButton}
-            data-testid="confirmation-pass"
-            onClick={() => submitConfirmation(true)}
+            data-testid="submit-confirmation"
+            onClick={submitConfirmation}
           >
-            Submit passing attempt on this form
+            Submit confirmation attempt
           </button>
         </div>
       </section>
