@@ -31,6 +31,6 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 |---|---|---|---|
 | SR-R2-001 | Certified Reading Rate | Done | 9b5cd1f |
 | SR-R2-002 | Independent confirmation | Done | b528d9c |
-| SR-R2-003 | Certification gate composition | In progress | |
-| SR-R2-004 | Certification history | Not started | |
+| SR-R2-003 | Certification gate composition | Done | 67f856c |
+| SR-R2-004 | Certification history | In progress | |
 | SR-R2-005 | Rate states | Not started | |
