@@ -5,8 +5,16 @@
 // from its own correct/total - a perfect immediate score never influences the retention score.
 
 import { useState } from "react";
-import { classifyDelayBucket, recordRetentionEvidence } from "../../lib/retention";
+import {
+  classifyDelayBucket,
+  classifyRetentionState,
+  evaluateAdvancedCertification,
+  recordRetentionEvidence,
+  RetentionState
+} from "../../lib/retention";
 import styles from "../page.module.css";
+
+const RETENTION_PASS_THRESHOLD = 0.7;
 
 export default function RetentionDemoPage() {
   const [delayedCorrect, setDelayedCorrect] = useState(2);
@@ -15,6 +23,15 @@ export default function RetentionDemoPage() {
   const delaySeconds = 50000;
 
   const evidence = recordRetentionEvidence("level1_001", delaySeconds, immediate, delayed);
+
+  // SR-R8-002: Retained comprehension.
+  const [retentionRequired, setRetentionRequired] = useState(true);
+  const retentionState: RetentionState = classifyRetentionState(evidence.retentionScore, RETENTION_PASS_THRESHOLD);
+  const certification = evaluateAdvancedCertification({
+    immediatePassed: true,
+    retentionState,
+    retentionRequired
+  });
 
   return (
     <main className={styles.shell} data-testid="retention-demo">
@@ -53,6 +70,31 @@ export default function RetentionDemoPage() {
             onClick={() => setDelayedCorrect((previous) => Math.min(5, previous + 1))}
           >
             Record a correct delayed item
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="retained-comprehension">
+        <p className={styles.kicker}>Retained comprehension (SR-R8-002)</p>
+        <p className={styles.stageHint}>
+          Immediate comprehension and retention are reported as distinct outcomes - a passing
+          immediate result never compensates for a failing retention result when retention is
+          configured as mandatory for advanced certification.
+        </p>
+        <p data-testid="immediate-result">Immediate: PASS</p>
+        <p data-testid="retention-state">Retention: {retentionState}</p>
+        <p data-testid="retention-required-state">Retention required: {retentionRequired ? "yes" : "no"}</p>
+        <p data-testid="advanced-certification-result">
+          Advanced certification: {certification.eligible ? "ELIGIBLE" : "WITHHELD"} ({certification.reasonCode})
+        </p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="toggle-retention-required"
+            onClick={() => setRetentionRequired((previous) => !previous)}
+          >
+            {retentionRequired ? "Make retention optional" : "Make retention mandatory"}
           </button>
         </div>
       </section>

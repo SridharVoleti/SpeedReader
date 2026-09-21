@@ -44,3 +44,37 @@ export function recordRetentionEvidence(
     retentionScore: delayed.total > 0 ? delayed.correct / delayed.total : null
   };
 }
+
+// SR-R8-002: Retained comprehension.
+// "Report retention separately and optionally require it for advanced certification."
+// "Immediate PASS + delayed FAIL remain distinct; advanced certification withheld when
+//  retention mandatory." (TC-R8-002-B) Immediate comprehension and retention are two separate
+// gates - a passing immediate result never compensates for a failing retention result when
+// retention is configured as mandatory, and retention never blocks anything when it isn't.
+export type RetentionState = "PASS" | "FAIL" | "NOT_ASSESSED";
+
+export function classifyRetentionState(retentionScore: number | null, passThreshold: number): RetentionState {
+  if (retentionScore === null) return "NOT_ASSESSED";
+  return retentionScore >= passThreshold ? "PASS" : "FAIL";
+}
+
+export type AdvancedCertificationInputs = {
+  immediatePassed: boolean;
+  retentionState: RetentionState;
+  retentionRequired: boolean;
+};
+
+export type AdvancedCertificationResult = {
+  eligible: boolean;
+  reasonCode: string;
+};
+
+export function evaluateAdvancedCertification(inputs: AdvancedCertificationInputs): AdvancedCertificationResult {
+  if (!inputs.immediatePassed) {
+    return { eligible: false, reasonCode: "IMMEDIATE_COMPREHENSION_NOT_PASSED" };
+  }
+  if (inputs.retentionRequired && inputs.retentionState !== "PASS") {
+    return { eligible: false, reasonCode: "RETENTION_REQUIRED_NOT_MET" };
+  }
+  return { eligible: true, reasonCode: "ELIGIBLE" };
+}
