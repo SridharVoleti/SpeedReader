@@ -67,3 +67,39 @@ export function diagnoseBottleneck(
   const bottleneckCode: BottleneckCode = failureRate >= failureRateThreshold ? "BOTTLENECK_DETECTED" : "NO_BOTTLENECK";
   return { rsId, evidenceCount, bottleneckCode };
 }
+
+// SR-R5-003: Independent oral/comprehension gates.
+// "Keep oral fluency and comprehension as separate dimensions." "Neither strong oral nor strong
+// comprehension compensates for failure of the other when both are required." Each dimension is
+// evaluated and reported independently - readiness is never an average or a max of the two.
+export type GateState = "PASS" | "FAIL";
+
+export type ReadinessResult = {
+  oralState: GateState;
+  comprehensionState: GateState;
+  ready: boolean;
+  reasonCode: "READY" | "ORAL_GATE_FAILED" | "COMPREHENSION_GATE_FAILED" | "BOTH_GATES_FAILED";
+};
+
+export function evaluateReadiness(
+  oralState: GateState,
+  comprehensionState: GateState,
+  bothRequired: boolean
+): ReadinessResult {
+  const oralPassed = oralState === "PASS";
+  const comprehensionPassed = comprehensionState === "PASS";
+  const ready = bothRequired ? oralPassed && comprehensionPassed : oralPassed || comprehensionPassed;
+
+  let reasonCode: ReadinessResult["reasonCode"];
+  if (ready) {
+    reasonCode = "READY";
+  } else if (!oralPassed && !comprehensionPassed) {
+    reasonCode = "BOTH_GATES_FAILED";
+  } else if (!comprehensionPassed) {
+    reasonCode = "COMPREHENSION_GATE_FAILED";
+  } else {
+    reasonCode = "ORAL_GATE_FAILED";
+  }
+
+  return { oralState, comprehensionState, ready, reasonCode };
+}

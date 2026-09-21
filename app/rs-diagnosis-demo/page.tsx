@@ -8,6 +8,8 @@ import { useState } from "react";
 import {
   attributeEvidenceToRs,
   diagnoseBottleneck,
+  evaluateReadiness,
+  GateState,
   RsAttributedEvidence,
   RsTaggedItem
 } from "../../lib/reading-skill-diagnosis";
@@ -45,6 +47,11 @@ export default function RsDiagnosisDemoPage() {
   }
 
   const diagnosis = diagnoseBottleneck(inferenceEvidence, "RS-INFERENCE", MINIMUM_EVIDENCE_COUNT, FAILURE_RATE_THRESHOLD);
+
+  // SR-R5-003: Independent oral/comprehension gates.
+  const [oralState, setOralState] = useState<GateState>("PASS");
+  const [comprehensionState, setComprehensionState] = useState<GateState>("FAIL");
+  const readiness = evaluateReadiness(oralState, comprehensionState, true);
 
   return (
     <main className={styles.shell} data-testid="rs-diagnosis-demo">
@@ -101,6 +108,38 @@ export default function RsDiagnosisDemoPage() {
             Add matched attempt
           </button>
         </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="independent-gates">
+        <p className={styles.kicker}>Independent oral/comprehension gates (SR-R5-003)</p>
+        <p className={styles.stageHint}>
+          When both gates are required, neither a passing oral gate nor a passing comprehension
+          gate compensates for the other one failing.
+        </p>
+        <label style={{ display: "block", marginBottom: 6 }}>
+          Oral state:{" "}
+          <select
+            data-testid="oral-state-select"
+            value={oralState}
+            onChange={(event) => setOralState(event.target.value as GateState)}
+          >
+            <option value="PASS">PASS</option>
+            <option value="FAIL">FAIL</option>
+          </select>
+        </label>
+        <label style={{ display: "block", marginBottom: 12 }}>
+          Comprehension state:{" "}
+          <select
+            data-testid="comprehension-state-select"
+            value={comprehensionState}
+            onChange={(event) => setComprehensionState(event.target.value as GateState)}
+          >
+            <option value="PASS">PASS</option>
+            <option value="FAIL">FAIL</option>
+          </select>
+        </label>
+        <p data-testid="readiness-result">Ready: {readiness.ready ? "yes" : "no"}</p>
+        <p data-testid="readiness-reason">Reason: {readiness.reasonCode}</p>
       </section>
     </main>
   );
