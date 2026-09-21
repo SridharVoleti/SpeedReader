@@ -21,3 +21,35 @@ export function recordChallengeAttempt(
   // evaluation) can never lower it.
   return { certifiedWpm: Math.max(state.certifiedWpm, challengeWpm), challengeWpm };
 }
+
+// SR-R2-002: Independent confirmation.
+// "Require configurable valid independent forms before certifying WPM."
+// "One success cannot certify when confirmations>1; same form/version cannot count repeatedly as
+//  independent." Tracks distinct passed form_ids toward a configurable requiredConfirmations
+// count; the result feeds the `certificationPassed` gate of recordChallengeAttempt above.
+export type ConfirmationTracker = {
+  challengeWpm: number;
+  requiredConfirmations: number;
+  confirmedFormIds: string[];
+};
+
+export function startConfirmationTracker(
+  challengeWpm: number,
+  requiredConfirmations: number
+): ConfirmationTracker {
+  return { challengeWpm, requiredConfirmations, confirmedFormIds: [] };
+}
+
+export function recordConfirmation(
+  tracker: ConfirmationTracker,
+  formId: string,
+  passed: boolean
+): ConfirmationTracker {
+  if (!passed) return tracker;
+  if (tracker.confirmedFormIds.includes(formId)) return tracker; // same form/version, not independent
+  return { ...tracker, confirmedFormIds: [...tracker.confirmedFormIds, formId] };
+}
+
+export function isReadyToCertify(tracker: ConfirmationTracker): boolean {
+  return tracker.confirmedFormIds.length >= tracker.requiredConfirmations;
+}
