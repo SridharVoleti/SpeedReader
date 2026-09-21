@@ -10,11 +10,19 @@ import {
   classifyRetentionState,
   evaluateAdvancedCertification,
   recordRetentionEvidence,
-  RetentionState
+  RetentionState,
+  selectTransferEvidence,
+  TransferCandidateContent
 } from "../../lib/retention";
 import styles from "../page.module.css";
 
 const RETENTION_PASS_THRESHOLD = 0.7;
+
+// SR-R8-003: Unfamiliar-content transfer.
+const TRANSFER_CANDIDATES: TransferCandidateContent[] = [
+  { contentId: "passage-trained-1", topicFamily: "animals" },
+  { contentId: "passage-novel-1", topicFamily: "space" }
+];
 
 export default function RetentionDemoPage() {
   const [delayedCorrect, setDelayedCorrect] = useState(2);
@@ -32,6 +40,11 @@ export default function RetentionDemoPage() {
     retentionState,
     retentionRequired
   });
+
+  // SR-R8-003: Unfamiliar-content transfer.
+  const [allTopicsRecentlyTrained, setAllTopicsRecentlyTrained] = useState(false);
+  const recentlyTrainedTopicFamilies = allTopicsRecentlyTrained ? ["animals", "space"] : ["animals"];
+  const transferSelection = selectTransferEvidence(TRANSFER_CANDIDATES, recentlyTrainedTopicFamilies);
 
   return (
     <main className={styles.shell} data-testid="retention-demo">
@@ -95,6 +108,30 @@ export default function RetentionDemoPage() {
             onClick={() => setRetentionRequired((previous) => !previous)}
           >
             {retentionRequired ? "Make retention optional" : "Make retention mandatory"}
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="unfamiliar-content-transfer">
+        <p className={styles.kicker}>Unfamiliar-content transfer (SR-R8-003)</p>
+        <p className={styles.stageHint}>
+          A candidate whose topic family was recently trained cannot satisfy the transfer
+          requirement - even when it's the only candidate left, it is excluded rather than
+          reused.
+        </p>
+        <p data-testid="recently-trained-topics">
+          Recently trained topics: {recentlyTrainedTopicFamilies.join(", ")}
+        </p>
+        <p data-testid="transfer-content">Transfer content: {transferSelection.contentId ?? "none"}</p>
+        <p data-testid="transfer-reason">Reason: {transferSelection.reasonCode}</p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="toggle-all-topics-trained"
+            onClick={() => setAllTopicsRecentlyTrained((previous) => !previous)}
+          >
+            {allTopicsRecentlyTrained ? "Untrain the space topic family" : "Also recently train the space topic family"}
           </button>
         </div>
       </section>

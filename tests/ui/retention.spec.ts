@@ -43,3 +43,22 @@ test("keeps immediate PASS and delayed FAIL distinct, withholding advanced certi
   await expect(retained.getByTestId("immediate-result")).toHaveText("Immediate: PASS");
   await expect(retained.getByTestId("advanced-certification-result")).toHaveText("Advanced certification: ELIGIBLE (ELIGIBLE)");
 });
+
+// SR-R8-003: Unfamiliar-content transfer.
+// "Near-duplicate/recently trained form cannot satisfy transfer requirement."
+test("selects transfer content outside recently trained topic families, and excludes it entirely once every candidate is recently trained", async ({
+  page
+}) => {
+  await page.goto("/retention-demo");
+  const transfer = page.getByTestId("unfamiliar-content-transfer");
+
+  await expect(transfer.getByTestId("recently-trained-topics")).toHaveText("Recently trained topics: animals");
+  await expect(transfer.getByTestId("transfer-content")).toHaveText("Transfer content: passage-novel-1");
+  await expect(transfer.getByTestId("transfer-reason")).toHaveText("Reason: TRANSFER_ELIGIBLE_space");
+
+  await transfer.getByTestId("toggle-all-topics-trained").click();
+
+  await expect(transfer.getByTestId("recently-trained-topics")).toHaveText("Recently trained topics: animals, space");
+  await expect(transfer.getByTestId("transfer-content")).toHaveText("Transfer content: none");
+  await expect(transfer.getByTestId("transfer-reason")).toHaveText("Reason: NO_TRANSFER_ELIGIBLE_CONTENT");
+});

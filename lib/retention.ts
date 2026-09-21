@@ -78,3 +78,37 @@ export function evaluateAdvancedCertification(inputs: AdvancedCertificationInput
   }
   return { eligible: true, reasonCode: "ELIGIBLE" };
 }
+
+// SR-R8-003: Unfamiliar-content transfer.
+// "Advanced evidence includes independent content outside recently trained patterns."
+// "Near-duplicate/recently trained form cannot satisfy transfer requirement." A candidate whose
+// topic family was recently trained is excluded outright, even when it's the only candidate
+// available - unlike SR-R6-003's unavoidable-reuse fallback, transfer has no fallback: content
+// tied to a recently trained pattern never counts as transfer evidence.
+export type TransferCandidateContent = {
+  contentId: string;
+  topicFamily: string;
+};
+
+export type TransferSelection = {
+  contentId: string | null;
+  reasonCode: string;
+};
+
+export function isTransferEligible(candidate: TransferCandidateContent, recentlyTrainedTopicFamilies: string[]): boolean {
+  return !recentlyTrainedTopicFamilies.includes(candidate.topicFamily);
+}
+
+export function selectTransferEvidence(
+  candidates: TransferCandidateContent[],
+  recentlyTrainedTopicFamilies: string[]
+): TransferSelection {
+  const eligible = candidates.filter((candidate) => isTransferEligible(candidate, recentlyTrainedTopicFamilies));
+
+  if (eligible.length === 0) {
+    return { contentId: null, reasonCode: "NO_TRANSFER_ELIGIBLE_CONTENT" };
+  }
+
+  const chosen = eligible[0];
+  return { contentId: chosen.contentId, reasonCode: `TRANSFER_ELIGIBLE_${chosen.topicFamily}` };
+}
