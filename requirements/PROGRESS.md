@@ -77,7 +77,9 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 |---|---|---|---|
 | SR-R6-001 | Evidence-driven next activity | Done | 03a40e5 |
 | SR-R6-002 | Remediation then independent reassessment | Done | a09bcb2 |
-| SR-R6-003 | No meaningless repetition | In progress | |
+| SR-R6-003 | No meaningless repetition | Done | 45376f6 |
+
+**R6: all 3 requirements implemented, tested, pushed and live-validated.**
 
 ## R7: Sustainable Reading
 
