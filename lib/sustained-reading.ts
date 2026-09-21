@@ -53,3 +53,35 @@ export function measureSustainedPerformance(
     comprehensionRate: totalQuestions > 0 ? totalCorrect / totalQuestions : null
   };
 }
+
+// SR-R7-002: Sustainable Reading Rate.
+// "Maintain sustainable WPM separately from short-passage CRR."
+// "Short CRR increase does not raise sustainable rate without its own evidence gates." The
+// sustainable rate is its own state, moved only by recordSustainedAttempt below - a short-passage
+// CRR change (lib/certification.ts) has no path to it whatsoever.
+export type SustainableRateState = {
+  sustainableWpm: number;
+};
+
+export type SustainedEvidenceGates = {
+  durationBandMet: boolean;
+  comprehensionPassed: boolean;
+};
+
+export function startSustainableRate(): SustainableRateState {
+  return { sustainableWpm: 0 };
+}
+
+export function allSustainedGatesPassed(gates: SustainedEvidenceGates): boolean {
+  return gates.durationBandMet && gates.comprehensionPassed;
+}
+
+export function recordSustainedAttempt(
+  state: SustainableRateState,
+  measuredWpm: number,
+  gates: SustainedEvidenceGates
+): SustainableRateState {
+  if (!allSustainedGatesPassed(gates)) return state;
+  // Like CRR, the sustainable rate only ever moves up on a qualifying attempt.
+  return { sustainableWpm: Math.max(state.sustainableWpm, measuredWpm) };
+}

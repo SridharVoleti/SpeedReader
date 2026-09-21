@@ -6,7 +6,14 @@
 // comprehension rate.
 
 import { useState } from "react";
-import { measureSustainedPerformance, ReadingSegment } from "../../lib/sustained-reading";
+import { recordChallengeAttempt, CertificationRateState } from "../../lib/certification";
+import {
+  measureSustainedPerformance,
+  ReadingSegment,
+  recordSustainedAttempt,
+  startSustainableRate,
+  SustainedEvidenceGates
+} from "../../lib/sustained-reading";
 import styles from "../page.module.css";
 
 const VALID_SEGMENTS: ReadingSegment[] = [
@@ -23,12 +30,20 @@ const INTERRUPTION_SEGMENT: ReadingSegment = {
   comprehensionTotal: 0
 };
 
+const PASSING_SUSTAINED_GATES: SustainedEvidenceGates = { durationBandMet: true, comprehensionPassed: true };
+
 export default function SustainedReadingDemoPage() {
   const [hasInterruption, setHasInterruption] = useState(false);
 
   const measurement = measureSustainedPerformance({
     segments: hasInterruption ? [...VALID_SEGMENTS, INTERRUPTION_SEGMENT] : VALID_SEGMENTS
   });
+
+  // SR-R7-002: Sustainable Reading Rate.
+  const [crrState, setCrrState] = useState<CertificationRateState>({ certifiedWpm: 240, challengeWpm: null });
+  const [sustainableState, setSustainableState] = useState(() =>
+    recordSustainedAttempt(startSustainableRate(), 240, PASSING_SUSTAINED_GATES)
+  );
 
   return (
     <main className={styles.shell} data-testid="sustained-reading-demo">
@@ -56,6 +71,35 @@ export default function SustainedReadingDemoPage() {
             onClick={() => setHasInterruption((previous) => !previous)}
           >
             {hasInterruption ? "Remove interruption segment" : "Add technical interruption segment"}
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="sustainable-reading-rate">
+        <p className={styles.kicker}>Sustainable Reading Rate (SR-R7-002)</p>
+        <p className={styles.stageHint}>
+          The sustainable rate is maintained separately from the short-passage Certified Reading
+          Rate (CRR) - certifying a higher short-passage CRR never raises it on its own; it only
+          moves through its own passing sustained-reading evidence.
+        </p>
+        <p data-testid="crr-value">Short-passage CRR: {crrState.certifiedWpm}</p>
+        <p data-testid="sustainable-wpm-value">Sustainable rate: {sustainableState.sustainableWpm}</p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="certify-short-crr"
+            onClick={() => setCrrState((previous) => recordChallengeAttempt(previous, 300, true))}
+          >
+            Certify short-passage CRR to 300
+          </button>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            data-testid="record-sustained-attempt"
+            onClick={() => setSustainableState((previous) => recordSustainedAttempt(previous, 260, PASSING_SUSTAINED_GATES))}
+          >
+            Record passing sustained attempt at 260
           </button>
         </div>
       </section>
