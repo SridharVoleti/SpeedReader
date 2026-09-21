@@ -8,7 +8,18 @@ export type Option = { id: string; label: string };
 
 // SR-R1-006: Basic constructs. R1's construct ontology - every item declares exactly one of
 // these as its primary construct, so results can be reported per construct, not just overall.
-export type ConstructId = "main_idea" | "detail" | "sequence_relationship";
+// SR-R3-005: Expanded construct ontology - adds sequence_structure, relationship_cause_effect,
+// inference, integration and meaning_in_context. "sequence_relationship" is R1's pre-R3 combined
+// construct, kept for backward compatibility with existing R1 content/items rather than removed.
+export type ConstructId =
+  | "main_idea"
+  | "detail"
+  | "sequence_relationship"
+  | "sequence_structure"
+  | "relationship_cause_effect"
+  | "inference"
+  | "integration"
+  | "meaning_in_context";
 
 // SR-R1-007: Mandatory gates. A mandatory item is non-compensable: failing it blocks PASS no
 // matter how high the aggregate score is.

@@ -4,10 +4,15 @@
 // variants that all count as the same evidence, and expressions that indicate the proposition is
 // being explicitly contradicted rather than merely absent.
 
+// SR-R3-005: Expanded construct ontology - every proposition declares which construct it's
+// evidence for, so results can be reported per construct (see summarizePropositionConstructs).
+import { ConstructId } from "./item-types";
+
 export type Proposition = {
   propositionId: string;
   canonicalText: string;
   mandatory: boolean;
+  constructId: ConstructId;
   acceptedExpressions: string[];
   contradictionExpressions: string[];
 };
@@ -57,6 +62,7 @@ function containsPhrase(words: string[], phrase: string): boolean {
 
 export type PropositionMatchResult = {
   propositionId: string;
+  constructId: ConstructId;
   matched: boolean;
   contradicted: boolean;
 };
@@ -64,11 +70,31 @@ export type PropositionMatchResult = {
 export function matchProposition(proposition: Proposition, normalizedWords: string[]): PropositionMatchResult {
   return {
     propositionId: proposition.propositionId,
+    constructId: proposition.constructId,
     matched: proposition.acceptedExpressions.some((expression) => containsPhrase(normalizedWords, expression)),
     contradicted: proposition.contradictionExpressions.some((expression) =>
       containsPhrase(normalizedWords, expression)
     )
   };
+}
+
+// SR-R3-005: "Each construct has executable evidence definition and construct-level reporting."
+// Aggregates matched/total per construct across a set of proposition-match results.
+export type ConstructSummary = { constructId: ConstructId; matched: number; total: number };
+
+export function summarizePropositionConstructs(results: PropositionMatchResult[]): ConstructSummary[] {
+  const byConstruct = new Map<ConstructId, ConstructSummary>();
+  for (const result of results) {
+    const existing = byConstruct.get(result.constructId) ?? {
+      constructId: result.constructId,
+      matched: 0,
+      total: 0
+    };
+    existing.total += 1;
+    if (result.matched) existing.matched += 1;
+    byConstruct.set(result.constructId, existing);
+  }
+  return [...byConstruct.values()];
 }
 
 // SR-R3-002: File-based semantic equivalence.
@@ -88,6 +114,7 @@ export type GroupedProposition = {
   propositionId: string;
   canonicalText: string;
   mandatory: boolean;
+  constructId: ConstructId;
   equivalenceGroups: EquivalenceGroup[];
   contradictionExpressions: string[];
 };
@@ -102,6 +129,7 @@ export function matchPropositionWithGroups(
     if (group.expressions.some((expression) => containsPhrase(normalizedWords, expression))) {
       return {
         propositionId: proposition.propositionId,
+        constructId: proposition.constructId,
         matched: true,
         contradicted: false,
         matchedGroupId: group.equivalenceGroupId
@@ -111,7 +139,13 @@ export function matchPropositionWithGroups(
   const contradicted = proposition.contradictionExpressions.some((expression) =>
     containsPhrase(normalizedWords, expression)
   );
-  return { propositionId: proposition.propositionId, matched: false, contradicted, matchedGroupId: null };
+  return {
+    propositionId: proposition.propositionId,
+    constructId: proposition.constructId,
+    matched: false,
+    contradicted,
+    matchedGroupId: null
+  };
 }
 
 // SR-R3-003: Partial evidence classes.

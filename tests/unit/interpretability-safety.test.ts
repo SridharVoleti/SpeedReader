@@ -16,6 +16,7 @@ const mainIdea: Proposition = {
   propositionId: "p-main-idea",
   canonicalText: "Ravi returned the extra change",
   mandatory: true,
+  constructId: "main_idea",
   acceptedExpressions: ["returned the extra change"],
   contradictionExpressions: ["kept the extra change"]
 };

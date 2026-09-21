@@ -10,6 +10,7 @@ const mainIdea: Proposition = {
   propositionId: "p-main-idea",
   canonicalText: "Ravi returned the extra change",
   mandatory: true,
+  constructId: "main_idea",
   acceptedExpressions: ["returned the extra change", "gave back the money"],
   contradictionExpressions: ["kept the extra change", "never returned it"]
 };
@@ -18,6 +19,7 @@ const detail: Proposition = {
   propositionId: "p-detail",
   canonicalText: "The shopkeeper made a mistake",
   mandatory: false,
+  constructId: "detail",
   acceptedExpressions: ["shopkeeper made a mistake", "shopkeeper gave too much change"],
   contradictionExpressions: []
 };

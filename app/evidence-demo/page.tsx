@@ -14,7 +14,8 @@ import {
   matchProposition,
   matchPropositionWithGroups,
   normalizeEvidenceText,
-  Proposition
+  Proposition,
+  summarizePropositionConstructs
 } from "../../lib/evidence-scoring";
 import styles from "../page.module.css";
 
@@ -22,6 +23,7 @@ const PROPOSITION: Proposition = {
   propositionId: "p-honesty",
   canonicalText: "Ravi returned the extra change",
   mandatory: true,
+  constructId: "main_idea",
   acceptedExpressions: ["returned the extra change", "gave back the extra money", "returned the coins"],
   contradictionExpressions: ["kept the extra change", "did not return", "never returned"]
 };
@@ -35,6 +37,7 @@ const GROUPED_PROPOSITION = {
   propositionId: PROPOSITION.propositionId,
   canonicalText: PROPOSITION.canonicalText,
   mandatory: PROPOSITION.mandatory,
+  constructId: PROPOSITION.constructId,
   equivalenceGroups: [HONESTY_GROUP],
   contradictionExpressions: PROPOSITION.contradictionExpressions
 };
@@ -46,6 +49,7 @@ const DETAIL_PROPOSITION: Proposition = {
   propositionId: "p-detail",
   canonicalText: "The shopkeeper made a mistake",
   mandatory: false,
+  constructId: "detail",
   acceptedExpressions: ["shopkeeper made a mistake", "shopkeeper gave too much change"],
   contradictionExpressions: []
 };
@@ -62,6 +66,10 @@ export default function EvidenceDemoPage() {
   const result = matchProposition(PROPOSITION, words);
   const evidenceClass = classifyEvidence(words, CLASSIFICATION_CONFIG);
   const scoringOutcome = deriveScoringOutcome(evidenceClass);
+  const constructResults = CLASSIFICATION_CONFIG.propositions.map((proposition) =>
+    matchProposition(proposition, words)
+  );
+  const constructSummary = summarizePropositionConstructs(constructResults);
 
   return (
     <main className={styles.shell} data-testid="evidence-demo">
@@ -98,6 +106,12 @@ export default function EvidenceDemoPage() {
           Scoring decision (SR-R3-004): {scoringOutcome.decision}
           {scoringOutcome.needsReassessment ? " (reassessment needed)" : ""}
         </p>
+        <p className={styles.kicker}>Construct-level reporting (SR-R3-005)</p>
+        {constructSummary.map((summary) => (
+          <p key={summary.constructId} data-testid={`construct-summary-${summary.constructId}`}>
+            {summary.constructId}: {summary.matched}/{summary.total}
+          </p>
+        ))}
       </section>
 
       <section className={styles.stageCard} data-testid="equivalence-demo">

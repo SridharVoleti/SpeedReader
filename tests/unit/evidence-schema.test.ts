@@ -15,6 +15,7 @@ function mainIdeaProposition(overrides: Partial<Proposition> = {}): Proposition 
     propositionId: "p1",
     canonicalText: "Ravi returned the extra change",
     mandatory: true,
+    constructId: "main_idea",
     acceptedExpressions: ["returned the extra change", "gave back the extra money"],
     contradictionExpressions: ["kept the extra change", "did not return"],
     ...overrides

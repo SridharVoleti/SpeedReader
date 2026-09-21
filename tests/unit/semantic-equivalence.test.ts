@@ -22,6 +22,7 @@ const proposition = {
   propositionId: "p-honesty",
   canonicalText: "Ravi returned the extra change",
   mandatory: true,
+  constructId: "main_idea" as const,
   equivalenceGroups: [honestyGroup],
   contradictionExpressions: ["kept the extra change"]
 };

@@ -85,3 +85,18 @@ test("an ambiguous response is scored SCORING_UNCERTAIN with reassessment needed
   await responseText.fill("Ravi kept the extra change and said nothing.");
   await expect(decision).toHaveText("Scoring decision (SR-R3-004): SCORED");
 });
+
+// SR-R3-005: Expanded construct ontology.
+// "Each construct has executable evidence definition and construct-level reporting."
+test("construct-level reporting shows matched/total per construct as the response changes", async ({ page }) => {
+  await page.goto("/evidence-demo");
+  const responseText = page.getByTestId("response-text");
+
+  await responseText.fill("He returned the extra change because the shopkeeper made a mistake.");
+  await expect(page.getByTestId("construct-summary-main_idea")).toHaveText("main_idea: 1/1");
+  await expect(page.getByTestId("construct-summary-detail")).toHaveText("detail: 1/1");
+
+  await responseText.fill("Ravi returned the extra change to the shop.");
+  await expect(page.getByTestId("construct-summary-main_idea")).toHaveText("main_idea: 1/1");
+  await expect(page.getByTestId("construct-summary-detail")).toHaveText("detail: 0/1");
+});
