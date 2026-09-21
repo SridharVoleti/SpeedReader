@@ -40,3 +40,30 @@ test("a gold paraphrase and a short child response in the same equivalence group
   await expect(demo.getByTestId("child-response-result")).toContainText("matched (group eq-honesty)");
   await expect(demo.getByTestId("equivalence-outcome")).toHaveText("equivalent credit");
 });
+
+// SR-R3-003: Partial evidence classes.
+// "Distinguish complete, partial/minimal, contradicted, irrelevant, no-evidence and
+//  uninterpretable where configured."
+test("the live evidence class reflects each gold case as the response text changes", async ({ page }) => {
+  await page.goto("/evidence-demo");
+  const evidenceClass = page.getByTestId("evidence-class");
+  const responseText = page.getByTestId("response-text");
+
+  await responseText.fill("He returned the extra change because the shopkeeper made a mistake.");
+  await expect(evidenceClass).toHaveText("Evidence class (SR-R3-003): complete");
+
+  await responseText.fill("Ravi returned the extra change to the shop.");
+  await expect(evidenceClass).toHaveText("Evidence class (SR-R3-003): partial");
+
+  await responseText.fill("Ravi kept the extra change and said nothing.");
+  await expect(evidenceClass).toHaveText("Evidence class (SR-R3-003): contradicted");
+
+  await responseText.fill("Ravi liked going to the market with his friends every day.");
+  await expect(evidenceClass).toHaveText("Evidence class (SR-R3-003): irrelevant");
+
+  await responseText.fill("He went.");
+  await expect(evidenceClass).toHaveText("Evidence class (SR-R3-003): no_evidence");
+
+  await responseText.fill("I don't know what happened in the story honestly.");
+  await expect(evidenceClass).toHaveText("Evidence class (SR-R3-003): uninterpretable");
+});

@@ -113,3 +113,41 @@ export function matchPropositionWithGroups(
   );
   return { propositionId: proposition.propositionId, matched: false, contradicted, matchedGroupId: null };
 }
+
+// SR-R3-003: Partial evidence classes.
+// "Distinguish complete, partial/minimal, contradicted, irrelevant, no-evidence and
+//  uninterpretable where configured." Classification is deterministic and precedence-ordered:
+// contradiction of a mandatory proposition always wins, then an authored ambiguity marker
+// ("where configured" - never guessed), then length, then match completeness.
+export type EvidenceClass =
+  | "complete"
+  | "partial"
+  | "contradicted"
+  | "irrelevant"
+  | "no_evidence"
+  | "uninterpretable";
+
+export type EvidenceClassificationConfig = {
+  propositions: Proposition[];
+  minimumWords: number;
+  ambiguityMarkers: string[];
+};
+
+export function classifyEvidence(normalizedWords: string[], config: EvidenceClassificationConfig): EvidenceClass {
+  const matches = config.propositions.map((proposition) => matchProposition(proposition, normalizedWords));
+
+  const mandatoryContradicted = config.propositions.some(
+    (proposition, index) => proposition.mandatory && matches[index].contradicted
+  );
+  if (mandatoryContradicted) return "contradicted";
+
+  const isAmbiguous = config.ambiguityMarkers.some((marker) => containsPhrase(normalizedWords, marker));
+  if (isAmbiguous) return "uninterpretable";
+
+  if (normalizedWords.length < config.minimumWords) return "no_evidence";
+
+  const matchedCount = matches.filter((match) => match.matched).length;
+  if (matchedCount === 0) return "irrelevant";
+  if (matchedCount === config.propositions.length) return "complete";
+  return "partial";
+}

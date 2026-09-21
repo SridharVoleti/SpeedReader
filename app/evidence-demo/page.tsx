@@ -7,7 +7,9 @@
 
 import { useState } from "react";
 import {
+  classifyEvidence,
   EquivalenceGroup,
+  EvidenceClassificationConfig,
   matchProposition,
   matchPropositionWithGroups,
   normalizeEvidenceText,
@@ -38,11 +40,26 @@ const GROUPED_PROPOSITION = {
 const GOLD_RESPONSE = "He politely returned the extra change he had been given by mistake.";
 const CHILD_RESPONSE = "he gave it back";
 
+// SR-R3-003: Partial evidence classes.
+const DETAIL_PROPOSITION: Proposition = {
+  propositionId: "p-detail",
+  canonicalText: "The shopkeeper made a mistake",
+  mandatory: false,
+  acceptedExpressions: ["shopkeeper made a mistake", "shopkeeper gave too much change"],
+  contradictionExpressions: []
+};
+const CLASSIFICATION_CONFIG: EvidenceClassificationConfig = {
+  propositions: [PROPOSITION, DETAIL_PROPOSITION],
+  minimumWords: 5,
+  ambiguityMarkers: ["i don't know", "not sure", "maybe something happened"]
+};
+
 export default function EvidenceDemoPage() {
   const [responseText, setResponseText] = useState("");
 
   const words = normalizeEvidenceText(responseText);
   const result = matchProposition(PROPOSITION, words);
+  const evidenceClass = classifyEvidence(words, CLASSIFICATION_CONFIG);
 
   return (
     <main className={styles.shell} data-testid="evidence-demo">
@@ -71,6 +88,9 @@ export default function EvidenceDemoPage() {
         />
         <p data-testid="match-result">
           {result.matched ? "matched" : result.contradicted ? "contradicted" : "no evidence"}
+        </p>
+        <p data-testid="evidence-class" className={styles.stageHint}>
+          Evidence class (SR-R3-003): {evidenceClass}
         </p>
       </section>
 
