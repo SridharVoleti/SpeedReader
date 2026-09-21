@@ -15,12 +15,47 @@ import {
   SpeedDecisionInput
 } from "../../lib/adaptive-speed";
 import { CertificationRateState } from "../../lib/certification";
+import { AssessmentItem, deriveAttemptOutcome, scoreItem } from "../../lib/item-types";
 import styles from "../page.module.css";
 
 const CERTIFIED_WPM = 150;
 const CHALLENGE_WPM = 200;
 const INCREMENT_WPM = 20;
 const INITIAL_FRONTIER_STATE: FrontierState = { stepSize: 10, minStepSize: 5, maxStepSize: 80 };
+
+// SR-R4-004: Comprehension dominates speed (TC-R4-004-B: "Fast but poor comprehension").
+const MANDATORY_MAIN_IDEA: AssessmentItem = {
+  itemId: "mi1",
+  itemType: "single_choice",
+  constructId: "main_idea",
+  mandatory: true,
+  prompt: "What is this story mainly about?",
+  options: [
+    { id: "a", label: "Honesty" },
+    { id: "b", label: "Cooking" }
+  ],
+  correctOptionId: "a"
+};
+function easyDetailItem(itemId: string): AssessmentItem {
+  return {
+    itemId,
+    itemType: "single_choice",
+    constructId: "detail",
+    mandatory: false,
+    prompt: "Easy detail question.",
+    options: [
+      { id: "a", label: "Correct" },
+      { id: "b", label: "Wrong" }
+    ],
+    correctOptionId: "a"
+  };
+}
+const DOMINATES_ITEMS = [MANDATORY_MAIN_IDEA, easyDetailItem("d1"), easyDetailItem("d2"), easyDetailItem("d3"), easyDetailItem("d4")];
+const DOMINATES_RESULTS = [
+  scoreItem(MANDATORY_MAIN_IDEA, { type: "single_choice", selectedOptionId: "b" }), // mandatory FAILS
+  ...DOMINATES_ITEMS.slice(1).map((item) => scoreItem(item, { type: "single_choice", selectedOptionId: "a" }))
+];
+const DOMINATES_CRR_BEFORE: CertificationRateState = { certifiedWpm: 150, challengeWpm: 300 };
 
 export default function AdaptiveSpeedDemoPage() {
   const [attemptOutcome, setAttemptOutcome] = useState<AttemptOutcome>("PASS");
@@ -150,6 +185,28 @@ export default function AdaptiveSpeedDemoPage() {
             Submit a genuine PASS
           </button>
         </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="dominates-speed-demo">
+        <p className={styles.kicker}>Comprehension dominates speed (SR-R4-004)</p>
+        <p className={styles.stageHint}>
+          A fast 300 WPM challenge with every optional detail correct (80% aggregate) still can't
+          raise the CRR when the mandatory main-idea item fails.
+        </p>
+        {(() => {
+          const attemptEvaluation = deriveAttemptOutcome(DOMINATES_ITEMS, DOMINATES_RESULTS, 70);
+          const resolution = resolveChallengeAttempt(DOMINATES_CRR_BEFORE, attemptEvaluation.attemptOutcome, 20);
+          return (
+            <>
+              <p data-testid="dominates-aggregate">
+                Challenge WPM: {DOMINATES_CRR_BEFORE.challengeWpm} | Aggregate score:{" "}
+                {attemptEvaluation.comprehension?.aggregateScore ?? 0}%
+              </p>
+              <p data-testid="dominates-outcome">Comprehension outcome: {attemptEvaluation.attemptOutcome}</p>
+              <p data-testid="dominates-crr-after">CRR after: {resolution.crrState.certifiedWpm} WPM</p>
+            </>
+          );
+        })()}
       </section>
     </main>
   );

@@ -71,3 +71,16 @@ test("an injected technical interruption leaves the CRR unchanged and selects re
     "Last decision reason: COMPREHENSION_PASSED_ADVANCE"
   );
 });
+
+// SR-R4-004: Comprehension dominates speed (TC-R4-004-B: "Fast but poor comprehension").
+// "Fast failed-comprehension attempt cannot raise CRR/progression."
+test("a fast challenge with a failed mandatory item cannot raise the CRR, despite an 80% aggregate", async ({
+  page
+}) => {
+  await page.goto("/adaptive-speed-demo");
+  const demo = page.getByTestId("dominates-speed-demo");
+
+  await expect(demo.getByTestId("dominates-aggregate")).toHaveText("Challenge WPM: 300 | Aggregate score: 80%");
+  await expect(demo.getByTestId("dominates-outcome")).toHaveText("Comprehension outcome: HOLD");
+  await expect(demo.getByTestId("dominates-crr-after")).toHaveText("CRR after: 150 WPM");
+});
