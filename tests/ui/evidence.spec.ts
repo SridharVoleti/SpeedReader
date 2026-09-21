@@ -27,3 +27,16 @@ test("an unrelated response shows no evidence, and a contradiction is flagged di
   await page.getByTestId("response-text").fill("He kept the extra change for himself.");
   await expect(page.getByTestId("match-result")).toHaveText("contradicted");
 });
+
+// SR-R3-002: File-based semantic equivalence.
+// "Gold paraphrases/short child responses map to same proposition result/credit."
+test("a gold paraphrase and a short child response in the same equivalence group get equivalent credit", async ({
+  page
+}) => {
+  await page.goto("/evidence-demo");
+  const demo = page.getByTestId("equivalence-demo");
+
+  await expect(demo.getByTestId("gold-response-result")).toContainText("matched (group eq-honesty)");
+  await expect(demo.getByTestId("child-response-result")).toContainText("matched (group eq-honesty)");
+  await expect(demo.getByTestId("equivalence-outcome")).toHaveText("equivalent credit");
+});

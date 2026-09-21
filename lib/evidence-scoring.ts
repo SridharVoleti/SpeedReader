@@ -70,3 +70,46 @@ export function matchProposition(proposition: Proposition, normalizedWords: stri
     )
   };
 }
+
+// SR-R3-002: File-based semantic equivalence.
+// "Explicitly equivalent wording receives equivalent credit." An equivalence group is an
+// authored (file-defined, never fuzzy-guessed) set of phrasings - a polished gold paraphrase and
+// a short child-level response alike - that all count as exactly the same evidence.
+export type EquivalenceGroup = {
+  equivalenceGroupId: string;
+  expressions: string[];
+};
+
+export function expressionsFromGroups(groups: EquivalenceGroup[]): string[] {
+  return groups.flatMap((group) => group.expressions);
+}
+
+export type GroupedProposition = {
+  propositionId: string;
+  canonicalText: string;
+  mandatory: boolean;
+  equivalenceGroups: EquivalenceGroup[];
+  contradictionExpressions: string[];
+};
+
+export type GroupedMatchResult = PropositionMatchResult & { matchedGroupId: string | null };
+
+export function matchPropositionWithGroups(
+  proposition: GroupedProposition,
+  normalizedWords: string[]
+): GroupedMatchResult {
+  for (const group of proposition.equivalenceGroups) {
+    if (group.expressions.some((expression) => containsPhrase(normalizedWords, expression))) {
+      return {
+        propositionId: proposition.propositionId,
+        matched: true,
+        contradicted: false,
+        matchedGroupId: group.equivalenceGroupId
+      };
+    }
+  }
+  const contradicted = proposition.contradictionExpressions.some((expression) =>
+    containsPhrase(normalizedWords, expression)
+  );
+  return { propositionId: proposition.propositionId, matched: false, contradicted, matchedGroupId: null };
+}
