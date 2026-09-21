@@ -85,7 +85,7 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 
 | Requirement | Title | Status | Commit |
 |---|---|---|---|
-| SR-R7-001 | Duration-band measurement | Not started | |
+| SR-R7-001 | Duration-band measurement | Done | 5b49741 |
 | SR-R7-002 | Sustainable Reading Rate | Not started | |
 | SR-R7-003 | Fatigue/stability indicators | Not started | |
 
