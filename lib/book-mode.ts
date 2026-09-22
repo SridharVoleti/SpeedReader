@@ -49,3 +49,30 @@ export function summarizeBookChallenge(challenge: BookChallenge): BookChallengeS
     status
   };
 }
+
+// SR-R10-002: Book ETA.
+// "Estimate completion from appropriate sustainable/book rate, not peak short CRR."
+// "ETA uses configured book-rate source; peak CRR alone cannot override it." Which WPM value
+// feeds the estimate is decided purely by the explicit rateSource - a higher peak CRR is never
+// implicitly preferred, however large it is.
+export type BookRateSource = "sustainable" | "peak_crr";
+
+export type BookEtaInputs = {
+  remainingWords: number;
+  peakCrrWpm: number;
+  sustainableWpm: number;
+  rateSource: BookRateSource;
+};
+
+export type BookEtaResult = {
+  estimatedMinutes: number;
+  rateSource: BookRateSource;
+  wpmUsed: number;
+};
+
+export function estimateBookEta(inputs: BookEtaInputs): BookEtaResult {
+  const wpmUsed = inputs.rateSource === "sustainable" ? inputs.sustainableWpm : inputs.peakCrrWpm;
+  const estimatedMinutes = wpmUsed > 0 ? inputs.remainingWords / wpmUsed : Infinity;
+
+  return { estimatedMinutes, rateSource: inputs.rateSource, wpmUsed };
+}
