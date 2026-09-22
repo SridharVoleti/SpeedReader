@@ -109,7 +109,9 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R9-002 | Flexible span progression | Done | c96641d |
 | SR-R9-003 | Semantic pacing | Done | 36b00c8 |
 | SR-R9-004 | Personal Reading Model | Done | 2e6c845 |
-| SR-R9-005 | Reading-purpose profiles | Not started | |
+| SR-R9-005 | Reading-purpose profiles | Done | c10771e |
+
+**R9: all 5 requirements implemented, tested, pushed and live-validated.**
 
 ## R10: Book Mode
 
