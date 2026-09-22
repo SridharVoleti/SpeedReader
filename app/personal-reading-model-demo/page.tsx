@@ -6,7 +6,13 @@
 // result).
 
 import { useState } from "react";
-import { buildPersonalReadingModel, LedgerEntry } from "../../lib/personal-reading-model";
+import {
+  buildPersonalReadingModel,
+  LedgerEntry,
+  ModeCertificationState,
+  recordModeChallengeAttempt,
+  startModeCertificationState
+} from "../../lib/personal-reading-model";
 import styles from "../page.module.css";
 
 const LEDGER: LedgerEntry[] = [
@@ -30,6 +36,9 @@ export default function PersonalReadingModelDemoPage() {
     setRebuildCount((previous) => previous + 1);
   }
 
+  // SR-R9-005: Reading-purpose profiles.
+  const [modeState, setModeState] = useState<ModeCertificationState>(startModeCertificationState());
+
   return (
     <main className={styles.shell} data-testid="personal-reading-model-demo">
       <h1>Personal Reading Model</h1>
@@ -51,6 +60,40 @@ export default function PersonalReadingModelDemoPage() {
         <div className={styles.actions}>
           <button type="button" className={styles.primaryButton} data-testid="rebuild-from-ledger" onClick={rebuildFromLedger}>
             Delete derived profile and rebuild from ledger
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="reading-purpose-profiles">
+        <p className={styles.kicker}>Reading-purpose profiles (SR-R9-005)</p>
+        <p className={styles.stageHint}>
+          Each reading-purpose mode keeps its own certified rate - a passing attempt in one mode
+          never certifies another mode unless an explicit transfer rule permits it.
+        </p>
+        <p data-testid="mode-normal-crr">normal: {modeState.normal.certifiedWpm}</p>
+        <p data-testid="mode-study-crr">study: {modeState.study.certifiedWpm}</p>
+        <p data-testid="mode-story-crr">story: {modeState.story.certifiedWpm}</p>
+        <p data-testid="mode-scan-crr">scan_preview_review: {modeState.scan_preview_review.certifiedWpm}</p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="certify-study-mode"
+            onClick={() => setModeState((previous) => recordModeChallengeAttempt(previous, "study", 240, true))}
+          >
+            Certify study mode at 240 WPM
+          </button>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            data-testid="certify-story-mode-with-transfer"
+            onClick={() =>
+              setModeState((previous) =>
+                recordModeChallengeAttempt(previous, "story", 320, true, [{ fromMode: "story", toMode: "normal" }])
+              )
+            }
+          >
+            Certify story mode at 320 WPM (transfers to normal)
           </button>
         </div>
       </section>
