@@ -8,16 +8,25 @@
 import { useState } from "react";
 import {
   addReadingBlock,
+  BookCertificationGates,
   BookChallenge,
+  BookCompletionReport,
   BookRateSource,
   buildCheckpointContribution,
   CheckpointEvidence,
   estimateBookEta,
+  evaluateBookCertification,
   ReadingBlock,
   shouldTriggerCheckpoint,
   summarizeBookChallenge
 } from "../../lib/book-mode";
 import styles from "../page.module.css";
+
+const BOOK_CERTIFICATION_GATES: BookCertificationGates = {
+  comprehensionPassThreshold: 0.7,
+  retentionPassThreshold: 0.7,
+  retentionRequired: true
+};
 
 const CHECKPOINT_INTERVAL_PARAGRAPHS = 5;
 const CHECKPOINT_EVIDENCE: CheckpointEvidence = {
@@ -59,6 +68,16 @@ export default function BookModeDemoPage() {
   const [paragraphsRead, setParagraphsRead] = useState(0);
   const checkpointTriggered = shouldTriggerCheckpoint(paragraphsRead, CHECKPOINT_INTERVAL_PARAGRAPHS);
   const checkpointContribution = buildCheckpointContribution(CHECKPOINT_EVIDENCE, 320);
+
+  // SR-R10-004: Book-level certification.
+  const [comprehensionScore, setComprehensionScore] = useState(0.4);
+  const completionReport: BookCompletionReport = {
+    actualMinutes: 40,
+    effectiveWpm: 500,
+    comprehensionScore,
+    retentionScore: 0.9
+  };
+  const certification = evaluateBookCertification(completionReport, BOOK_CERTIFICATION_GATES);
 
   return (
     <main className={styles.shell} data-testid="book-mode-demo">
@@ -129,6 +148,31 @@ export default function BookModeDemoPage() {
             onClick={() => setParagraphsRead((previous) => previous + 1)}
           >
             Read next paragraph
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="book-level-certification">
+        <p className={styles.kicker}>Book-level certification (SR-R10-004)</p>
+        <p className={styles.stageHint}>
+          Actual time, effective rate, comprehension and retention are reported separately -
+          a fast completion never buys its way past a failing comprehension gate.
+        </p>
+        <p data-testid="report-actual-minutes">Actual minutes: {certification.actualMinutes}</p>
+        <p data-testid="report-effective-wpm">Effective rate: {certification.effectiveWpm} WPM</p>
+        <p data-testid="report-comprehension">Comprehension: {Math.round(certification.comprehensionScore * 100)}%</p>
+        <p data-testid="report-retention">Retention: {certification.retentionScore === null ? "none" : `${Math.round(certification.retentionScore * 100)}%`}</p>
+        <p data-testid="certification-result">
+          Book-level certification: {certification.certified ? "CERTIFIED" : "WITHHELD"} ({certification.reasonCode})
+        </p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="raise-comprehension-score"
+            onClick={() => setComprehensionScore(0.9)}
+          >
+            Raise comprehension to 90%
           </button>
         </div>
       </section>

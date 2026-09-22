@@ -111,3 +111,45 @@ export function buildCheckpointContribution(evidence: CheckpointEvidence, effect
     comprehensionScore: evidence.total > 0 ? evidence.correct / evidence.total : 0
   };
 }
+
+// SR-R10-004: Book-level certification.
+// "Report actual time, effective rate, comprehension and retention separately."
+// "Fast completion cannot be certified as book-level success if configured
+//  comprehension/retention gates fail." (TC-R10-004-B) Time/rate are always reported regardless
+// of the outcome - a fast completion never buys its way past a failing comprehension or
+// (when mandatory) retention gate.
+export type BookCompletionReport = {
+  actualMinutes: number;
+  effectiveWpm: number;
+  comprehensionScore: number;
+  retentionScore: number | null;
+};
+
+export type BookCertificationGates = {
+  comprehensionPassThreshold: number;
+  retentionPassThreshold: number;
+  retentionRequired: boolean;
+};
+
+export type BookCertificationResult = BookCompletionReport & {
+  certified: boolean;
+  reasonCode: string;
+};
+
+export function evaluateBookCertification(report: BookCompletionReport, gates: BookCertificationGates): BookCertificationResult {
+  const comprehensionPassed = report.comprehensionScore >= gates.comprehensionPassThreshold;
+  const retentionPassed = report.retentionScore !== null && report.retentionScore >= gates.retentionPassThreshold;
+
+  let certified = true;
+  let reasonCode = "CERTIFIED";
+
+  if (!comprehensionPassed) {
+    certified = false;
+    reasonCode = "COMPREHENSION_GATE_NOT_MET";
+  } else if (gates.retentionRequired && !retentionPassed) {
+    certified = false;
+    reasonCode = "RETENTION_GATE_NOT_MET";
+  }
+
+  return { ...report, certified, reasonCode };
+}

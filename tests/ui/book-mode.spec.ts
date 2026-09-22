@@ -69,3 +69,27 @@ test("only triggers a checkpoint at the section-level paragraph interval, linked
   // The comprehension score is unaffected regardless of when the checkpoint fires.
   await expect(checkpoint.getByTestId("checkpoint-score")).toHaveText("Comprehension score: 80%");
 });
+
+// SR-R10-004: Book-level certification (TC-R10-004-B: book fast, comprehension below gate).
+// "Fast completion cannot be certified as book-level success if configured
+//  comprehension/retention gates fail."
+test("shows time/rate for a fast completion but withholds book-level certification when comprehension fails the gate", async ({
+  page
+}) => {
+  await page.goto("/book-mode-demo");
+  const certification = page.getByTestId("book-level-certification");
+
+  await expect(certification.getByTestId("report-actual-minutes")).toHaveText("Actual minutes: 40");
+  await expect(certification.getByTestId("report-effective-wpm")).toHaveText("Effective rate: 500 WPM");
+  await expect(certification.getByTestId("report-comprehension")).toHaveText("Comprehension: 40%");
+  await expect(certification.getByTestId("certification-result")).toHaveText(
+    "Book-level certification: WITHHELD (COMPREHENSION_GATE_NOT_MET)"
+  );
+
+  await certification.getByTestId("raise-comprehension-score").click();
+
+  // Time/rate remain exactly as reported before - only the gate outcome changes.
+  await expect(certification.getByTestId("report-actual-minutes")).toHaveText("Actual minutes: 40");
+  await expect(certification.getByTestId("report-effective-wpm")).toHaveText("Effective rate: 500 WPM");
+  await expect(certification.getByTestId("certification-result")).toHaveText("Book-level certification: CERTIFIED (CERTIFIED)");
+});
