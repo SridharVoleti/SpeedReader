@@ -17,8 +17,10 @@ import {
   estimateBookEta,
   evaluateBookCertification,
   ReadingBlock,
+  resolveWordCount,
   shouldTriggerCheckpoint,
-  summarizeBookChallenge
+  summarizeBookChallenge,
+  WordCountInput
 } from "../../lib/book-mode";
 import styles from "../page.module.css";
 
@@ -78,6 +80,10 @@ export default function BookModeDemoPage() {
     retentionScore: 0.9
   };
   const certification = evaluateBookCertification(completionReport, BOOK_CERTIFICATION_GATES);
+
+  // SR-R10-005: 200-page goal measurement.
+  const [wordCountInput, setWordCountInput] = useState<WordCountInput>({ source: "page_estimate", pageCount: 200 });
+  const wordCountResult = resolveWordCount(wordCountInput);
 
   return (
     <main className={styles.shell} data-testid="book-mode-demo">
@@ -173,6 +179,39 @@ export default function BookModeDemoPage() {
             onClick={() => setComprehensionScore(0.9)}
           >
             Raise comprehension to 90%
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="page-goal-measurement">
+        <p className={styles.kicker}>200-page goal measurement (SR-R10-005)</p>
+        <p className={styles.stageHint}>
+          A page-only input is always clearly labeled as an estimate, derived from the
+          configured words/page assumption - it never masquerades as a measured word count.
+        </p>
+        <p data-testid="word-count-source">Source: {wordCountResult.wordCountSource}</p>
+        <p data-testid="word-count-value">Word count: {wordCountResult.wordCount}</p>
+        <p data-testid="word-count-estimated">
+          {wordCountResult.isEstimated
+            ? `Estimated (using ${wordCountResult.wordsPerPageAssumption} words/page)`
+            : "Measured (exact)"}
+        </p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="use-measured-word-count"
+            onClick={() => setWordCountInput({ source: "measured", wordCount: 52000 })}
+          >
+            Use known word count (52,000)
+          </button>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            data-testid="use-page-estimate"
+            onClick={() => setWordCountInput({ source: "page_estimate", pageCount: 200 })}
+          >
+            Use page-only input (200 pages)
           </button>
         </div>
       </section>

@@ -153,3 +153,32 @@ export function evaluateBookCertification(report: BookCompletionReport, gates: B
 
   return { ...report, certified, reasonCode };
 }
+
+// SR-R10-005: 200-page goal measurement.
+// "Use actual word count when available; distinguish page estimate from measured word count."
+// "Known words use words/time; page-only input is labeled estimated using configurable
+//  words/page assumption." (TC-R10-005-B) A page-only input can never masquerade as a measured
+// word count - it is always tagged isEstimated with the exact assumption that produced it.
+export type WordCountSource = "measured" | "page_estimate";
+
+export type WordCountInput = { source: "measured"; wordCount: number } | { source: "page_estimate"; pageCount: number };
+
+export type WordCountResult = {
+  wordCountSource: WordCountSource;
+  wordCount: number;
+  isEstimated: boolean;
+  wordsPerPageAssumption: number | null;
+};
+
+export function resolveWordCount(input: WordCountInput, wordsPerPageAssumption = 250): WordCountResult {
+  if (input.source === "measured") {
+    return { wordCountSource: "measured", wordCount: input.wordCount, isEstimated: false, wordsPerPageAssumption: null };
+  }
+
+  return {
+    wordCountSource: "page_estimate",
+    wordCount: input.pageCount * wordsPerPageAssumption,
+    isEstimated: true,
+    wordsPerPageAssumption
+  };
+}

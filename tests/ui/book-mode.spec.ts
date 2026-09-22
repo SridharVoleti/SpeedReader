@@ -93,3 +93,23 @@ test("shows time/rate for a fast completion but withholds book-level certificati
   await expect(certification.getByTestId("report-effective-wpm")).toHaveText("Effective rate: 500 WPM");
   await expect(certification.getByTestId("certification-result")).toHaveText("Book-level certification: CERTIFIED (CERTIFIED)");
 });
+
+// SR-R10-005: 200-page goal measurement (TC-R10-005-B: 200 pages, no word count).
+// "Known words use words/time; page-only input is labeled estimated using configurable
+//  words/page assumption."
+test("labels a page-only input as a clear estimate, and uses the exact measured word count when known words are available", async ({
+  page
+}) => {
+  await page.goto("/book-mode-demo");
+  const wordCount = page.getByTestId("page-goal-measurement");
+
+  await expect(wordCount.getByTestId("word-count-source")).toHaveText("Source: page_estimate");
+  await expect(wordCount.getByTestId("word-count-value")).toHaveText("Word count: 50000");
+  await expect(wordCount.getByTestId("word-count-estimated")).toHaveText("Estimated (using 250 words/page)");
+
+  await wordCount.getByTestId("use-measured-word-count").click();
+
+  await expect(wordCount.getByTestId("word-count-source")).toHaveText("Source: measured");
+  await expect(wordCount.getByTestId("word-count-value")).toHaveText("Word count: 52000");
+  await expect(wordCount.getByTestId("word-count-estimated")).toHaveText("Measured (exact)");
+});
