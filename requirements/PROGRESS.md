@@ -107,7 +107,7 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 |---|---|---|---|
 | SR-R9-001 | Meaningful chunk schema | Done | abb0a1c |
 | SR-R9-002 | Flexible span progression | Done | c96641d |
-| SR-R9-003 | Semantic pacing | Not started | |
+| SR-R9-003 | Semantic pacing | Done | 36b00c8 |
 | SR-R9-004 | Personal Reading Model | Not started | |
 | SR-R9-005 | Reading-purpose profiles | Not started | |
 
