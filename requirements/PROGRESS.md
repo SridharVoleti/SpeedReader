@@ -100,3 +100,23 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R8-003 | Unfamiliar-content transfer | Done | 7a2c04d |
 
 **R8: all 3 requirements implemented, tested, pushed and live-validated.**
+
+## R9: Meaningful Chunking & Personal Reading Model
+
+| Requirement | Title | Status | Commit |
+|---|---|---|---|
+| SR-R9-001 | Meaningful chunk schema | Done | abb0a1c |
+| SR-R9-002 | Flexible span progression | Not started | |
+| SR-R9-003 | Semantic pacing | Not started | |
+| SR-R9-004 | Personal Reading Model | Not started | |
+| SR-R9-005 | Reading-purpose profiles | Not started | |
+
+## R10: Book Mode
+
+| Requirement | Title | Status | Commit |
+|---|---|---|---|
+| SR-R10-001 | Book Challenge | Not started | |
+| SR-R10-002 | Book ETA | Not started | |
+| SR-R10-003 | Section mental-model checks | Not started | |
+| SR-R10-004 | Book-level certification | Not started | |
+| SR-R10-005 | 200-page goal measurement | Not started | |
