@@ -17,3 +17,24 @@ test("variable-size authored chunks reproduce the source exactly, and a schema w
 
   await expect(schema.getByTestId("reproduces-source")).toHaveText("Reproduces source exactly: no");
 });
+
+// SR-R9-002: Flexible span progression (TC-R9-002-B: certified L2, challenge L3, fail
+// comprehension).
+// "Failed comprehension at larger span cannot raise certified span."
+test("a failed comprehension attempt at a larger span never raises the certified span, but a passing one does", async ({
+  page
+}) => {
+  await page.goto("/meaningful-chunking-demo");
+  const span = page.getByTestId("flexible-span-progression");
+
+  await expect(span.getByTestId("certified-span")).toHaveText("Certified span: L2");
+
+  await span.getByTestId("fail-span-challenge").click();
+
+  await expect(span.getByTestId("certified-span")).toHaveText("Certified span: L2");
+  await expect(span.getByTestId("challenge-span")).toHaveText("Challenge span: L3");
+
+  await span.getByTestId("pass-span-challenge").click();
+
+  await expect(span.getByTestId("certified-span")).toHaveText("Certified span: L3");
+});

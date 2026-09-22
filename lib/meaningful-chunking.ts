@@ -26,3 +26,26 @@ export function chunksReproduceSourceExactly(tokens: string[], chunks: MeaningCh
   if (reconstructed.length !== tokens.length) return false;
   return reconstructed.every((token, index) => token === tokens[index]);
 }
+
+// SR-R9-002: Flexible span progression.
+// "Progress from word-level to larger meaning groups using comprehension-qualified evidence."
+// "Failed comprehension at larger span cannot raise certified span." (TC-R9-002-B) Mirrors the
+// CRR pattern in lib/certification.ts (recordChallengeAttempt) applied to span level instead of
+// WPM: the certified span only ever moves via a passing comprehension gate on the challenge.
+export type SpanLevel = number;
+
+export type SpanCertificationState = {
+  certifiedSpanLevel: SpanLevel;
+  challengeSpanLevel: SpanLevel | null;
+};
+
+export function recordSpanChallengeAttempt(
+  state: SpanCertificationState,
+  challengeSpanLevel: SpanLevel,
+  comprehensionPassed: boolean
+): SpanCertificationState {
+  if (!comprehensionPassed) {
+    return { certifiedSpanLevel: state.certifiedSpanLevel, challengeSpanLevel };
+  }
+  return { certifiedSpanLevel: Math.max(state.certifiedSpanLevel, challengeSpanLevel), challengeSpanLevel };
+}
