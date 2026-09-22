@@ -49,3 +49,53 @@ export function recordSpanChallengeAttempt(
   }
   return { certifiedSpanLevel: Math.max(state.certifiedSpanLevel, challengeSpanLevel), challengeSpanLevel };
 }
+
+// SR-R9-003: Semantic pacing.
+// "Apply bounded deterministic pacing adjustments for punctuation/meaning boundaries."
+// "Same content/rules yield same logged timing schedule within bounds." Pause type is classified
+// purely from a token's trailing punctuation - a pure function of the content, so the same
+// content and rules always produce the exact same schedule - and every multiplier is clamped
+// into the configured [min, max] bound.
+export type PauseType = "NONE" | "COMMA" | "SENTENCE_END" | "PARAGRAPH_END";
+
+export type PacingConfig = {
+  baseMsPerToken: number;
+  pauseMultipliers: Record<PauseType, number>;
+  minMultiplier: number;
+  maxMultiplier: number;
+};
+
+export type PacingScheduleEntry = {
+  token: string;
+  pauseType: PauseType;
+  pacingMultiplier: number;
+  durationMs: number;
+};
+
+export const DEFAULT_PACING_CONFIG: PacingConfig = {
+  baseMsPerToken: 300,
+  pauseMultipliers: { NONE: 1, COMMA: 1.3, SENTENCE_END: 1.8, PARAGRAPH_END: 2.2 },
+  minMultiplier: 1,
+  maxMultiplier: 2.5
+};
+
+export function classifyPauseType(token: string): PauseType {
+  if (/\n\s*\n$/.test(token)) return "PARAGRAPH_END";
+  if (/[.!?]$/.test(token)) return "SENTENCE_END";
+  if (/[,;:]$/.test(token)) return "COMMA";
+  return "NONE";
+}
+
+export function computePacingSchedule(tokens: string[], config: PacingConfig = DEFAULT_PACING_CONFIG): PacingScheduleEntry[] {
+  return tokens.map((token) => {
+    const pauseType = classifyPauseType(token);
+    const rawMultiplier = config.pauseMultipliers[pauseType];
+    const pacingMultiplier = Math.min(config.maxMultiplier, Math.max(config.minMultiplier, rawMultiplier));
+    return {
+      token,
+      pauseType,
+      pacingMultiplier,
+      durationMs: config.baseMsPerToken * pacingMultiplier
+    };
+  });
+}

@@ -9,11 +9,14 @@ import { useState } from "react";
 import {
   chunksReproduceSourceExactly,
   chunkTokens,
+  computePacingSchedule,
   MeaningChunk,
   recordSpanChallengeAttempt,
   SpanCertificationState
 } from "../../lib/meaningful-chunking";
 import styles from "../page.module.css";
+
+const PACING_TOKENS = ["First,", "second.", "third"];
 
 const SOURCE_TOKENS = ["The", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog"];
 
@@ -37,6 +40,9 @@ export default function MeaningfulChunkingDemoPage() {
 
   // SR-R9-002: Flexible span progression.
   const [spanState, setSpanState] = useState<SpanCertificationState>({ certifiedSpanLevel: 2, challengeSpanLevel: null });
+
+  // SR-R9-003: Semantic pacing.
+  const pacingSchedule = computePacingSchedule(PACING_TOKENS);
 
   return (
     <main className={styles.shell} data-testid="meaningful-chunking-demo">
@@ -89,6 +95,19 @@ export default function MeaningfulChunkingDemoPage() {
             Attempt L3 challenge - pass comprehension
           </button>
         </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="semantic-pacing">
+        <p className={styles.kicker}>Semantic pacing (SR-R9-003)</p>
+        <p className={styles.stageHint}>
+          Pacing is a bounded, deterministic function of each token's punctuation - the same
+          content and rules always log the exact same timing schedule.
+        </p>
+        {pacingSchedule.map((entry, index) => (
+          <p key={index} data-testid={`pacing-entry-${index}`}>
+            {entry.token}: {entry.pauseType} (x{entry.pacingMultiplier.toFixed(2)}, {Math.round(entry.durationMs)}ms)
+          </p>
+        ))}
       </section>
     </main>
   );

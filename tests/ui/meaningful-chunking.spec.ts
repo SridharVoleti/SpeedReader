@@ -38,3 +38,20 @@ test("a failed comprehension attempt at a larger span never raises the certified
 
   await expect(span.getByTestId("certified-span")).toHaveText("Certified span: L3");
 });
+
+// SR-R9-003: Semantic pacing.
+// "Same content/rules yield same logged timing schedule within bounds."
+test("logs a bounded, deterministic pacing schedule driven by trailing punctuation", async ({ page }) => {
+  await page.goto("/meaningful-chunking-demo");
+  const pacing = page.getByTestId("semantic-pacing");
+
+  await expect(pacing.getByTestId("pacing-entry-0")).toHaveText("First,: COMMA (x1.30, 390ms)");
+  await expect(pacing.getByTestId("pacing-entry-1")).toHaveText("second.: SENTENCE_END (x1.80, 540ms)");
+  await expect(pacing.getByTestId("pacing-entry-2")).toHaveText("third: NONE (x1.00, 300ms)");
+
+  // Reloading re-derives the schedule from the same content/rules - it must log identically.
+  await page.reload();
+  await expect(pacing.getByTestId("pacing-entry-0")).toHaveText("First,: COMMA (x1.30, 390ms)");
+  await expect(pacing.getByTestId("pacing-entry-1")).toHaveText("second.: SENTENCE_END (x1.80, 540ms)");
+  await expect(pacing.getByTestId("pacing-entry-2")).toHaveText("third: NONE (x1.00, 300ms)");
+});
