@@ -6,8 +6,27 @@
 // block contributes nothing).
 
 import { useState } from "react";
-import { addReadingBlock, BookChallenge, BookRateSource, estimateBookEta, ReadingBlock, summarizeBookChallenge } from "../../lib/book-mode";
+import {
+  addReadingBlock,
+  BookChallenge,
+  BookRateSource,
+  buildCheckpointContribution,
+  CheckpointEvidence,
+  estimateBookEta,
+  ReadingBlock,
+  shouldTriggerCheckpoint,
+  summarizeBookChallenge
+} from "../../lib/book-mode";
 import styles from "../page.module.css";
+
+const CHECKPOINT_INTERVAL_PARAGRAPHS = 5;
+const CHECKPOINT_EVIDENCE: CheckpointEvidence = {
+  checkpointId: "cp-1",
+  sectionId: "chapter-3",
+  constructsAssessed: ["main-idea", "cause-effect"],
+  correct: 4,
+  total: 5
+};
 
 const INITIAL_BOOK: BookChallenge = { bookId: "book-1", totalWords: 1000, blocks: [] };
 
@@ -35,6 +54,11 @@ export default function BookModeDemoPage() {
     sustainableWpm: 250,
     rateSource
   });
+
+  // SR-R10-003: Section mental-model checks.
+  const [paragraphsRead, setParagraphsRead] = useState(0);
+  const checkpointTriggered = shouldTriggerCheckpoint(paragraphsRead, CHECKPOINT_INTERVAL_PARAGRAPHS);
+  const checkpointContribution = buildCheckpointContribution(CHECKPOINT_EVIDENCE, 320);
 
   return (
     <main className={styles.shell} data-testid="book-mode-demo">
@@ -81,6 +105,30 @@ export default function BookModeDemoPage() {
             onClick={() => setRateSource((previous) => (previous === "sustainable" ? "peak_crr" : "sustainable"))}
           >
             {rateSource === "sustainable" ? "Configure book-rate source: peak CRR" : "Configure book-rate source: sustainable"}
+          </button>
+        </div>
+      </section>
+
+      <section className={styles.stageCard} data-testid="section-checkpoint">
+        <p className={styles.kicker}>Section mental-model checks (SR-R10-003)</p>
+        <p className={styles.stageHint}>
+          A checkpoint only triggers at the configured section-level paragraph interval - never
+          on every paragraph - and links to section-level constructs/evidence, contributing a
+          comprehension score independent of reading speed.
+        </p>
+        <p data-testid="paragraphs-read">Paragraphs read: {paragraphsRead}</p>
+        <p data-testid="checkpoint-triggered">Checkpoint triggered: {checkpointTriggered ? "yes" : "no"}</p>
+        <p data-testid="checkpoint-section">Checkpoint section: {checkpointContribution.sectionId}</p>
+        <p data-testid="checkpoint-constructs">Constructs assessed: {checkpointContribution.constructsAssessed.join(", ")}</p>
+        <p data-testid="checkpoint-score">Comprehension score: {Math.round(checkpointContribution.comprehensionScore * 100)}%</p>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            data-testid="advance-paragraph"
+            onClick={() => setParagraphsRead((previous) => previous + 1)}
+          >
+            Read next paragraph
           </button>
         </div>
       </section>

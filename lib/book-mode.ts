@@ -76,3 +76,38 @@ export function estimateBookEta(inputs: BookEtaInputs): BookEtaResult {
 
   return { estimatedMinutes, rateSource: inputs.rateSource, wpmUsed };
 }
+
+// SR-R10-003: Section mental-model checks.
+// "Test section/chapter understanding without over-testing every paragraph."
+// "Checkpoint links to section-level constructs/evidence and contributes independently of
+//  speed." A checkpoint fires only at the configured section-level paragraph interval - never
+// per paragraph - and its comprehension score is computed purely from checkpoint evidence; the
+// effective reading speed is accepted for reporting only and never enters the computation.
+export function shouldTriggerCheckpoint(paragraphIndex: number, checkpointIntervalParagraphs: number): boolean {
+  return paragraphIndex > 0 && paragraphIndex % checkpointIntervalParagraphs === 0;
+}
+
+export type CheckpointEvidence = {
+  checkpointId: string;
+  sectionId: string;
+  constructsAssessed: string[];
+  correct: number;
+  total: number;
+};
+
+export type CheckpointContribution = {
+  checkpointId: string;
+  sectionId: string;
+  constructsAssessed: string[];
+  comprehensionScore: number;
+};
+
+export function buildCheckpointContribution(evidence: CheckpointEvidence, effectiveWpm: number): CheckpointContribution {
+  void effectiveWpm; // accepted for reporting context only - never feeds the comprehension score
+  return {
+    checkpointId: evidence.checkpointId,
+    sectionId: evidence.sectionId,
+    constructsAssessed: evidence.constructsAssessed,
+    comprehensionScore: evidence.total > 0 ? evidence.correct / evidence.total : 0
+  };
+}

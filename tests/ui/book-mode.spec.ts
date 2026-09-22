@@ -41,3 +41,31 @@ test("the ETA uses the configured sustainable rate, not the higher peak CRR, unl
   await expect(eta.getByTestId("eta-rate-source")).toHaveText("Rate source: peak_crr");
   await expect(eta.getByTestId("eta-wpm-used")).toHaveText("WPM used: 350");
 });
+
+// SR-R10-003: Section mental-model checks.
+// "Test section/chapter understanding without over-testing every paragraph."
+// "Checkpoint links to section-level constructs/evidence and contributes independently of
+//  speed."
+test("only triggers a checkpoint at the section-level paragraph interval, linked to section constructs and a speed-independent score", async ({
+  page
+}) => {
+  await page.goto("/book-mode-demo");
+  const checkpoint = page.getByTestId("section-checkpoint");
+
+  await expect(checkpoint.getByTestId("checkpoint-triggered")).toHaveText("Checkpoint triggered: no");
+  await expect(checkpoint.getByTestId("checkpoint-section")).toHaveText("Checkpoint section: chapter-3");
+  await expect(checkpoint.getByTestId("checkpoint-constructs")).toHaveText("Constructs assessed: main-idea, cause-effect");
+  await expect(checkpoint.getByTestId("checkpoint-score")).toHaveText("Comprehension score: 80%");
+
+  for (let i = 0; i < 4; i++) {
+    await checkpoint.getByTestId("advance-paragraph").click();
+  }
+  await expect(checkpoint.getByTestId("paragraphs-read")).toHaveText("Paragraphs read: 4");
+  await expect(checkpoint.getByTestId("checkpoint-triggered")).toHaveText("Checkpoint triggered: no");
+
+  await checkpoint.getByTestId("advance-paragraph").click();
+  await expect(checkpoint.getByTestId("paragraphs-read")).toHaveText("Paragraphs read: 5");
+  await expect(checkpoint.getByTestId("checkpoint-triggered")).toHaveText("Checkpoint triggered: yes");
+  // The comprehension score is unaffected regardless of when the checkpoint fires.
+  await expect(checkpoint.getByTestId("checkpoint-score")).toHaveText("Comprehension score: 80%");
+});
