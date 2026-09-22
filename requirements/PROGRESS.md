@@ -118,7 +118,7 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | Requirement | Title | Status | Commit |
 |---|---|---|---|
 | SR-R10-001 | Book Challenge | Done | c27e2a4 |
-| SR-R10-002 | Book ETA | Not started | |
+| SR-R10-002 | Book ETA | Done | a028f92 |
 | SR-R10-003 | Section mental-model checks | Not started | |
 | SR-R10-004 | Book-level certification | Not started | |
 | SR-R10-005 | 200-page goal measurement | Not started | |
