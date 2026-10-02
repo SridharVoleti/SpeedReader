@@ -24,6 +24,7 @@ import { applyAttemptToCore, newCoreWpmState as newCoreState, type AttemptType }
 import { recordPracticeAttempt, selectFamiliarPassage, type LearnerRecord } from "../../lib/v2/familiar-practice";
 import { ALL_INTERNAL_STATES, learnerCopyFor, learnerLanguageViolations } from "../../lib/v2/learner-language";
 import { scoreComprehension, structuredEvidence } from "../../lib/v2/comprehension-score";
+import { greenThresholdForCalibration, validateCalibration } from "../../lib/v2/calibration-lifecycle";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -203,6 +204,15 @@ const checks: Check[] = [
       const pending = scoreComprehension(structuredEvidence([{ itemId: "q1", score: 1 }]), null);
       if (r.status !== "SCORED") return "unscored";
       return `structured ${r.structured.items.length} items stored separately from spoken; weights ${r.weights.structured}/${r.weights.spoken} (${r.calibrationVersion}); one result; without spoken: ${pending.status}`;
+    })()
+  },
+  {
+    id: "FR-021",
+    title: "weighting lifecycle",
+    result: (() => {
+      const cfg = (structured: number, spoken: number) => ({ version: "demo", status: "PROVISIONAL_PILOT" as const, comprehensionWeights: { structured, spoken } });
+      const verdict = (s: number, p: number) => (validateCalibration(cfg(s, p)).length === 0 ? "ok" : "rejected");
+      return `70/30 ${verdict(0.7, 0.3)}; 65/35 ${verdict(0.65, 0.35)}; 50/50 ${verdict(0.5, 0.5)}; 100/0 ${verdict(1, 0)}; GREEN threshold stays ${greenThresholdForCalibration("any") * 100}%`;
     })()
   }
 ];

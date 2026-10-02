@@ -140,3 +140,10 @@ test("FR-020 hybrid comprehension evidence", async ({ page }) => {
     "structured 4 items stored separately from spoken; weights 0.7/0.3 (calibration-2026-10-pilot-1); one result; without spoken: AWAITING_SPOKEN_EVIDENCE"
   );
 });
+
+test("FR-021 weighting lifecycle", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-021")).toHaveText(
+    "70/30 ok; 65/35 ok; 50/50 rejected; 100/0 rejected; GREEN threshold stays 75%"
+  );
+});
