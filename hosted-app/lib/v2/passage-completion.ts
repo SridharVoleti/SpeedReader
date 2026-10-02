@@ -9,6 +9,7 @@ import type { ComprehensionResult } from "./comprehension-score";
 import { recordNewPassage, type CoreWpmEvent, type CoreWpmState } from "./core-wpm";
 import { buildLearnerFeedback, buildLevelUpFeedback, type LearnerFeedback } from "./learner-feedback";
 import type { Classification } from "./comprehension-threshold";
+import { bookTimeImpact, type BookTimeImpact } from "./book-time";
 
 export type InternalAttemptRecord = {
   attemptId: string;
@@ -21,12 +22,17 @@ export type InternalAttemptRecord = {
 
 export type PassageCompletionOutcome = {
   record: InternalAttemptRecord;
-  learner: LearnerFeedback & { newWpm?: number };
+  learner: LearnerFeedback & { newWpm?: number; bookTime?: BookTimeImpact };
   coreAfter: CoreWpmState;
   coreEvent: CoreWpmEvent;
 };
 
-export function completeNewPassage(attemptId: string, comprehension: ComprehensionResult, core: CoreWpmState): PassageCompletionOutcome {
+export function completeNewPassage(
+  attemptId: string,
+  comprehension: ComprehensionResult,
+  core: CoreWpmState,
+  baselineWpm?: number
+): PassageCompletionOutcome {
   if (comprehension.status !== "SCORED") {
     // Unscored (awaiting/unresolved spoken evidence): nothing stored as a score, nothing counted.
     return {
@@ -45,7 +51,7 @@ export function completeNewPassage(attemptId: string, comprehension: Comprehensi
     // A validated +1 WPM Level Up gets a larger celebration than an individual GREEN passage (FR-032).
     learner:
       event === "LEVEL_UP"
-        ? buildLevelUpFeedback(state.wpm)
+        ? { ...buildLevelUpFeedback(state.wpm), bookTime: bookTimeImpact(core.wpm, state.wpm, baselineWpm) }
         : buildLearnerFeedback({ attemptId, score: comprehension.score, classification: comprehension.classification }),
     coreAfter: state,
     coreEvent: event

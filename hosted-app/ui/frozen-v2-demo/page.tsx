@@ -36,6 +36,7 @@ import { EXPRESSION_FOCUS_BY_WORLD, expressionFocusFor, permanentFeaturesFor } f
 import { assertNoInternalLeak, buildLearnerFeedback } from "../../lib/v2/learner-feedback";
 import { completeNewPassage } from "../../lib/v2/passage-completion";
 import { CELEBRATION_RANK } from "../../lib/v2/learner-feedback";
+import { bookTimeImpact, formatDuration } from "../../lib/v2/book-time";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -367,6 +368,19 @@ const checks: Check[] = [
       const green = outs[0].learner;
       const up = outs[4].learner;
       return `single GREEN celebration ${green.celebration}; Level Up celebration ${up.celebration} ("${up.message}"), new WPM ${up.newWpm}; larger=${CELEBRATION_RANK[up.celebration] > CELEBRATION_RANK[green.celebration]}`;
+    })()
+  },
+  {
+    id: "FR-033",
+    title: "book-time impact on Level Up",
+    result: (() => {
+      const i = bookTimeImpact(90, 91, 60);
+      const scored = (s: number) => scoreComprehension(structuredEvidence([{ itemId: "q1", score: s }]), { score: s });
+      let core = newCoreWpmState(90);
+      let last = completeNewPassage("b0", scored(0.9), core, 90);
+      core = last.coreAfter;
+      for (let k = 1; k < 5; k += 1) { last = completeNewPassage(`b${k}`, scored(0.9), core, 90); core = last.coreAfter; }
+      return `${i.previousWpm}->${i.newWpm} WPM: 50,000-word book ${formatDuration(i.estimatedAtNewWpm)}, saves about ${formatDuration(i.savedVsPrevious)}; since baseline about ${formatDuration(i.cumulativeSavedVsBaseline!)}; wording estimated+about=${/estimated/.test(i.message) && /about/.test(i.message)}; shown on Level Up=${last.learner.bookTime !== undefined}`;
     })()
   }
 ];

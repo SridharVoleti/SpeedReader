@@ -224,3 +224,10 @@ test("FR-032 Level Up is celebrated more than a GREEN passage", async ({ page })
     "single GREEN celebration SMALL; Level Up celebration LARGE (\"You Levelled Up!\"), new WPM 91; larger=true"
   );
 });
+
+test("FR-033 book-time impact on Level Up", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-033")).toHaveText(
+    "90->91 WPM: 50,000-word book 9 hours 9 minutes, saves about 6 minutes; since baseline about 4 hours 44 minutes; wording estimated+about=true; shown on Level Up=true"
+  );
+});
