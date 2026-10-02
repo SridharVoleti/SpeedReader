@@ -280,3 +280,10 @@ test("FR-040 passage 1500 alone does not prove mastery", async ({ page }) => {
     "P1500 done without readiness: SEQUENCE_COMPLETE_READINESS_PENDING; 14/15 ready: SEQUENCE_COMPLETE_READINESS_PENDING (missing RS15); 15/15 ready: WORLD1_COMPLETE; ready but P900: IN_PROGRESS"
   );
 });
+
+test("FR-041 150 WPM is not mandatory", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-041")).toHaveText(
+    "completes at 60 WPM=WORLD1_COMPLETE; at 90 WPM=WORLD1_COMPLETE; at 149 WPM=WORLD1_COMPLETE; at 150 WPM=WORLD1_COMPLETE; 150 WPM but readiness missing=SEQUENCE_COMPLETE_READINESS_PENDING; ceiling is a requirement=false"
+  );
+});
