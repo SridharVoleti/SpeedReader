@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { chunkWords } from "../../lib/chunking";
-import { ProgressionLevel } from "../../lib/progression";
+import { levels, ProgressionLevel } from "../../lib/progression";
 import { planReadingTiming, recordActualDuration, ReadingTimingRecord } from "../../lib/reading-timing";
 import { PassageData, ScoreResult, scoreComprehension } from "../../lib/scoring";
 import styles from "../page.module.css";
@@ -68,6 +68,27 @@ type Props = {
 
 function msPerChunk(wpm: number, wordsPerChunk: number) {
   return Math.floor((60_000 / wpm) * wordsPerChunk);
+}
+
+function playCompletionSound() {
+  if (window.localStorage.getItem("speedreader-sound-effects") === "false") return;
+  try {
+    const context = new AudioContext();
+    [523.25, 659.25, 783.99].forEach((frequency, index) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const start = context.currentTime + index * 0.12;
+      oscillator.type = "sine";
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.08, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start(start);
+      oscillator.stop(start + 0.23);
+    });
+    window.setTimeout(() => void context.close(), 900);
+  } catch { /* Audio may be unavailable or blocked by the browser. */ }
 }
 
 export default function LevelPlayer({
@@ -220,6 +241,7 @@ export default function LevelPlayer({
   function submitAnswer() {
     recognitionRef.current?.stop();
     const scored = scoreComprehension(passage, answer, level.passThreshold);
+    if (scored.passed) playCompletionSound();
     setResult(scored);
     onRecord(scored.score, readingTiming);
     setPhase("results");
@@ -241,7 +263,7 @@ export default function LevelPlayer({
 
   return (
     <div className={styles.player} data-testid="level-player">
-      <header className={styles.playerHeader}>
+      {phase !== "results" && <header className={styles.playerHeader}>
         <button className={styles.backButton} onClick={onExit} aria-label="Back to level map">
           ← Map
         </button>
@@ -259,7 +281,7 @@ export default function LevelPlayer({
             {learnerName}
           </span>
         )}
-      </header>
+      </header>}
 
       {phase === "intro" && (
         <section className={styles.stageCard}>
@@ -459,24 +481,23 @@ export default function LevelPlayer({
       )}
 
       {phase === "results" && result && (
-        <section className={styles.stageCard} data-testid="level-results">
-          <p className={styles.kicker}>{result.passed ? "Level cleared!" : "Not yet"}</p>
-          <div className={styles.resultScore}>
-            <strong data-testid="result-score">{result.score}</strong>
-            <span>/ 100</span>
+        <section className={styles.resultPage} data-testid="level-results">
+          <div className={styles.resultHero}>
+            <button type="button" className={styles.resultClose} onClick={onExit} aria-label="Back to map">×</button>
+            <p className={styles.resultEyebrow}>⚡ {result.passed ? "Level complete" : "Keep going"}</p>
+            <div className={styles.resultStars} aria-label="Stars earned">
+              {[70, 80, 90].map((threshold) => <span key={threshold} className={result.score >= threshold ? styles.starOnBig : styles.starOffBig} aria-hidden="true">{result.score >= threshold ? "★" : "☆"}</span>)}
+            </div>
+            <h1>{result.passed ? `Level ${level.id} clear!` : `Level ${level.id} — try again`}</h1>
+            <p>{result.passed ? `You cleared ${worldName} at a target of ${level.wpm} WPM.` : `Reach ${level.passThreshold} comprehension points to unlock the next level.`}</p>
           </div>
-          <div className={styles.resultStars} aria-label="Stars earned">
-            {/* Accessibility baseline: on/off stars differ by shape, not color alone. */}
-            {[70, 80, 90].map((threshold) => (
-              <span
-                key={threshold}
-                className={result.score >= threshold ? styles.starOnBig : styles.starOffBig}
-                aria-hidden="true"
-              >
-                {result.score >= threshold ? "★" : "☆"}
-              </span>
-            ))}
+          <div className={styles.resultMetrics}>
+            <div><span aria-hidden="true">ϟ</span><strong>{readingTiming?.actual_duration_ms ? Math.round(readingTiming.word_count * 60000 / readingTiming.actual_duration_ms) : level.wpm} WPM</strong><small>Your speed</small></div>
+            <div><span aria-hidden="true">✓</span><strong className={styles.resultScore}><span data-testid="result-score">{result.score}</span> / 100</strong><small>Comprehension</small></div>
+            <div><span aria-hidden="true">★</span><strong>+{[70, 80, 90].filter((threshold) => result.score >= threshold).length}</strong><small>Stars earned</small></div>
           </div>
+          <p className={styles.resultWorldMeta}>{worldName} · Level {level.step} of 6</p>
+          {result.passed && hasNextLevel && <div className={styles.upNext}><div><small>Up next</small><strong>Level {level.id + 1}</strong></div><span>{level.step === 6 ? 100 : levels.find((next) => next.id === level.id + 1)?.wpm} <small>WPM target</small></span></div>}
           <dl className={styles.breakdown}>
             <Item label="Detail (length)" value={result.lengthPoints} max={15} />
             <Item label="Key facts" value={result.keywordPoints} max={30} />
