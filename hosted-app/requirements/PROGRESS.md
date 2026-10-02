@@ -171,3 +171,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-036 | Shared content, separate state | Done | 3b9adf1 |
 | FR-037 | Reference delivery | Done | ec4acfe |
 | FR-038 | Oral two-read coaching | Done | ebfc04d |
+| FR-039 | Supersession of oral-as-core-gate | Done | e74164f |
