@@ -287,3 +287,10 @@ test("FR-041 150 WPM is not mandatory", async ({ page }) => {
     "completes at 60 WPM=WORLD1_COMPLETE; at 90 WPM=WORLD1_COMPLETE; at 149 WPM=WORLD1_COMPLETE; at 150 WPM=WORLD1_COMPLETE; 150 WPM but readiness missing=SEQUENCE_COMPLETE_READINESS_PENDING; ceiling is a requirement=false"
   );
 });
+
+test("FR-042 Level Ups do not substitute for readiness", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-042")).toHaveText(
+    "12 Level Ups earned (60->72 WPM); readiness missing 15/15; World 1 status with 12 Level Ups but no readiness: SEQUENCE_COMPLETE_READINESS_PENDING"
+  );
+});

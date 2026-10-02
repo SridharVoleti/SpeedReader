@@ -46,6 +46,7 @@ import { CORE_WPM_GATES, SUPERSESSION_REGISTER, assertNoOralGate, supersededRule
 import { world1Status } from "../../lib/v2/world1-completion";
 import { RS_IDS } from "../../lib/world1-framework";
 import { ceilingIsCompletionRequirement } from "../../lib/v2/speed-ceiling";
+import { missingReadiness } from "../../lib/v2/world1-completion";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -489,6 +490,18 @@ const checks: Check[] = [
       const ready = RS_IDS.map((rsId) => ({ rsId, confirmed: true, formId: `form-${rsId}-v1` }));
       const at = (earnedWpm: number, readiness = ready, canonicalPointer = 1501) => world1Status({ canonicalPointer, readiness, earnedWpm }).status;
       return `completes at 60 WPM=${at(60)}; at 90 WPM=${at(90)}; at 149 WPM=${at(149)}; at 150 WPM=${at(150)}; 150 WPM but readiness missing=${at(150, [])}; ceiling is a requirement=${ceilingIsCompletionRequirement()}`;
+    })()
+  },
+  {
+    id: "FR-042",
+    title: "Level Ups do not substitute for readiness",
+    result: (() => {
+      const scored = (s: number) => scoreComprehension(structuredEvidence([{ itemId: "q1", score: s }]), { score: s });
+      let learner = newLearnerAggregate("l1", 60);
+      for (let i = 0; i < 60; i += 1) learner = applyNewPassage(learner, `u${i}`, scored(0.95)).learner;
+      const levelUps = learner.core.wpm - learner.baselineWpm;
+      const verdict = world1Status({ canonicalPointer: 1501, readiness: [], levelUps, earnedWpm: learner.core.wpm });
+      return `${levelUps} Level Ups earned (${learner.baselineWpm}->${learner.core.wpm} WPM); readiness missing ${missingReadiness([]).length}/15; World 1 status with ${levelUps} Level Ups but no readiness: ${verdict.status}`;
     })()
   }
 ];
