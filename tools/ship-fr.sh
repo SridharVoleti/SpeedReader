@@ -25,7 +25,7 @@ if ! timeout 200 npx playwright test hosted-app/tests/ui/frozen-v2.spec.ts --pro
 fi
 tail -3 /tmp/pw-ship.log
 
-git add -A hosted-app/lib hosted-app/tests hosted-app/ui hosted-app/app.manifest.ts hosted-app/archive tools tsconfig.json 2>/dev/null
+git add -A hosted-app/lib hosted-app/tests hosted-app/ui hosted-app/app.manifest.ts hosted-app/archive tools tsconfig.json requirements 2>/dev/null
 git commit -q -m "Implement $FR: $TITLE" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 H=$(git rev-parse --short HEAD)
 python tools/progress-row.py "$P" "$FR" "$TITLE" "$H"

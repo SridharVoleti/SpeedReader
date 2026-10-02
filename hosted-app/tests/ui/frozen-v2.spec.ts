@@ -371,3 +371,10 @@ test("AC-C06 boundary matrix", async ({ page }) => {
     "boundary matrix 13/13 PASS; B03 91 WPM, LEVEL_UP; B09 90 WPM at pointer 151; B11 AWAITING_SPOKEN_EVIDENCE, evidence 0; B13 FORM_VERSION_MISMATCH"
   );
 });
+
+test("AC-C03 separate state", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-AC-C03")).toHaveText(
+    "aggregate domains: attempts,baselineWpm,canonicalPointer,core,learnerId,ledger,newsReader; generic score/level/status fields=0; News Reader state separate from core WPM state=true"
+  );
+});

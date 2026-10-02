@@ -662,6 +662,16 @@ const checks: Check[] = [
       const failing = rows.filter((r) => !r.pass).map((r) => r.id).join(",");
       return `boundary matrix ${passed}/${rows.length} PASS${failing ? ` (failing ${failing})` : ""}; B03 ${rows[2].observed}; B09 ${rows[8].observed}; B11 ${rows[10].observed}; B13 ${rows[12].observed}`;
     })()
+  },
+  {
+    id: "AC-C03",
+    title: "separate state",
+    result: (() => {
+      const learner = newLearnerAggregate("l", 90);
+      const keys = Object.keys(learner).sort();
+      const generic = keys.filter((k) => /^(score|level|status|state|rating|result)$/i.test(k)).length;
+      return `aggregate domains: ${keys.join(",")}; generic score/level/status fields=${generic}; News Reader state separate from core WPM state=${learner.newsReader !== (learner.core as unknown)}`;
+    })()
   }
 ];
 
