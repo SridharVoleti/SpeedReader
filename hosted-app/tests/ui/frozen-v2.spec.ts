@@ -294,3 +294,10 @@ test("FR-042 Level Ups do not substitute for readiness", async ({ page }) => {
     "12 Level Ups earned (60->72 WPM); readiness missing 15/15; World 1 status with 12 Level Ups but no readiness: SEQUENCE_COMPLETE_READINESS_PENDING"
   );
 });
+
+test("FR-043 News Reader does not block World progression", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-043")).toHaveText(
+    "ready + no News Reader: advance to World 2; ready + worst oral: advance to World 2; ready + mic unavailable: advance to World 2; not ready + perfect oral: hold (SEQUENCE_COMPLETE_READINESS_PENDING)"
+  );
+});

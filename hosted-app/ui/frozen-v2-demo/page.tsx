@@ -47,6 +47,7 @@ import { world1Status } from "../../lib/v2/world1-completion";
 import { RS_IDS } from "../../lib/world1-framework";
 import { ceilingIsCompletionRequirement } from "../../lib/v2/speed-ceiling";
 import { missingReadiness } from "../../lib/v2/world1-completion";
+import { advanceFromWorld1 } from "../../lib/v2/world1-completion";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -502,6 +503,15 @@ const checks: Check[] = [
       const levelUps = learner.core.wpm - learner.baselineWpm;
       const verdict = world1Status({ canonicalPointer: 1501, readiness: [], levelUps, earnedWpm: learner.core.wpm });
       return `${levelUps} Level Ups earned (${learner.baselineWpm}->${learner.core.wpm} WPM); readiness missing ${missingReadiness([]).length}/15; World 1 status with ${levelUps} Level Ups but no readiness: ${verdict.status}`;
+    })()
+  },
+  {
+    id: "FR-043",
+    title: "News Reader does not block World progression",
+    result: (() => {
+      const ready = RS_IDS.map((rsId) => ({ rsId, confirmed: true, formId: `form-${rsId}-v1` }));
+      const show = (mastery: unknown, readiness = ready) => { const r = advanceFromWorld1({ canonicalPointer: 1501, readiness, newsReaderMastery: mastery }); return r.advance ? `advance to World ${r.toWorld}` : `hold (${r.reason})`; };
+      return `ready + no News Reader: ${show(undefined)}; ready + worst oral: ${show({ score: 0 })}; ready + mic unavailable: ${show("MIC_UNAVAILABLE")}; not ready + perfect oral: ${show({ score: 1 }, [])}`;
     })()
   }
 ];

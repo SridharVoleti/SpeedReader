@@ -49,3 +49,15 @@ export function world1Status(facts: World1Facts): World1Status {
   const missing = missingReadiness(facts.readiness);
   return missing.length === 0 ? { status: "WORLD1_COMPLETE" } : { status: "SEQUENCE_COMPLETE_READINESS_PENDING", missingReadiness: missing };
 }
+
+export type WorldAdvance = { advance: true; toWorld: 2 } | { advance: false; reason: World1Status["status"] };
+
+/**
+ * FR-043: a learner who has satisfied the core World 1 reading requirements progresses in the core World
+ * architecture. News Reader/oral mastery is parallel, so `newsReaderMastery` (and every other
+ * non-core fact) is never consulted here.
+ */
+export function advanceFromWorld1(facts: World1Facts): WorldAdvance {
+  const status = world1Status({ canonicalPointer: facts.canonicalPointer, readiness: facts.readiness });
+  return status.status === "WORLD1_COMPLETE" ? { advance: true, toWorld: 2 } : { advance: false, reason: status.status };
+}
