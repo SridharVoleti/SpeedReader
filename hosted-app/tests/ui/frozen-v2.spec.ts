@@ -217,3 +217,10 @@ test("FR-031 below 75% remains positive", async ({ page }) => {
     "below-75 stored as NOT_GREEN (exact score kept=true); celebration NONE; BPC offered=true; digits/failure words shown=false; 8 low passages keep 90 WPM"
   );
 });
+
+test("FR-032 Level Up is celebrated more than a GREEN passage", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-032")).toHaveText(
+    "single GREEN celebration SMALL; Level Up celebration LARGE (\"You Levelled Up!\"), new WPM 91; larger=true"
+  );
+});

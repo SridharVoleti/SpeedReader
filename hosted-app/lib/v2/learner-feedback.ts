@@ -17,13 +17,21 @@ export type LearnerFeedback = {
   /** Warm, non-numeric message. */
   message: string;
   /** Larger/smaller celebration level; never labelled with a result state. */
-  celebration: "SMALL" | "NONE";
+  celebration: "NONE" | "SMALL" | "LARGE";
   /** Best Possible Comprehension is offered after every scored passage (FR-025). */
   showBestPossibleComprehension: boolean;
 };
 
 const GREEN_MESSAGES = ["Great reading! You explained the story well.", "Wonderful job telling the story!"];
 const NEUTRAL_MESSAGES = ["Thanks for reading. Take a look at how a strong reader might explain it.", "Nice effort. Here is one way to tell this story."];
+
+/** Ordering used to prove a Level Up is celebrated more than an individual GREEN passage (FR-032). */
+export const CELEBRATION_RANK: Readonly<Record<LearnerFeedback["celebration"], number>> = Object.freeze({ NONE: 0, SMALL: 1, LARGE: 2 });
+
+/** Canonical Level Up message (FR-011/FR-032). Shows the new WPM, which is not a comprehension score. */
+export function buildLevelUpFeedback(newWpm: number): LearnerFeedback & { newWpm: number } {
+  return { message: "You Levelled Up!", celebration: "LARGE", showBestPossibleComprehension: true, newWpm };
+}
 
 export function buildLearnerFeedback(result: InternalPassageResult): LearnerFeedback {
   if (result.classification === "GREEN") {

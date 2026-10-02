@@ -7,7 +7,7 @@
 
 import type { ComprehensionResult } from "./comprehension-score";
 import { recordNewPassage, type CoreWpmEvent, type CoreWpmState } from "./core-wpm";
-import { buildLearnerFeedback, type LearnerFeedback } from "./learner-feedback";
+import { buildLearnerFeedback, buildLevelUpFeedback, type LearnerFeedback } from "./learner-feedback";
 import type { Classification } from "./comprehension-threshold";
 
 export type InternalAttemptRecord = {
@@ -21,7 +21,7 @@ export type InternalAttemptRecord = {
 
 export type PassageCompletionOutcome = {
   record: InternalAttemptRecord;
-  learner: LearnerFeedback;
+  learner: LearnerFeedback & { newWpm?: number };
   coreAfter: CoreWpmState;
   coreEvent: CoreWpmEvent;
 };
@@ -42,7 +42,11 @@ export function completeNewPassage(attemptId: string, comprehension: Comprehensi
       attemptId, attemptType: "NEW_PROGRESSION", score: comprehension.score, classification: comprehension.classification,
       countedTowardEvidence: true, calibrationVersion: comprehension.calibrationVersion
     },
-    learner: buildLearnerFeedback({ attemptId, score: comprehension.score, classification: comprehension.classification }),
+    // A validated +1 WPM Level Up gets a larger celebration than an individual GREEN passage (FR-032).
+    learner:
+      event === "LEVEL_UP"
+        ? buildLevelUpFeedback(state.wpm)
+        : buildLearnerFeedback({ attemptId, score: comprehension.score, classification: comprehension.classification }),
     coreAfter: state,
     coreEvent: event
   };

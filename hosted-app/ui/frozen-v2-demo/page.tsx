@@ -35,6 +35,7 @@ import { checkBpcFidelity } from "../../lib/v2/bpc-fidelity";
 import { EXPRESSION_FOCUS_BY_WORLD, expressionFocusFor, permanentFeaturesFor } from "../../lib/v2/expression-by-world";
 import { assertNoInternalLeak, buildLearnerFeedback } from "../../lib/v2/learner-feedback";
 import { completeNewPassage } from "../../lib/v2/passage-completion";
+import { CELEBRATION_RANK } from "../../lib/v2/learner-feedback";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -353,6 +354,19 @@ const checks: Check[] = [
       for (let i = 0; i < 8; i += 1) core = completeNewPassage(`n${i}`, scored(0.5), core).coreAfter;
       const text = JSON.stringify(out.learner);
       return `below-75 stored as ${out.record.classification} (exact score kept=${out.record.score !== null}); celebration ${out.learner.celebration}; BPC offered=${out.learner.showBestPossibleComprehension}; digits/failure words shown=${/\d|fail|wrong/i.test(text)}; 8 low passages keep ${core.wpm} WPM`;
+    })()
+  },
+  {
+    id: "FR-032",
+    title: "Level Up is celebrated more than a GREEN passage",
+    result: (() => {
+      const scored = (s: number) => scoreComprehension(structuredEvidence([{ itemId: "q1", score: s }]), { score: s });
+      let core = newCoreWpmState(90);
+      const outs = [];
+      for (let i = 0; i < 5; i += 1) { const o = completeNewPassage(`l${i}`, scored(0.9), core); core = o.coreAfter; outs.push(o); }
+      const green = outs[0].learner;
+      const up = outs[4].learner;
+      return `single GREEN celebration ${green.celebration}; Level Up celebration ${up.celebration} ("${up.message}"), new WPM ${up.newWpm}; larger=${CELEBRATION_RANK[up.celebration] > CELEBRATION_RANK[green.celebration]}`;
     })()
   }
 ];
