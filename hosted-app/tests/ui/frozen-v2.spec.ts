@@ -112,3 +112,10 @@ test("FR-016 earned WPM is never removed", async ({ page }) => {
     "12 NOT_GREEN passages from 90 WPM -> 90 WPM; outcomes NONE/LEVEL_UP/HOLD_AFTER_FIVE; 3 decrement rules superseded"
   );
 });
+
+test("FR-017 only new passages prove progress", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-017")).toHaveText(
+    "50 GREEN practice -> 90 WPM; 4 new + 3 practice -> 90 WPM; 5 new -> 91 WPM"
+  );
+});
