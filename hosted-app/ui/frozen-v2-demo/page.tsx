@@ -23,6 +23,7 @@ import { CORE_PROGRESSION_OUTCOMES, SUPERSEDED_DECREMENT_RULES } from "../../lib
 import { applyAttemptToCore, newCoreWpmState as newCoreState, type AttemptType } from "../../lib/v2/attempt-types";
 import { recordPracticeAttempt, selectFamiliarPassage, type LearnerRecord } from "../../lib/v2/familiar-practice";
 import { ALL_INTERNAL_STATES, learnerCopyFor, learnerLanguageViolations } from "../../lib/v2/learner-language";
+import { scoreComprehension, structuredEvidence } from "../../lib/v2/comprehension-score";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -192,6 +193,16 @@ const checks: Check[] = [
       const copy = shown.map((s) => learnerCopyFor(s));
       const violations = copy.flatMap((c) => learnerLanguageViolations(c));
       return `${ALL_INTERNAL_STATES.length} internal states -> learner copy; violations in shown copy: ${violations.length}; "struggling" flagged=${learnerLanguageViolations("struggling").length > 0}`;
+    })()
+  },
+  {
+    id: "FR-020",
+    title: "hybrid comprehension evidence",
+    result: (() => {
+      const r = scoreComprehension(structuredEvidence([1, 1, 0, 1].map((score, i) => ({ itemId: `q${i + 1}`, score }))), { score: 0.8 });
+      const pending = scoreComprehension(structuredEvidence([{ itemId: "q1", score: 1 }]), null);
+      if (r.status !== "SCORED") return "unscored";
+      return `structured ${r.structured.items.length} items stored separately from spoken; weights ${r.weights.structured}/${r.weights.spoken} (${r.calibrationVersion}); one result; without spoken: ${pending.status}`;
     })()
   }
 ];
