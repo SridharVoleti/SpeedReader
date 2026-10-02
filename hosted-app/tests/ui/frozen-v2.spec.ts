@@ -49,3 +49,10 @@ test("FR-007 AC-53R replaces AC-53", async ({ page }) => {
     "36 transitions; sample PASS; no data INSUFFICIENT_EVIDENCE; AC-53 superseded=true"
   );
 });
+
+test("FR-008 ten-minute initial assessment finds a sustainable starting WPM", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-008")).toHaveText(
+    "limit 95 -> start 90 WPM in 10 attempts; limit 45 -> start 40 WPM; budget 600s"
+  );
+});

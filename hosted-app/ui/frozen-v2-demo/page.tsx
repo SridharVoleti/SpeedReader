@@ -11,6 +11,7 @@ import { foundationSpec, presentationChunks, validateFoundationPassageText } fro
 import { passageWords, staircaseTable } from "../../lib/v2/stamina";
 import { planNextPassage } from "../../lib/v2/stamina-transition";
 import { evaluateStaminaTransitions, STAMINA_TRANSITIONS, SUPERSEDED_RULES } from "../../lib/v2/ac53r";
+import { runAssessment } from "../../lib/v2/initial-assessment";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -63,6 +64,17 @@ const checks: Check[] = [
         from, to, learners: 30, comprehensionDrop: 0.02, completionBurdenIncrease: 0.03, confidenceDrop: 0.01, engagementDrop: 0.02
       }));
       return `${STAMINA_TRANSITIONS.length} transitions; sample ${evaluateStaminaTransitions(sample, limits).status}; no data ${evaluateStaminaTransitions([], limits).status}; AC-53 superseded=${"AC-53" in SUPERSEDED_RULES}`;
+    })()
+  },
+  {
+    id: "FR-008",
+    title: "Ten-minute initial assessment",
+    result: (() => {
+      const run = (limit: number) =>
+        runAssessment((wpm) => ({ wpm, comprehensionScore: wpm <= limit ? 0.9 : 0.4, durationSec: 40 }));
+      const a = run(95);
+      const b = run(45);
+      return `limit 95 -> start ${a.startingWpm} WPM in ${a.attempts.length} attempts; limit 45 -> start ${b.startingWpm} WPM; budget 600s`;
     })()
   }
 ];
