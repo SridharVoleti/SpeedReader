@@ -6,6 +6,7 @@
 
 import { startingWorld, WORLDS } from "../../lib/v2/worlds";
 import { worldStrategies } from "../../lib/v2/world-strategies";
+import { first150Architecture, validateWorld1Catalog, WORLD1_PASSAGE_COUNT } from "../../lib/v2/catalog";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -20,6 +21,11 @@ const checks: Check[] = [
     id: "FR-002",
     title: "World 2+ strategy direction",
     result: [2, 3, 4, 5].map((id) => `W${id}=${worldStrategies(id).join("+")}`).join(" | ")
+  },
+  {
+    id: "FR-003",
+    title: "1,500 canonical passages",
+    result: `${WORLD1_PASSAGE_COUNT} sequential passages, ${validateWorld1Catalog(Array.from({ length: WORLD1_PASSAGE_COUNT }, (_, i) => ({ sequence: i + 1 }))).length} structural errors; first 150 = ${new Set(first150Architecture().map((c) => c.rsId)).size} RS x ${new Set(first150Architecture().map((c) => c.pLevel)).size} P`
   }
 ];
 

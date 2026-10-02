@@ -14,3 +14,10 @@ test("FR-002 World 2+ strategy direction", async ({ page }) => {
   expect(text).toContain("W2=skimming+scanning+keywords+locating-information-quickly");
   expect(text).toContain("W5=skimming+scanning+chunking+selective-deep-reading-by-purpose");
 });
+
+test("FR-003 1,500 canonical passages", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-003")).toHaveText(
+    "1500 sequential passages, 0 structural errors; first 150 = 15 RS x 10 P"
+  );
+});
