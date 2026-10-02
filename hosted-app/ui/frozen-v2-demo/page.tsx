@@ -39,6 +39,7 @@ import { CELEBRATION_RANK } from "../../lib/v2/learner-feedback";
 import { bookTimeImpact, formatDuration } from "../../lib/v2/book-time";
 import { NEWS_READER_PURPOSES, newNewsReaderState, newsReaderGatesCoreProgression, recordNewsReaderAttempt } from "../../lib/v2/news-reader";
 import { applyNewPassage, newLearnerAggregate } from "../../lib/v2/learner-aggregate";
+import { assertComprehensionEvidence, comprehensionEvidenceForPassage, emptyEvidenceStore, oralEvidenceForPassage, recordCoreEvidence, recordNewsReaderEvidence } from "../../lib/v2/evidence-store";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -413,6 +414,20 @@ const checks: Check[] = [
       const low = run(oral(0));
       const high = run(oral(1));
       return `five GREEN passages -> WPM@pointer: no News Reader ${none}; worst oral ${low}; best oral ${high}; identical=${none === low && low === high}`;
+    })()
+  },
+  {
+    id: "FR-036",
+    title: "shared content, separate state",
+    result: (() => {
+      let store = emptyEvidenceStore();
+      store = recordCoreEvidence(store, "P001", { attemptId: "c1", attemptType: "NEW_PROGRESSION", score: 0.9, classification: "GREEN", countedTowardEvidence: true, calibrationVersion: "demo" });
+      for (let i = 0; i < 3; i += 1) {
+        store = recordNewsReaderEvidence(store, { attemptId: `n${i}`, passageId: "P001", readNumber: 1, metrics: { clarity: 1 }, technicalState: "OK", recordedAt: "2026-10-03T10:00:00Z" });
+      }
+      let refused = false;
+      try { assertComprehensionEvidence({ attemptType: "NEWS_READER" }); } catch { refused = true; }
+      return `P001 shared: ${comprehensionEvidenceForPassage(store, "P001").length} comprehension record(s), ${oralEvidenceForPassage(store, "P001").length} oral record(s); oral counted as comprehension: ${comprehensionEvidenceForPassage(store, "P001").length === 1 ? "no" : "yes"}; substitution refused=${refused}`;
     })()
   }
 ];

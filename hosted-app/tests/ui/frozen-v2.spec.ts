@@ -245,3 +245,10 @@ test("FR-035 News Reader is independent of core progression", async ({ page }) =
     "five GREEN passages -> WPM@pointer: no News Reader 91@6; worst oral 91@6; best oral 91@6; identical=true"
   );
 });
+
+test("FR-036 shared content, separate state", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-036")).toHaveText(
+    "P001 shared: 1 comprehension record(s), 3 oral record(s); oral counted as comprehension: no; substitution refused=true"
+  );
+});
