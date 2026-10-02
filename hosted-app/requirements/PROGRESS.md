@@ -180,3 +180,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-045 | Evidence recency | Done | 6665be8 |
 | FR-046 | Threshold lifecycle | Done | ba9199c |
 | FR-047 | Attempt types and records | Done | 6666dee |
+| FR-048 | Evidence separation | Done | d1db9c2 |
