@@ -182,3 +182,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-047 | Attempt types and records | Done | 6666dee |
 | FR-048 | Evidence separation | Done | d1db9c2 |
 | FR-049 | Explainability | Done | 1951dc1 |
+| AC-C01 | No stale-rule implementation (superseded v1 modules archived) | Done | 878c379 |
