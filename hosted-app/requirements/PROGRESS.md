@@ -166,3 +166,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-031 | Below 75% remains positive | Done | 799581d |
 | FR-032 | Level-Up celebration | Done | a062bf7 |
 | FR-033 | Book-time impact | Done | 1173870 |
+| FR-034 | Parallel track | Done | 4867c6f |
