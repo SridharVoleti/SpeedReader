@@ -161,3 +161,10 @@ test("FR-023 spoken expression rewards meaning, not vocabulary or accent", async
     "retelling covers 6/6 ideas (strong=true); fancy vocabulary adds nothing=true; dialect keeps coverage=true; unrelated covers 0/6"
   );
 });
+
+test("FR-024 ASR uncertainty is never learner error", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-024")).toHaveText(
+    "low confidence -> UNRESOLVED_TECHNICAL (ASR_LOW_CONFIDENCE); silence -> NO_SPEECH_DETECTED; comprehension AWAITING_SPOKEN_EVIDENCE, classification null; retries 0/1/2 -> RETRY/RETRY/CONTINUE_WITHOUT_PROGRESSION_EVIDENCE"
+  );
+});

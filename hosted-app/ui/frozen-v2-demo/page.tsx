@@ -28,6 +28,7 @@ import { greenThresholdForCalibration, validateCalibration } from "../../lib/v2/
 import { alignItem, P_LEVEL_QUESTION_TYPES, questionTypeForPLevel, scoreAlignedItems } from "../../lib/v2/question-alignment";
 import type { AssessmentItem } from "../../lib/item-types";
 import { evaluateSpokenExpression, type SpokenPassageMeta } from "../../lib/v2/spoken-expression";
+import { comprehensionFromOutcome, resolveSpokenEvidence, technicalRecoveryAction } from "../../lib/v2/spoken-evidence";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -253,6 +254,18 @@ const checks: Check[] = [
       const dialect = evaluateSpokenExpression("Mia she lost her kite cos the wind blew it away. Mia feel sad. Then her brother Sam he help her. They go up hill and find kite in tree.", meta);
       const unrelated = evaluateSpokenExpression("I like pizza and my dog is big and brown today.", meta);
       return `retelling covers ${plain.matchedIdeaIds.length}/6 ideas (strong=${plain.score > 0.85}); fancy vocabulary adds nothing=${fancy.score <= plain.score + 1e-9}; dialect keeps coverage=${dialect.evidenceCoverage === plain.evidenceCoverage}; unrelated covers ${unrelated.matchedIdeaIds.length}/6`;
+    })()
+  },
+  {
+    id: "FR-024",
+    title: "ASR uncertainty is never learner error",
+    result: (() => {
+      const meta: SpokenPassageMeta = { passageId: "d", ideas: [{ ideaId: "i1", role: "KEY_EVENT", wordings: [["mia", "lost", "kite"]] }] };
+      const structured = structuredEvidence([{ itemId: "q1", score: 1 }]);
+      const low = resolveSpokenEvidence("garbled", { usable: true, confidence: 0.2, speechDetected: true }, meta);
+      const silent = resolveSpokenEvidence("", { usable: true, confidence: 0.9, speechDetected: false }, meta);
+      const outcome = comprehensionFromOutcome(structured, low);
+      return `low confidence -> ${low.status} (${low.status === "UNRESOLVED_TECHNICAL" ? low.audit.reason : ""}); silence -> ${silent.status === "UNRESOLVED_TECHNICAL" ? silent.audit.reason : silent.status}; comprehension ${outcome.status}, classification ${outcome.classification}; retries 0/1/2 -> ${[0, 1, 2].map((n) => technicalRecoveryAction(n)).join("/")}`;
     })()
   }
 ];
