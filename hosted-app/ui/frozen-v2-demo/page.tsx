@@ -25,6 +25,8 @@ import { recordPracticeAttempt, selectFamiliarPassage, type LearnerRecord } from
 import { ALL_INTERNAL_STATES, learnerCopyFor, learnerLanguageViolations } from "../../lib/v2/learner-language";
 import { scoreComprehension, structuredEvidence } from "../../lib/v2/comprehension-score";
 import { greenThresholdForCalibration, validateCalibration } from "../../lib/v2/calibration-lifecycle";
+import { alignItem, P_LEVEL_QUESTION_TYPES, questionTypeForPLevel, scoreAlignedItems } from "../../lib/v2/question-alignment";
+import type { AssessmentItem } from "../../lib/item-types";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -213,6 +215,21 @@ const checks: Check[] = [
       const cfg = (structured: number, spoken: number) => ({ version: "demo", status: "PROVISIONAL_PILOT" as const, comprehensionWeights: { structured, spoken } });
       const verdict = (s: number, p: number) => (validateCalibration(cfg(s, p)).length === 0 ? "ok" : "rejected");
       return `70/30 ${verdict(0.7, 0.3)}; 65/35 ${verdict(0.65, 0.35)}; 50/50 ${verdict(0.5, 0.5)}; 100/0 ${verdict(1, 0)}; GREEN threshold stays ${greenThresholdForCalibration("any") * 100}%`;
+    })()
+  },
+  {
+    id: "FR-022",
+    title: "structured questions aligned to P1-P10",
+    result: (() => {
+      const item = (id: string) => ({
+        itemId: id, itemType: "single_choice", constructId: "detail", mandatory: true, prompt: "Q?",
+        options: [{ id: "a", label: "A" }, { id: "b", label: "B" }], correctOptionId: "a"
+      }) as AssessmentItem;
+      const aligned = [alignItem(1, item("q1")), alignItem(7, item("q2"))];
+      const responses = { q1: { type: "single_choice", selectedOptionId: "a" }, q2: { type: "single_choice", selectedOptionId: "b" } };
+      const out = scoreAlignedItems(aligned, responses);
+      const again = scoreAlignedItems(aligned, responses);
+      return `${P_LEVEL_QUESTION_TYPES.length} types P1=${questionTypeForPLevel(1)} P10=${questionTypeForPLevel(10)}; items ${out.records.map((r) => `${r.itemId}:${r.questionType}=${r.points}`).join(",")}; deterministic=${JSON.stringify(out) === JSON.stringify(again)}`;
     })()
   }
 ];

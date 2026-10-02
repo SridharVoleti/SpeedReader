@@ -147,3 +147,10 @@ test("FR-021 weighting lifecycle", async ({ page }) => {
     "70/30 ok; 65/35 ok; 50/50 rejected; 100/0 rejected; GREEN threshold stays 75%"
   );
 });
+
+test("FR-022 structured questions aligned to P1-P10", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-022")).toHaveText(
+    "10 types P1=DIRECT_RECALL P10=MIXED_MASTERY; items q1:DIRECT_RECALL=1,q2:SIMPLE_INFERENCE=0; deterministic=true"
+  );
+});
