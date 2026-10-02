@@ -154,3 +154,10 @@ test("FR-022 structured questions aligned to P1-P10", async ({ page }) => {
     "10 types P1=DIRECT_RECALL P10=MIXED_MASTERY; items q1:DIRECT_RECALL=1,q2:SIMPLE_INFERENCE=0; deterministic=true"
   );
 });
+
+test("FR-023 spoken expression rewards meaning, not vocabulary or accent", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-023")).toHaveText(
+    "retelling covers 6/6 ideas (strong=true); fancy vocabulary adds nothing=true; dialect keeps coverage=true; unrelated covers 0/6"
+  );
+});

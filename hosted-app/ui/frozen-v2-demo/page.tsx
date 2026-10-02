@@ -27,6 +27,7 @@ import { scoreComprehension, structuredEvidence } from "../../lib/v2/comprehensi
 import { greenThresholdForCalibration, validateCalibration } from "../../lib/v2/calibration-lifecycle";
 import { alignItem, P_LEVEL_QUESTION_TYPES, questionTypeForPLevel, scoreAlignedItems } from "../../lib/v2/question-alignment";
 import type { AssessmentItem } from "../../lib/item-types";
+import { evaluateSpokenExpression, type SpokenPassageMeta } from "../../lib/v2/spoken-expression";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -230,6 +231,28 @@ const checks: Check[] = [
       const out = scoreAlignedItems(aligned, responses);
       const again = scoreAlignedItems(aligned, responses);
       return `${P_LEVEL_QUESTION_TYPES.length} types P1=${questionTypeForPLevel(1)} P10=${questionTypeForPLevel(10)}; items ${out.records.map((r) => `${r.itemId}:${r.questionType}=${r.points}`).join(",")}; deterministic=${JSON.stringify(out) === JSON.stringify(again)}`;
+    })()
+  },
+  {
+    id: "FR-023",
+    title: "spoken expression rewards meaning, not vocabulary or accent",
+    result: (() => {
+      const meta: SpokenPassageMeta = {
+        passageId: "demo",
+        ideas: [
+          { ideaId: "i1", role: "KEY_EVENT", wordings: [["mia", "lost", "kite"], ["kite", "flew", "away"]] },
+          { ideaId: "i2", role: "CAUSE_EFFECT", wordings: [["wind", "kite"], ["wind", "blew"]] },
+          { ideaId: "i3", role: "MOTIVATION", wordings: [["mia", "sad"], ["mia", "cry"]] },
+          { ideaId: "i4", role: "KEY_EVENT", wordings: [["sam", "help"], ["brother", "help"]] },
+          { ideaId: "i5", role: "DETAIL", wordings: [["hill"]] },
+          { ideaId: "i6", role: "KEY_EVENT", wordings: [["found", "kite", "tree"], ["kite", "tree"]] }
+        ]
+      };
+      const plain = evaluateSpokenExpression("Mia lost her kite because the wind blew it away. She felt sad. Then her brother Sam helped her. They went up the hill and found the kite in a tree.", meta);
+      const fancy = evaluateSpokenExpression("Notwithstanding turbulence, Mia lost her kite because the wind blew it away. She felt sad. Then her brother Sam helped her. They ascended the magnificent hill and found the kite in a tree.", meta);
+      const dialect = evaluateSpokenExpression("Mia she lost her kite cos the wind blew it away. Mia feel sad. Then her brother Sam he help her. They go up hill and find kite in tree.", meta);
+      const unrelated = evaluateSpokenExpression("I like pizza and my dog is big and brown today.", meta);
+      return `retelling covers ${plain.matchedIdeaIds.length}/6 ideas (strong=${plain.score > 0.85}); fancy vocabulary adds nothing=${fancy.score <= plain.score + 1e-9}; dialect keeps coverage=${dialect.evidenceCoverage === plain.evidenceCoverage}; unrelated covers ${unrelated.matchedIdeaIds.length}/6`;
     })()
   }
 ];
