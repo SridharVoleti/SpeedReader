@@ -40,6 +40,7 @@ import { bookTimeImpact, formatDuration } from "../../lib/v2/book-time";
 import { NEWS_READER_PURPOSES, newNewsReaderState, newsReaderGatesCoreProgression, recordNewsReaderAttempt } from "../../lib/v2/news-reader";
 import { applyNewPassage, newLearnerAggregate } from "../../lib/v2/learner-aggregate";
 import { assertComprehensionEvidence, comprehensionEvidenceForPassage, emptyEvidenceStore, oralEvidenceForPassage, recordCoreEvidence, recordNewsReaderEvidence } from "../../lib/v2/evidence-store";
+import { REFERENCE_QUALITIES, resolveReferenceAudio, type Platform, type ReferenceAudio } from "../../lib/v2/reference-audio";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -428,6 +429,18 @@ const checks: Check[] = [
       let refused = false;
       try { assertComprehensionEvidence({ attemptType: "NEWS_READER" }); } catch { refused = true; }
       return `P001 shared: ${comprehensionEvidenceForPassage(store, "P001").length} comprehension record(s), ${oralEvidenceForPassage(store, "P001").length} oral record(s); oral counted as comprehension: ${comprehensionEvidenceForPassage(store, "P001").length === 1 ? "no" : "yes"}; substitution refused=${refused}`;
+    })()
+  },
+  {
+    id: "FR-037",
+    title: "canonical pre-generated reference audio",
+    result: (() => {
+      const qualities = Object.fromEntries(REFERENCE_QUALITIES.map((q) => [q, true])) as ReferenceAudio["qaQualities"];
+      const audio: ReferenceAudio = { passageId: "P001", assetId: "ref-P001-v1", url: "https://cdn.example/reference/P001-v1.mp3", version: "v1", sha256: "a".repeat(64), source: "PRE_GENERATED", qaQualities: qualities, qaApproved: true };
+      const platforms: Platform[] = ["ios", "android", "web", "desktop"];
+      const urls = new Set(platforms.map((p) => { const r = resolveReferenceAudio([audio], "P001", p); return r.ok ? r.audio.url : "none"; }));
+      const device = resolveReferenceAudio([{ ...audio, source: "DEVICE_TTS" }], "P001", "ios");
+      return `${REFERENCE_QUALITIES.length} reference qualities; ${platforms.length} platforms resolve ${urls.size} identical asset; device TTS reference rejected=${!device.ok}`;
     })()
   }
 ];

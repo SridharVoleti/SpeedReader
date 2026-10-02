@@ -252,3 +252,10 @@ test("FR-036 shared content, separate state", async ({ page }) => {
     "P001 shared: 1 comprehension record(s), 3 oral record(s); oral counted as comprehension: no; substitution refused=true"
   );
 });
+
+test("FR-037 canonical pre-generated reference audio", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-037")).toHaveText(
+    "7 reference qualities; 4 platforms resolve 1 identical asset; device TTS reference rejected=true"
+  );
+});
