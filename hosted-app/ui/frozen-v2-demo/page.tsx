@@ -60,6 +60,7 @@ import { ProgressStore } from "../../lib/v2/progress-store";
 import { LearnerAggregate } from "../../lib/v2/learner-aggregate";
 import { COMPLIANT_SNIPPETS, STALE_SNIPPETS } from "../../lib/v2/stale-rules-fixtures";
 import { OPS_EVENT_KINDS, OpsLog, contentDefectEvent, learnerVisibleOps, opsEventsForAttempt } from "../../lib/v2/ops-log";
+import { runBoundaryMatrix } from "../../lib/v2/boundary-matrix";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -650,6 +651,16 @@ const checks: Check[] = [
       log.emit(...opsEventsForAttempt(low, true), ...opsEventsForAttempt(tech), contentDefectEvent("P077", "missing approved BPC", "2026-10-03T00:00:00Z"));
       const kinds = [...new Set(log.all().map((e) => e.kind))];
       return `${OPS_EVENT_KINDS.length} ops event kinds; logged: ${kinds.join(",")}; technical retry logged as learner NOT_GREEN=${log.byKind("LEARNER_NOT_GREEN").some((e) => e.attemptId === "o2")}; learner-visible ops events=${learnerVisibleOps(log.all()).length}`;
+    })()
+  },
+  {
+    id: "AC-C06",
+    title: "boundary matrix",
+    result: (() => {
+      const rows = runBoundaryMatrix();
+      const passed = rows.filter((r) => r.pass).length;
+      const failing = rows.filter((r) => !r.pass).map((r) => r.id).join(",");
+      return `boundary matrix ${passed}/${rows.length} PASS${failing ? ` (failing ${failing})` : ""}; B03 ${rows[2].observed}; B09 ${rows[8].observed}; B11 ${rows[10].observed}; B13 ${rows[12].observed}`;
     })()
   }
 ];

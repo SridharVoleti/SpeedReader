@@ -364,3 +364,10 @@ test("AC-C08 operational observability", async ({ page }) => {
     "7 ops event kinds; logged: LEARNER_NOT_GREEN,PRACTICE_SCHEDULING,ASR_TECHNICAL_UNCERTAINTY,CONTENT_DEFECT; technical retry logged as learner NOT_GREEN=false; learner-visible ops events=0"
   );
 });
+
+test("AC-C06 boundary matrix", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-AC-C06")).toHaveText(
+    "boundary matrix 13/13 PASS; B03 91 WPM, LEVEL_UP; B09 90 WPM at pointer 151; B11 AWAITING_SPOKEN_EVIDENCE, evidence 0; B13 FORM_VERSION_MISMATCH"
+  );
+});
