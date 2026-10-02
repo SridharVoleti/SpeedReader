@@ -17,6 +17,7 @@ import { clampToCeiling, developmentContinuesAtCeiling, isSchedulableWpm, WORLD1
 import { dimensionCelebration, levelUpAchievement, levelUpCount, levelUpsForWpmChange } from "../../lib/v2/level-semantics";
 import { toGateEvidence } from "../../lib/v2/gate-evidence";
 import { classifyComprehension, greenCount, GREEN_THRESHOLD } from "../../lib/v2/comprehension-threshold";
+import { evaluateFirstFive } from "../../lib/v2/first-five";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -117,6 +118,16 @@ const checks: Check[] = [
     id: "FR-013",
     title: "Passage GREEN threshold",
     result: `threshold ${GREEN_THRESHOLD * 100}%; 75%=${classifyComprehension(0.75)}; 74.99%=${classifyComprehension(0.7499)}; [100,100,74,60,70] GREEN count=${greenCount([1, 1, 0.74, 0.6, 0.7])} (average ignored)`
+  },
+  {
+    id: "FR-014",
+    title: "First-five rule",
+    result: (() => {
+      const show = (p: ("GREEN" | "NOT_GREEN")[]) => `${p.filter((c) => c === "GREEN").length}/5=${evaluateFirstFive(p).decision}`;
+      const G = "GREEN" as const;
+      const N = "NOT_GREEN" as const;
+      return [show([G, G, G, G, G]), show([G, G, N, G, G]), show([G, N, G, N, G]), show([N, N, G, N, N]), show([N, N, N, N, N])].join(" ");
+    })()
   }
 ];
 

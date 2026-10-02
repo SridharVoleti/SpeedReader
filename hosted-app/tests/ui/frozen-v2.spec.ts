@@ -91,3 +91,10 @@ test("FR-013 75% GREEN threshold, counted per passage", async ({ page }) => {
     "threshold 75%; 75%=GREEN; 74.99%=NOT_GREEN; [100,100,74,60,70] GREEN count=2 (average ignored)"
   );
 });
+
+test("FR-014 first-five rule", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-014")).toHaveText(
+    "5/5=LEVEL_UP 4/5=LEVEL_UP 3/5=HOLD 1/5=HOLD 0/5=HOLD"
+  );
+});
