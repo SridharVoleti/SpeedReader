@@ -42,3 +42,10 @@ test("FR-006 length increase takes precedence over a same-passage Level Up", asy
     "P151 at 125w 90WPM (level-up deferred=true); P161 at 125w 91WPM (level-up applied=true)"
   );
 });
+
+test("FR-007 AC-53R replaces AC-53", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-007")).toHaveText(
+    "36 transitions; sample PASS; no data INSUFFICIENT_EVIDENCE; AC-53 superseded=true"
+  );
+});

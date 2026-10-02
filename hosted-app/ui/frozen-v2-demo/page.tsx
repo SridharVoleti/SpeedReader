@@ -10,6 +10,7 @@ import { first150Architecture, validateWorld1Catalog, WORLD1_PASSAGE_COUNT } fro
 import { foundationSpec, presentationChunks, validateFoundationPassageText } from "../../lib/v2/foundation";
 import { passageWords, staircaseTable } from "../../lib/v2/stamina";
 import { planNextPassage } from "../../lib/v2/stamina-transition";
+import { evaluateStaminaTransitions, STAMINA_TRANSITIONS, SUPERSEDED_RULES } from "../../lib/v2/ac53r";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -51,6 +52,17 @@ const checks: Check[] = [
       const boundary = planNextPassage({ completedSequence: 150, currentWpm: 90, levelUpEligible: true });
       const normal = planNextPassage({ completedSequence: 160, currentWpm: 90, levelUpEligible: true });
       return `P151 at ${boundary.nextWords}w ${boundary.nextWpm}WPM (level-up deferred=${boundary.levelUpDeferred}); P161 at ${normal.nextWords}w ${normal.nextWpm}WPM (level-up applied=${normal.levelUpApplied})`;
+    })()
+  },
+  {
+    id: "FR-007",
+    title: "AC-53R progressive stamina-transition validity",
+    result: (() => {
+      const limits = { maxComprehensionDrop: 0.1, maxCompletionBurdenIncrease: 0.15, maxConfidenceDrop: 0.1, maxEngagementDrop: 0.1 };
+      const sample = STAMINA_TRANSITIONS.map(([from, to]) => ({
+        from, to, learners: 30, comprehensionDrop: 0.02, completionBurdenIncrease: 0.03, confidenceDrop: 0.01, engagementDrop: 0.02
+      }));
+      return `${STAMINA_TRANSITIONS.length} transitions; sample ${evaluateStaminaTransitions(sample, limits).status}; no data ${evaluateStaminaTransitions([], limits).status}; AC-53 superseded=${"AC-53" in SUPERSEDED_RULES}`;
     })()
   }
 ];
