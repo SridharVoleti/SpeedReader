@@ -43,6 +43,8 @@ import { assertComprehensionEvidence, comprehensionEvidenceForPassage, emptyEvid
 import { REFERENCE_QUALITIES, resolveReferenceAudio, type Platform, type ReferenceAudio } from "../../lib/v2/reference-audio";
 import { twoReadCoaching } from "../../lib/v2/news-reader-coaching";
 import { CORE_WPM_GATES, SUPERSESSION_REGISTER, assertNoOralGate, supersededRuleFor } from "../../lib/v2/supersession";
+import { world1Status } from "../../lib/v2/world1-completion";
+import { RS_IDS } from "../../lib/world1-framework";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -465,6 +467,18 @@ const checks: Check[] = [
       let comprehensionOnly = true;
       try { assertNoOralGate([...CORE_WPM_GATES]); } catch { comprehensionOnly = false; }
       return `${SUPERSESSION_REGISTER.length} superseded rules recorded; core WPM gates: ${CORE_WPM_GATES.join(",")}; oral gates rejected ${rejected.length}/3; comprehension-only gate list accepted=${comprehensionOnly}; SUP-03 "${supersededRuleFor("SUP-03")?.replacement}"`;
+    })()
+  },
+  {
+    id: "FR-040",
+    title: "passage 1500 alone does not prove mastery",
+    result: (() => {
+      const ready = RS_IDS.map((rsId) => ({ rsId, confirmed: true, formId: `form-${rsId}-v1` }));
+      const none = world1Status({ canonicalPointer: 1501, readiness: [] });
+      const partial = world1Status({ canonicalPointer: 1501, readiness: ready.slice(0, 14) });
+      const full = world1Status({ canonicalPointer: 1501, readiness: ready });
+      const early = world1Status({ canonicalPointer: 900, readiness: ready });
+      return `P1500 done without readiness: ${none.status}; 14/15 ready: ${partial.status} (missing ${partial.status === "SEQUENCE_COMPLETE_READINESS_PENDING" ? partial.missingReadiness.join(",") : ""}); 15/15 ready: ${full.status}; ready but P900: ${early.status}`;
     })()
   }
 ];

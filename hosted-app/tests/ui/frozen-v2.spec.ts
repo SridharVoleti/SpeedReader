@@ -273,3 +273,10 @@ test("FR-039 oral-as-core-gate is superseded", async ({ page }) => {
     "14 superseded rules recorded; core WPM gates: COMPREHENSION; oral gates rejected 3/3; comprehension-only gate list accepted=true; SUP-03 \"News Reader is a parallel oral communication track\""
   );
 });
+
+test("FR-040 passage 1500 alone does not prove mastery", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-040")).toHaveText(
+    "P1500 done without readiness: SEQUENCE_COMPLETE_READINESS_PENDING; 14/15 ready: SEQUENCE_COMPLETE_READINESS_PENDING (missing RS15); 15/15 ready: WORLD1_COMPLETE; ready but P900: IN_PROGRESS"
+  );
+});
