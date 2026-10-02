@@ -42,6 +42,7 @@ import { applyNewPassage, newLearnerAggregate } from "../../lib/v2/learner-aggre
 import { assertComprehensionEvidence, comprehensionEvidenceForPassage, emptyEvidenceStore, oralEvidenceForPassage, recordCoreEvidence, recordNewsReaderEvidence } from "../../lib/v2/evidence-store";
 import { REFERENCE_QUALITIES, resolveReferenceAudio, type Platform, type ReferenceAudio } from "../../lib/v2/reference-audio";
 import { twoReadCoaching } from "../../lib/v2/news-reader-coaching";
+import { CORE_WPM_GATES, SUPERSESSION_REGISTER, assertNoOralGate, supersededRuleFor } from "../../lib/v2/supersession";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -454,6 +455,16 @@ const checks: Check[] = [
       const down = pair(0.7, 0.4);
       if (up.status !== "COMPLETE" || down.status !== "COMPLETE") return "incomplete";
       return `reads stored independently; delta ${up.meanDelta.toFixed(1)} improved=${up.improved}; lower second read improved=${down.improved}; both framed as practice=${/practice/i.test(up.coaching) && /practice/i.test(down.coaching)}; punishing words=${/worse|wrong|fail/i.test(up.coaching + down.coaching)}`;
+    })()
+  },
+  {
+    id: "FR-039",
+    title: "oral-as-core-gate is superseded",
+    result: (() => {
+      const rejected = ["ORAL", "NEWS_READER", "PRONUNCIATION"].filter((gate) => { try { assertNoOralGate(["COMPREHENSION", gate]); return false; } catch { return true; } });
+      let comprehensionOnly = true;
+      try { assertNoOralGate([...CORE_WPM_GATES]); } catch { comprehensionOnly = false; }
+      return `${SUPERSESSION_REGISTER.length} superseded rules recorded; core WPM gates: ${CORE_WPM_GATES.join(",")}; oral gates rejected ${rejected.length}/3; comprehension-only gate list accepted=${comprehensionOnly}; SUP-03 "${supersededRuleFor("SUP-03")?.replacement}"`;
     })()
   }
 ];

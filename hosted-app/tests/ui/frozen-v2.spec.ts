@@ -266,3 +266,10 @@ test("FR-038 oral two-read coaching", async ({ page }) => {
     "reads stored independently; delta 0.3 improved=true; lower second read improved=false; both framed as practice=true; punishing words=false"
   );
 });
+
+test("FR-039 oral-as-core-gate is superseded", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-039")).toHaveText(
+    "14 superseded rules recorded; core WPM gates: COMPREHENSION; oral gates rejected 3/3; comprehension-only gate list accepted=true; SUP-03 \"News Reader is a parallel oral communication track\""
+  );
+});
