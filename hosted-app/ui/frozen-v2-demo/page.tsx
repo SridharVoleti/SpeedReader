@@ -50,6 +50,7 @@ import { missingReadiness } from "../../lib/v2/world1-completion";
 import { advanceFromWorld1 } from "../../lib/v2/world1-completion";
 import { checkCertificationEvidence, selectEquivalentForm, type ReadinessForm } from "../../lib/v2/readiness-forms";
 import { RECENCY_POLICY_V1, applyRecency, evidenceRecency } from "../../lib/v2/evidence-recency";
+import { LIFECYCLE_STATES, THRESHOLD_REGISTRY, changeThreshold, transitionThreshold } from "../../lib/v2/threshold-lifecycle";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -538,6 +539,18 @@ const checks: Check[] = [
       dated[5] = { ...dated[5], gatheredAt: "2025-01-01T00:00:00Z" };
       const after = world1Status({ canonicalPointer: 1501, readiness: applyRecency(dated, now) });
       return `recent evidence current=${recent.current}; 21-month-old current=${old.current}; 500 sessions later current=${inactive.current}; policy ${RECENCY_POLICY_V1.status} v=${recent.policyVersion}; one stale competency -> ${after.status}${after.status === "SEQUENCE_COMPLETE_READINESS_PENDING" ? ` (missing ${after.missingReadiness.join(",")})` : ""}`;
+    })()
+  },
+  {
+    id: "FR-046",
+    title: "threshold lifecycle governance",
+    result: (() => {
+      const audit = { changedAt: "2026-11-01", reason: "pilot evidence", changedBy: "calibration-board" };
+      const find = (key: string) => THRESHOLD_REGISTRY.find((e) => e.key === key)!;
+      const tryIt = (fn: () => unknown) => { try { fn(); return "allowed"; } catch { return "blocked"; } };
+      const frozen = THRESHOLD_REGISTRY.filter((e) => e.frozen).length;
+      const calibratable = THRESHOLD_REGISTRY.filter((e) => !e.frozen).length;
+      return `${LIFECYCLE_STATES.length} states; ${frozen} frozen + ${calibratable} calibratable thresholds; change ASR confidence: ${tryIt(() => changeThreshold(find("asr-min-confidence"), 0.65, audit))}; change 75% GREEN threshold: ${tryIt(() => changeThreshold(find("green-threshold"), 0.6, audit))}; PROVISIONAL->APPROVED directly: ${tryIt(() => transitionThreshold(find("weight-spoken"), "PRODUCTION_APPROVED", audit))}`;
     })()
   }
 ];
