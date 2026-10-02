@@ -38,6 +38,7 @@ import { completeNewPassage } from "../../lib/v2/passage-completion";
 import { CELEBRATION_RANK } from "../../lib/v2/learner-feedback";
 import { bookTimeImpact, formatDuration } from "../../lib/v2/book-time";
 import { NEWS_READER_PURPOSES, newNewsReaderState, newsReaderGatesCoreProgression, recordNewsReaderAttempt } from "../../lib/v2/news-reader";
+import { applyNewPassage, newLearnerAggregate } from "../../lib/v2/learner-aggregate";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -395,6 +396,23 @@ const checks: Check[] = [
       }
       const mic = recordNewsReaderAttempt(newNewsReaderState(), { attemptId: "m", passageId: "P001", readNumber: 1, metrics: {}, technicalState: "MIC_UNAVAILABLE", recordedAt: "2026-10-03T10:00:00Z" });
       return `${NEWS_READER_PURPOSES.length} oral purposes; gates core=${newsReaderGatesCoreProgression()}; 5 zero-score News Reader attempts stored (${nr.attempts.length}) and core stays ${core.wpm} WPM with ${core.newAttempts.length} evidence; mic unavailable stored as ${mic.attempts[0].technicalState}`;
+    })()
+  },
+  {
+    id: "FR-035",
+    title: "News Reader is independent of core progression",
+    result: (() => {
+      const scored = (s: number) => scoreComprehension(structuredEvidence([{ itemId: "q1", score: s }]), { score: s });
+      const oral = (clarity: number) => recordNewsReaderAttempt(newNewsReaderState(), { attemptId: "o", passageId: "P001", readNumber: 1, metrics: { clarity, pronunciation: clarity, confidence: clarity }, technicalState: "OK", recordedAt: "2026-10-03T10:00:00Z" });
+      const run = (nr: ReturnType<typeof newNewsReaderState>) => {
+        let learner = { ...newLearnerAggregate("l", 90), newsReader: nr };
+        for (let i = 0; i < 5; i += 1) learner = applyNewPassage(learner, `a${i}`, scored(0.9)).learner;
+        return `${learner.core.wpm}@${learner.canonicalPointer}`;
+      };
+      const none = run(newNewsReaderState());
+      const low = run(oral(0));
+      const high = run(oral(1));
+      return `five GREEN passages -> WPM@pointer: no News Reader ${none}; worst oral ${low}; best oral ${high}; identical=${none === low && low === high}`;
     })()
   }
 ];

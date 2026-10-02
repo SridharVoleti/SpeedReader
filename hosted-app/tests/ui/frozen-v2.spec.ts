@@ -238,3 +238,10 @@ test("FR-034 News Reader is a separate parallel track", async ({ page }) => {
     "9 oral purposes; gates core=false; 5 zero-score News Reader attempts stored (5) and core stays 90 WPM with 0 evidence; mic unavailable stored as MIC_UNAVAILABLE"
   );
 });
+
+test("FR-035 News Reader is independent of core progression", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-035")).toHaveText(
+    "five GREEN passages -> WPM@pointer: no News Reader 91@6; worst oral 91@6; best oral 91@6; identical=true"
+  );
+});
