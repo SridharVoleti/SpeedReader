@@ -15,6 +15,7 @@ const manifest: AppManifest = {
     "adaptive-speed-demo": () => import("./ui/adaptive-speed-demo/page"),
     "book-mode-demo": () => import("./ui/book-mode-demo/page"),
     "certification-demo": () => import("./ui/certification-demo/page"),
+    "frozen-v2-demo": () => import("./ui/frozen-v2-demo/page"),
     "evidence-demo": () => import("./ui/evidence-demo/page"),
     "item-types-demo": () => import("./ui/item-types-demo/page"),
     "meaningful-chunking-demo": () => import("./ui/meaningful-chunking-demo/page"),

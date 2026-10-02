@@ -124,3 +124,13 @@ TDD -> test -> push to git -> validate on speedreader.babystepsindia.com.
 | SR-R10-005 | 200-page goal measurement | Done | 78410f5 |
 
 **R10: all 5 requirements implemented, tested, pushed and live-validated.**
+
+## v2.0 Final Frozen Requirements
+
+Source: `requirements/SpeedReader_Final_Frozen_Requirements_Codex_Acceptance_v2.0.md`. One FR at a time:
+unit test -> live-check entry on `/frozen-v2-demo` + Playwright spec -> push -> validate on
+speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
+
+| Requirement | Title | Status | Commit |
+|---|---|---|---|
+| FR-001 | Five content-difficulty Worlds | In progress | - |
