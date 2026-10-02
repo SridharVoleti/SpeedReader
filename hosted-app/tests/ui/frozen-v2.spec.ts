@@ -329,3 +329,10 @@ test("FR-047 attempt records carry every required field", async ({ page }) => {
     "5 frozen records; last: NEW_PROGRESSION P005 @90WPM 100w, spoken SCORED, Level-Up 90->91 (LEVEL_UP), 6 rule versions; types 5; News Reader record with comprehension rejected=true"
   );
 });
+
+test("FR-048 evidence separation guards", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-048")).toHaveText(
+    "edit after model answer blocked=true; technical retry stored as failure=false; original record kept (a1 score 0.6) while effective view uses a1-corrected; original frozen=true"
+  );
+});

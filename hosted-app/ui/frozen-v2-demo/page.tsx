@@ -53,6 +53,7 @@ import { RECENCY_POLICY_V1, applyRecency, evidenceRecency } from "../../lib/v2/e
 import { LIFECYCLE_STATES, THRESHOLD_REGISTRY, changeThreshold, transitionThreshold } from "../../lib/v2/threshold-lifecycle";
 import { recordNewProgressionAttempt, validateAttemptRecord } from "../../lib/v2/attempt-record";
 import { ATTEMPT_TYPES } from "../../lib/v2/attempt-types";
+import { assertResponseEditable, correctAttempt, effectiveAttempts, isSilentFailureRecord } from "../../lib/v2/evidence-governance";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -567,6 +568,24 @@ const checks: Check[] = [
       const r = last.record;
       const bad = validateAttemptRecord({ ...r, attemptType: "NEWS_READER" });
       return `${learner.ledger.length} frozen records; last: ${r.attemptType} ${r.passageId} @${r.displayedWpm}WPM ${r.passageWords}w, spoken ${r.spokenStatus}, Level-Up ${r.levelUpBefore.wpm}->${r.levelUpAfter.wpm} (${r.levelUpAfter.event}), ${Object.keys(r.ruleVersions).length} rule versions; types ${ATTEMPT_TYPES.length}; News Reader record with comprehension rejected=${bad.length > 0}`;
+    })()
+  },
+  {
+    id: "FR-048",
+    title: "evidence separation guards",
+    result: (() => {
+      const scored = scoreComprehension(structuredEvidence([{ itemId: "q1", score: 0.6 }]), { score: 0.6 });
+      const pending = scoreComprehension(structuredEvidence([{ itemId: "q1", score: 0 }]), null);
+      const base = { passageId: "P001", displayedWpm: 90, passageWords: 100, recordedAt: "2026-10-03T10:00:00Z" };
+      const first = recordNewProgressionAttempt(newLearnerAggregate("l", 90), { ...base, attemptId: "a1", comprehension: scored });
+      const technical = recordNewProgressionAttempt(newLearnerAggregate("l", 90), { ...base, attemptId: "t1", comprehension: pending, spokenReason: "ASR_UNUSABLE" });
+      const locked = lockScoring(submitAttempt(newBpcAttempt("a1", "P001")), { score: 0.6, classification: "NOT_GREEN" });
+      let editBlocked = false;
+      try { assertResponseEditable(locked); } catch { editBlocked = true; }
+      const fixed = { ...first.record, attemptId: "a1-corrected", comprehensionScore: 0.8, classification: "GREEN" as const };
+      const corr = correctAttempt(first.learner.ledger, [], "a1", fixed, { correctedAt: "2026-10-04", reason: "scoring defect", correctedBy: "qa-1" });
+      const view = effectiveAttempts(first.learner.ledger, corr)[0];
+      return `edit after model answer blocked=${editBlocked}; technical retry stored as failure=${isSilentFailureRecord(technical.record)}; original record kept (${first.learner.ledger[0].attemptId} score ${first.learner.ledger[0].comprehensionScore}) while effective view uses ${view.attemptId}; original frozen=${Object.isFrozen(first.record)}`;
     })()
   }
 ];
