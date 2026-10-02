@@ -301,3 +301,10 @@ test("FR-043 News Reader does not block World progression", async ({ page }) => 
     "ready + no News Reader: advance to World 2; ready + worst oral: advance to World 2; ready + mic unavailable: advance to World 2; not ready + perfect oral: hold (SEQUENCE_COMPLETE_READINESS_PENDING)"
   );
 });
+
+test("FR-044 readiness-critical forms are pre-approved", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-044")).toHaveText(
+    "approved form: accepted; runtime-generated id: UNKNOWN_FORM; version mismatch: FORM_VERSION_MISMATCH; unapproved form: FORM_NOT_APPROVED; next unused equivalent after A: RS03-B"
+  );
+});

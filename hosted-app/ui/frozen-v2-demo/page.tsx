@@ -48,6 +48,7 @@ import { RS_IDS } from "../../lib/world1-framework";
 import { ceilingIsCompletionRequirement } from "../../lib/v2/speed-ceiling";
 import { missingReadiness } from "../../lib/v2/world1-completion";
 import { advanceFromWorld1 } from "../../lib/v2/world1-completion";
+import { checkCertificationEvidence, selectEquivalentForm, type ReadinessForm } from "../../lib/v2/readiness-forms";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -512,6 +513,16 @@ const checks: Check[] = [
       const ready = RS_IDS.map((rsId) => ({ rsId, confirmed: true, formId: `form-${rsId}-v1` }));
       const show = (mastery: unknown, readiness = ready) => { const r = advanceFromWorld1({ canonicalPointer: 1501, readiness, newsReaderMastery: mastery }); return r.advance ? `advance to World ${r.toWorld}` : `hold (${r.reason})`; };
       return `ready + no News Reader: ${show(undefined)}; ready + worst oral: ${show({ score: 0 })}; ready + mic unavailable: ${show("MIC_UNAVAILABLE")}; not ready + perfect oral: ${show({ score: 1 }, [])}`;
+    })()
+  },
+  {
+    id: "FR-044",
+    title: "readiness-critical forms are pre-approved",
+    result: (() => {
+      const form = (over: Partial<ReadinessForm> = {}): ReadinessForm => ({ formId: "RS03-A", version: "1.0", rsId: "RS03", equivalenceGroupId: "RS03-equiv-1", source: "PRE_GENERATED", qaApproved: true, independentQaReviewerId: "qa-1", authorId: "author-1", ...over });
+      const catalog = [form(), form({ formId: "RS03-B" })];
+      const verdict = (ref: { formId: string; version: string }, cat = catalog) => { const r = checkCertificationEvidence(ref, cat); return r.ok ? "accepted" : r.reason.split(":")[0]; };
+      return `approved form: ${verdict({ formId: "RS03-A", version: "1.0" })}; runtime-generated id: ${verdict({ formId: "runtime-gen-1", version: "1.0" })}; version mismatch: ${verdict({ formId: "RS03-A", version: "0.9" })}; unapproved form: ${verdict({ formId: "RS03-A", version: "1.0" }, [form({ qaApproved: false })])}; next unused equivalent after A: ${selectEquivalentForm(catalog, "RS03", ["RS03-A"])?.formId}`;
     })()
   }
 ];
