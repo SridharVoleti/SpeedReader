@@ -210,3 +210,10 @@ test("FR-030 >=75% is a celebration", async ({ page }) => {
     "GREEN stored as GREEN with exact score kept=true; celebration SMALL; BPC offered=true; message mentions number=false; five GREEN -> 91 WPM (LEVEL_UP)"
   );
 });
+
+test("FR-031 below 75% remains positive", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-031")).toHaveText(
+    "below-75 stored as NOT_GREEN (exact score kept=true); celebration NONE; BPC offered=true; digits/failure words shown=false; 8 low passages keep 90 WPM"
+  );
+});

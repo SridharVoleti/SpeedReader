@@ -342,6 +342,18 @@ const checks: Check[] = [
       const single = completeNewPassage("b1", scored(0.75), newCoreWpmState(90));
       return `GREEN stored as ${single.record.classification} with exact score kept=${single.record.score !== null}; celebration ${single.learner.celebration}; BPC offered=${single.learner.showBestPossibleComprehension}; message mentions number=${/\d|%/.test(single.learner.message)}; five GREEN -> ${core.wpm} WPM (${last.coreEvent})`;
     })()
+  },
+  {
+    id: "FR-031",
+    title: "below 75% remains positive",
+    result: (() => {
+      const scored = (s: number) => scoreComprehension(structuredEvidence([{ itemId: "q1", score: s }]), { score: s });
+      const out = completeNewPassage("c1", scored(0.7499), newCoreWpmState(90));
+      let core = newCoreWpmState(90);
+      for (let i = 0; i < 8; i += 1) core = completeNewPassage(`n${i}`, scored(0.5), core).coreAfter;
+      const text = JSON.stringify(out.learner);
+      return `below-75 stored as ${out.record.classification} (exact score kept=${out.record.score !== null}); celebration ${out.learner.celebration}; BPC offered=${out.learner.showBestPossibleComprehension}; digits/failure words shown=${/\d|fail|wrong/i.test(text)}; 8 low passages keep ${core.wpm} WPM`;
+    })()
   }
 ];
 
