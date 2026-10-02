@@ -14,6 +14,7 @@ import { evaluateStaminaTransitions, STAMINA_TRANSITIONS, SUPERSEDED_RULES } fro
 import { runAssessment } from "../../lib/v2/initial-assessment";
 import { assertPersonalOnly, personalImprovement } from "../../lib/v2/personal-trajectory";
 import { clampToCeiling, developmentContinuesAtCeiling, isSchedulableWpm, WORLD1_MAX_WPM } from "../../lib/v2/speed-ceiling";
+import { dimensionCelebration, levelUpAchievement, levelUpCount, levelUpsForWpmChange } from "../../lib/v2/level-semantics";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -95,6 +96,11 @@ const checks: Check[] = [
     id: "FR-010",
     title: "World 1 speed ceiling",
     result: `max ${WORLD1_MAX_WPM} WPM; 151 schedulable=${isSchedulableWpm(151)}; clamp(180)=${clampToCeiling(180)}; at 150 other development continues=${developmentContinuesAtCeiling(150).otherDevelopmentContinues}`
+  },
+  {
+    id: "FR-011",
+    title: "Level semantics",
+    result: `+1 WPM = ${levelUpsForWpmChange(90, 91)} Level Up; 60->75 WPM = ${levelUpCount(60, 75)} Level Ups; "${levelUpAchievement().kind === "LEVEL_UP" ? "You Levelled Up!" : ""}"; stamina celebration numbered=${dimensionCelebration("stamina").numbered}`
   }
 ];
 

@@ -70,3 +70,10 @@ test("FR-010 World 1 speed ceiling", async ({ page }) => {
     "max 150 WPM; 151 schedulable=false; clamp(180)=150; at 150 other development continues=true"
   );
 });
+
+test("FR-011 +1 WPM is one Level Up; other dimensions are not numbered", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-011")).toHaveText(
+    '+1 WPM = 1 Level Up; 60->75 WPM = 15 Level Ups; "You Levelled Up!"; stamina celebration numbered=false'
+  );
+});

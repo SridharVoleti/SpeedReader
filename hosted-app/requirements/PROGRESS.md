@@ -143,3 +143,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-008 | Ten-minute initial assessment | Done | f0578d6 |
 | FR-009 | Personal trajectory | Done | 6226855 |
 | FR-010 | World 1 speed ceiling | Done | bdacc68 |
+| FR-011 | Level semantics | Done | cc6ca37 |
