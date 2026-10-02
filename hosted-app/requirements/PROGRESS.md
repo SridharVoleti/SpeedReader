@@ -134,16 +134,16 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | Requirement | Title | Status | Commit |
 |---|---|---|---|
 | FR-001 | Five content-difficulty Worlds | Done | 2cb419f |
-| FR-002 | World 2+ strategy direction | Done | 5a769a0 |
-| FR-003 | 1,500 canonical passages | Done | 240302a |
-| FR-004 | First 150 passages | Done | 1e73287 |
-| FR-005 | Stamina staircase | Done | 8249fd6 |
-| FR-006 | Stamina transition precedence | Done | 157d2ac |
-| FR-007 | AC-53R progressive stamina-transition validity | Done | 10bbef5 |
-| FR-008 | Ten-minute initial assessment | Done | f0578d6 |
-| FR-009 | Personal trajectory | Done | 6226855 |
-| FR-010 | World 1 speed ceiling | Done | bdacc68 |
-| FR-011 | Level semantics | Done | cc6ca37 |
-| FR-012 | Comprehension is the only WPM gate | Done | 354e269 |
-| FR-013 | Passage GREEN threshold | Done | bf1e7d4 |
-| FR-014 | First-five rule | Done | pending |
+| FR-002 | World 2+ strategy direction | Done | b7338ef |
+| FR-003 | 1,500 canonical passages | Done | d460dc0 |
+| FR-004 | First 150 passages | Done | ad8e48f |
+| FR-005 | Stamina staircase | Done | 535009b |
+| FR-006 | Stamina transition precedence | Done | cf3dc7c |
+| FR-007 | AC-53R progressive stamina-transition validity | Done | d17f8e3 |
+| FR-008 | Ten-minute initial assessment | Done | 669ccb6 |
+| FR-009 | Personal trajectory | Done | e72b396 |
+| FR-010 | World 1 speed ceiling | Done | ac5ed91 |
+| FR-011 | Level semantics | Done | d7a6deb |
+| FR-012 | Comprehension is the only WPM gate | Done | b2b0dcf |
+| FR-013 | Passage GREEN threshold | Done | 670036c |
+| FR-014 | First-five rule | Done | af998b0 |
