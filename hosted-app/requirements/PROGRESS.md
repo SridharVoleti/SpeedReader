@@ -159,3 +159,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-024 | ASR uncertainty | Done | 01dbf0d |
 | FR-025 | Best Possible Comprehension after every passage | Done | 23cadbb |
 | FR-026 | Story-style explanation | Done | 4193618 |
+| FR-027 | Best Possible Comprehension fidelity | Done | 0c3a98a |
