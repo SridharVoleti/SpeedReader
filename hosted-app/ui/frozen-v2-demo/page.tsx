@@ -32,6 +32,7 @@ import { comprehensionFromOutcome, resolveSpokenEvidence, technicalRecoveryActio
 import { bestComprehensionFor, lockScoring, newBpcAttempt, submitAttempt } from "../../lib/v2/best-comprehension";
 import { lintBpcStyle } from "../../lib/v2/bpc-style";
 import { checkBpcFidelity } from "../../lib/v2/bpc-fidelity";
+import { EXPRESSION_FOCUS_BY_WORLD, expressionFocusFor, permanentFeaturesFor } from "../../lib/v2/expression-by-world";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -305,6 +306,11 @@ const checks: Check[] = [
       const fact = checkBpcFidelity("Sam brought a ladder and a dog yesterday.", { passageText });
       return `faithful explanation supported=${ok.supported}; invented motive flagged: ${motive.inventionCues.join(",")}; invented facts flagged: ${fact.unsupportedTerms.join(",")}`;
     })()
+  },
+  {
+    id: "FR-028",
+    title: "expression and BPC are permanent across Worlds",
+    result: `both features active in ${WORLDS.filter((w) => permanentFeaturesFor(w.id).bestPossibleComprehension && permanentFeaturesFor(w.id).comprehensionExpression).length}/5 Worlds; sophistication ${EXPRESSION_FOCUS_BY_WORLD.map((f) => f.sophistication).join("<")}; W1 focus: ${expressionFocusFor(1).expectation.length} expectations; W4 includes ${expressionFocusFor(4).expectation[0]}`
   }
 ];
 

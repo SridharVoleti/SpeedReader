@@ -189,3 +189,10 @@ test("FR-027 BPC never invents unsupported content", async ({ page }) => {
     "faithful explanation supported=true; invented motive flagged: loved; invented facts flagged: brought,ladder,dog,yesterday"
   );
 });
+
+test("FR-028 expression and BPC are permanent across Worlds", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-028")).toHaveText(
+    "both features active in 5/5 Worlds; sophistication 1<2<3<4<5; W1 focus: 5 expectations; W4 includes arguments"
+  );
+});
