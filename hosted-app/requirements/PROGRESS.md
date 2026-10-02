@@ -154,3 +154,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-019 | Support is invisible | Done | 074d395 |
 | FR-020 | Hybrid evidence model | Done | 092ec55 |
 | FR-021 | Weighting lifecycle | Done | 2f1f398 |
+| FR-022 | Structured question alignment | Done | 68704eb |
