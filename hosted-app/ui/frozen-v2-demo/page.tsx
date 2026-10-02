@@ -56,6 +56,8 @@ import { ATTEMPT_TYPES } from "../../lib/v2/attempt-types";
 import { assertResponseEditable, correctAttempt, effectiveAttempts, isSilentFailureRecord } from "../../lib/v2/evidence-governance";
 import { explainFromLedger, lastDecision } from "../../lib/v2/explainability";
 import { SCAN_ALLOWLIST, STALE_RULE_PATTERNS, scanForStaleRules } from "../../lib/v2/stale-rules";
+import { ProgressStore } from "../../lib/v2/progress-store";
+import { LearnerAggregate } from "../../lib/v2/learner-aggregate";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -623,6 +625,23 @@ const checks: Check[] = [
       const detected = stale.filter((code) => scanForStaleRules([{ path: "demo.ts", text: code }]).length > 0).length;
       const compliant = scanForStaleRules([{ path: "demo.ts", text: "const next = Math.min(state.wpm + 1, 150);\nconst wpm = assessment.startingWpm;" }]).length;
       return `${STALE_RULE_PATTERNS.length} stale-rule patterns; detects ${detected}/${stale.length} stale snippets; compliant code findings=${compliant}; allowlisted registry files=${Object.keys(SCAN_ALLOWLIST).length}`;
+    })()
+  },
+  {
+    id: "AC-C05",
+    title: "Level Up and evidence commit atomically",
+    result: (() => {
+      const scored = scoreComprehension(structuredEvidence([{ itemId: "q1", score: 0.9 }]), { score: 0.9 });
+      const advance = (l: LearnerAggregate, i: number) => recordNewProgressionAttempt(l, { attemptId: `c${i}`, passageId: `P${i + 1}`, displayedWpm: l.core.wpm, passageWords: 100, recordedAt: "2026-10-03T10:00:00Z", comprehension: scored }).learner;
+      let before = newLearnerAggregate("l", 90);
+      for (let i = 0; i < 4; i += 1) before = advance(before, i);
+      const next = advance(before, 4);
+      const store = new ProgressStore(before);
+      const failed = store.commit(next, (s) => { if (s === "WRITE_WPM") throw new Error("boom"); });
+      const afterFail = `${store.snapshot.learner.core.wpm} WPM/${store.snapshot.learner.ledger.length} records/v${store.snapshot.version}`;
+      const retried = store.commit(next);
+      const forged = new ProgressStore(before).commit({ ...next, core: { ...next.core, wpm: 95 } });
+      return `failed mid-commit ok=${failed.ok} -> unchanged ${afterFail}; retry ok=${retried.ok} -> ${store.snapshot.learner.core.wpm} WPM/${store.snapshot.learner.ledger.length} records/v${store.snapshot.version}; WPM/evidence disagreement rejected=${!forged.ok}`;
     })()
   }
 ];
