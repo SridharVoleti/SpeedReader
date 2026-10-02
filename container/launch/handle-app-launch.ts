@@ -1,14 +1,16 @@
-// Orchestrates the whole POST /launch flow from docs/app-launch-integration.md:
+// Orchestrates the whole POST /launch flow from container/docs/app-launch-integration.md:
 //   form body  ->  exchange launch code  ->  verify bootstrap assertion  ->  start session
 // Framework-agnostic (no next/server import) so it is directly unit-testable. The route
-// handler (app/launch/route.ts) turns the result into a NextResponse + cookies.
+// handler (container/routes/launch.ts) turns the result into a NextResponse + cookies.
 //
 // Never throws: every failure comes back as { ok: false, ... } so the route fails closed.
 
+import identity from "../../hosted-app/app.identity";
 import { AppLaunchError, ERROR_STATUS, ERROR_MESSAGE, type AppLaunchErrorCode } from "./errors";
 import { exchangeLaunchCode } from "./exchange";
 import { verifyBootstrapAssertion, type LearnerBootstrap } from "./bootstrap-assertion";
 import { mintSessionToken } from "./session";
+import { confirmUsableLaunch, type PlatformGrant } from "./platform-api";
 import type { AppLaunchConfig } from "./config";
 
 export type HandleAppLaunchResult =
@@ -39,9 +41,27 @@ export async function handleAppLaunch(params: {
 
     const exchange = await exchangeLaunchCode({ cfg, launchCode, launchAttemptId, fetchImpl, now });
     const learner = await verifyBootstrapAssertion({ cfg, token: exchange.bootstrapAssertion, now });
+
+    // Activating the grant is what starts the learner's session clock on BabySteps' side, so
+    // it belongs here - right as we're about to actually show them the app - not speculatively
+    // earlier. Best-effort: a learner still gets to read and play even if this fails (a
+    // misconfigured deployment, a network blip, BabySteps rejecting our version guess - see
+    // platform-api.ts) - they just won't have their progress synced centrally this session.
+    let grant: PlatformGrant | undefined;
+    if (exchange.platformApiAccess) {
+      const provisional: PlatformGrant = { ...exchange.platformApiAccess, active: false };
+      try {
+        grant = await confirmUsableLaunch({ cfg, grant: provisional, learnerSessionId: learner.learnerSessionId, now, fetchImpl });
+      } catch (e) {
+        console.error("[app-launch] usable-launch confirmation failed, progress sync disabled for this session:", e instanceof Error ? e.message : e);
+        grant = provisional;
+      }
+    }
+
     const { token, expiresAt } = await mintSessionToken(learner, {
       centralSessionExpiresAt: exchange.centralSessionExpiresAt,
-      now
+      now,
+      grant
     });
 
     return {
@@ -59,7 +79,7 @@ export async function handleAppLaunch(params: {
       ok: false,
       code,
       status: ERROR_STATUS[code] ?? 500,
-      message: ERROR_MESSAGE[code] ?? "Speed Reading could not open this launch."
+      message: ERROR_MESSAGE[code] ?? `${identity.displayName} could not open this launch.`
     };
   }
 }

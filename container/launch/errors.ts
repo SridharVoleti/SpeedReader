@@ -1,6 +1,8 @@
-// Error type + HTTP status mapping for the BabySteps -> SpeedReader browser handoff
-// (see docs/app-launch-integration.md). Every failure in this module is an AppLaunchError
+// Error type + HTTP status mapping for the BabySteps -> hosted-app browser handoff
+// (see container/docs/app-launch-integration.md). Every failure in this module is an AppLaunchError
 // so the /launch route can fail closed with a safe, non-leaking response.
+
+import identity from "../../hosted-app/app.identity";
 
 export type AppLaunchErrorCode =
   | "LAUNCH_MISCONFIGURED"
@@ -30,9 +32,9 @@ export const ERROR_STATUS: Record<AppLaunchErrorCode, number> = {
 
 /** Short, safe sentence shown to the parent's browser for each failure class. */
 export const ERROR_MESSAGE: Record<AppLaunchErrorCode, string> = {
-  LAUNCH_MISCONFIGURED: "Speed Reading is not configured to accept launches yet.",
+  LAUNCH_MISCONFIGURED: `${identity.displayName} is not configured to accept launches yet.`,
   BAD_LAUNCH_REQUEST: "This launch link is missing information and cannot be opened.",
-  EXCHANGE_FAILED: "Speed Reading could not confirm this launch with BabySteps. Please try again.",
-  BOOTSTRAP_INVALID: "Speed Reading could not verify who is launching. Please try again.",
-  PROVISION_FAILED: "Speed Reading could not start a session. Please try again."
+  EXCHANGE_FAILED: `${identity.displayName} could not confirm this launch with BabySteps. Please try again.`,
+  BOOTSTRAP_INVALID: `${identity.displayName} could not verify who is launching. Please try again.`,
+  PROVISION_FAILED: `${identity.displayName} could not start a session. Please try again.`
 };

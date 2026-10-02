@@ -28,7 +28,7 @@ describe("isAiRelatedDependency", () => {
 
 describe("package.json has zero AI/LLM runtime dependencies", () => {
   it("no production dependency is an AI/LLM package", () => {
-    const packageJsonPath = resolve(__dirname, "../../package.json");
+    const packageJsonPath = resolve(__dirname, "../../../package.json");
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8")) as {
       dependencies: Record<string, string>;
     };

@@ -31,6 +31,46 @@ the browser's localStorage (see the main README). So unlike a database-backed ap
 session" here just means minting a signed, self-contained cookie; there is nothing to persist
 server-side and nothing to look up on the next request.
 
+## Progress sync (BabySteps "platform API")
+
+Beyond the login handoff, BabySteps exposes an internal API that lets an embedded app persist
+a learner's progress centrally, so it survives a lost device or a cleared browser instead of
+living only in localStorage. **No app - ChessMaster included - had implemented this before
+Speed Reading**, so there was no reference handler to copy; this was reverse-engineered
+directly from the BabySteps source (`src/lib/authorization/platform-api-contracts.ts`,
+`src/lib/app-authorization/service.ts`, `src/lib/app-progress/service.ts`).
+
+localStorage remains the source of truth for gameplay. This is best-effort on top of it, never
+a dependency: a standalone visit (no BabySteps session) or any failure along this path is
+silently a no-op - see `lib/app-launch/platform-api.ts` for the extensive "never let this block
+a learner reading a passage" framing.
+
+1. **Grant activation.** The `/launch` exchange returns a *provisional* access grant, scoped
+   only to confirm the app actually rendered. `handle-app-launch.ts` immediately calls
+   `confirmUsableLaunch` (`POST /v1/internal/learner-sessions/{id}/usable-launch`) to activate
+   it - this is also what starts the learner's session clock on BabySteps' side, so it has to
+   happen right as we're about to show them the app, not speculatively. The resulting grant
+   (a rotating ~5-minute access token) rides along in the same signed session cookie, right
+   alongside our own `progressVersion`/`checkpointSequence` counters - still no database.
+2. **Every call is "dual proof".** A Bearer access token (the grant) plus a *fresh* Ed25519
+   app-assertion, same mechanism as the `/launch` exchange but with a different `aud` claim per
+   endpoint (`babysteps:platform-api` for progress calls, `babysteps:app-session-grants:renew`
+   for token renewal). `lib/app-launch/platform-api.ts` always renews the token immediately
+   before use rather than tracking exact expiry - simpler, and renewal accepts an
+   already-expired token as long as the underlying learner session hasn't ended.
+3. **On each level pass** (`app/api/babysteps-progress/route.ts`, called from `app/page.tsx`):
+   `PUT .../learner-app-progress/current` (sets the session's checkpoint to this level) followed
+   by `POST .../learner-app-progress/lessons/{levelKey}/complete` (records the completion and
+   advances to the next level). Both require an `expectedProgressVersion` that must exactly
+   match BabySteps' own counter (optimistic concurrency) - tracked in the session cookie,
+   seeded from `GET current` on the first call of a session. A completion is **permanent** per
+   level key on BabySteps' side, so this is only ever called for an actual pass, never a retry.
+4. **Known gap:** `usable-launch` requires an `expectedSessionVersion` that the `/launch`
+   exchange response never actually provides. `1` is correct for a freshly dispatched session
+   (nothing else touches it beforehand) but could be wrong for a resumed one - in which case
+   confirmation just fails harmlessly and that whole session skips progress sync. Revisit if
+   BabySteps' contract ever exposes the real value.
+
 ## Environment variables
 
 See `.env.local.example` for the full list. The `APP_LAUNCH_*` names and defaults are a

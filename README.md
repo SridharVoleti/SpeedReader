@@ -1,47 +1,31 @@
-# Speed Reading App
+# BabySteps app container
 
-AI-free, Python-heavy speed reading trainer with a Candy Crush–style level
-progression: pass each level's comprehension check to unlock the next.
+A reusable Next.js shell that hosts one learning app and speaks the BabySteps embedded-app
+protocol (`/health`, `/launch`, `/return`, `/identity`, progress sync).
 
-## Progression
-
-- **6 worlds × 6 levels = 36 levels.** Each world fixes how many words are
-  highlighted at a time (the "chunk"), from 1 word up to 6 words.
-- **Within a world the speed climbs 100 → 120 → 140 → 160 → 180 → 200 WPM.**
-- **Finishing 200 WPM promotes you to the next world**, which restarts at
-  100 WPM with one more word per chunk (e.g. after 1-word @ 200 WPM comes
-  2-words @ 100 WPM), all the way to 6 words at a time.
-- **Every level ends with a comprehension check**: the student retells the
-  passage in their own words and a deterministic scorer (length, key facts,
-  main ideas, originality, clarity) awards 0–100 points. 70+ passes and
-  unlocks the next level; 80+ earns 2 stars, 90+ earns 3 stars.
-- Progress (best score, stars, unlocks) is stored in the browser's
-  localStorage. Auth and payment are intentionally deferred, except for the
-  BabySteps launch handoff below.
-
-## BabySteps launch integration
-
-Speed Reading can be opened from inside the BabySteps parent app, with the child already
-signed in — the same `/health`, `/launch`, `/return`, `/identity` protocol BabySteps uses for
-every embedded app. See `docs/app-launch-integration.md` for the full contract and
-`.env.local.example` for the required `APP_LAUNCH_*` / `SESSION_SECRET` environment variables.
-The app works standalone (without any of this configured) exactly as before.
-
-Level data lives in `data/progression.json`, passages in
-`data/passages/level-1.json`. The comprehension scorer exists twice by
-design — `backend/speed_reading/scoring.py` (source of truth, unit-tested)
-and `lib/scoring.ts` (browser port); keep their weights in sync.
-
-## Commands
-
-```bash
-npm run dev        # start the app (or double-click run.bat on Windows)
-npm run test:ui    # Playwright tests (requires a production build first)
-npm run test:backend
+```
+container/    BabySteps container - app-agnostic, never edit per app
+  app-contract.ts   the interface a hosted app must satisfy (AppIdentity, AppManifest)
+  launch/           launch-code exchange, assertions, session cookies, platform API
+  routes/           route handlers (health, identity, launch, return, progress-sync)
+  docs/             BabySteps integration contract
+  tests/            container Playwright specs
+app/          Next.js router shims (container-owned): re-export container routes and
+              resolve pages from the hosted app's manifest
+hosted-app/   EVERYTHING app-specific (currently SpeedReader): UI, lib, data, backend,
+              tests, docs, content, requirements
 ```
 
-Python tests can be run without installing the frontend dependencies:
+## Hosting a different app
 
-```bash
-python -m pytest backend/tests
-```
+Replace the `hosted-app/` folder with the new app's folder. It must provide:
+
+- `hosted-app/app.identity.ts` - default export `AppIdentity` (display name, cookie prefix, journey)
+- `hosted-app/app.manifest.ts` - default export `AppManifest` (layout, metadata, `Home`, `pages` table)
+- tests under `hosted-app/tests/unit/**/*.test.ts` and `hosted-app/tests/ui/**/*.spec.ts`
+
+Nothing in `container/` or `app/` changes. Shared tooling (`package.json`, `tsconfig.json`,
+`vitest.config.ts`, `playwright.config.ts`) is container-level; add any extra npm
+dependencies the new app needs to `package.json`.
+
+SpeedReader's own docs are in `hosted-app/README.md`.

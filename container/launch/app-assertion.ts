@@ -8,12 +8,21 @@ import { randomUUID } from "crypto";
 import { AppLaunchError } from "./errors";
 import type { AppLaunchConfig } from "./config";
 
-const AUDIENCE = "babysteps:app-launch:exchange";
+const EXCHANGE_AUDIENCE = "babysteps:app-launch:exchange";
+// The same app-assertion shape also authenticates every other BabySteps-internal call we
+// make as ourselves (progress writes, grant renewal) - just with a different `aud`, per
+// endpoint. See lib/app-launch/platform-api.ts.
+export const PLATFORM_API_AUDIENCE = "babysteps:platform-api";
+export const GRANT_RENEW_AUDIENCE = "babysteps:app-session-grants:renew";
 const TTL_SECONDS = 60;
 
 /** Mint one fresh app assertion. Valid for 60 seconds - never cache it. */
-export async function mintAppAssertion(cfg: AppLaunchConfig, opts: { now?: () => Date } = {}): Promise<string> {
+export async function mintAppAssertion(
+  cfg: AppLaunchConfig,
+  opts: { now?: () => Date; audience?: string } = {}
+): Promise<string> {
   const now = (opts.now ?? (() => new Date()))();
+  const audience = opts.audience ?? EXCHANGE_AUDIENCE;
   const iat = Math.floor(now.getTime() / 1000);
 
   let key;
@@ -35,7 +44,7 @@ export async function mintAppAssertion(cfg: AppLaunchConfig, opts: { now?: () =>
       .setProtectedHeader({ alg: "EdDSA", typ: "JWT" })
       .setIssuer(cfg.clientId)
       .setSubject(cfg.clientId)
-      .setAudience(AUDIENCE)
+      .setAudience(audience)
       .setJti(randomUUID())
       .setIssuedAt(iat)
       .setExpirationTime(iat + TTL_SECONDS)
@@ -48,5 +57,5 @@ export async function mintAppAssertion(cfg: AppLaunchConfig, opts: { now?: () =>
   }
 }
 
-export const APP_ASSERTION_AUDIENCE = AUDIENCE;
+export const APP_ASSERTION_AUDIENCE = EXCHANGE_AUDIENCE;
 export const APP_ASSERTION_TTL_SECONDS = TTL_SECONDS;

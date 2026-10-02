@@ -7,12 +7,24 @@ import { AppLaunchError } from "./errors";
 import { mintAppAssertion } from "./app-assertion";
 import type { AppLaunchConfig } from "./config";
 
+/** The provisional app-session grant returned alongside the bootstrap assertion - only
+ *  `session.usable_launch` scoped until confirmUsableLaunch() activates it (see
+ *  lib/app-launch/platform-api.ts). Lets us call BabySteps' progress-write API as this
+ *  specific learner session, without ever holding a learner credential ourselves. */
+export interface PlatformApiAccess {
+  grantId: string;
+  accessToken: string;
+  accessTokenExpiresAt: string;
+  scopes: string[];
+  apiContractVersion?: string;
+}
+
 export interface ExchangeResult {
   /** HS256 JWT - verify before trusting */
   bootstrapAssertion: string;
   bootstrapExpiresAt?: string;
   centralSessionExpiresAt?: string;
-  platformApiAccess?: unknown;
+  platformApiAccess?: PlatformApiAccess;
 }
 
 export async function exchangeLaunchCode(params: {
@@ -70,7 +82,28 @@ export async function exchangeLaunchCode(params: {
     bootstrapAssertion: body.bootstrapAssertion,
     bootstrapExpiresAt: typeof body.bootstrapExpiresAt === "string" ? body.bootstrapExpiresAt : undefined,
     centralSessionExpiresAt: typeof body.centralSessionExpiresAt === "string" ? body.centralSessionExpiresAt : undefined,
-    platformApiAccess: body.platformApiAccess
+    platformApiAccess: parsePlatformApiAccess(body.platformApiAccess)
+  };
+}
+
+function parsePlatformApiAccess(value: unknown): PlatformApiAccess | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const v = value as Record<string, unknown>;
+  if (
+    typeof v.grantId !== "string" ||
+    typeof v.accessToken !== "string" ||
+    typeof v.accessTokenExpiresAt !== "string" ||
+    !Array.isArray(v.scopes) ||
+    !v.scopes.every((s) => typeof s === "string")
+  ) {
+    return undefined;
+  }
+  return {
+    grantId: v.grantId,
+    accessToken: v.accessToken,
+    accessTokenExpiresAt: v.accessTokenExpiresAt,
+    scopes: v.scopes as string[],
+    apiContractVersion: typeof v.apiContractVersion === "string" ? v.apiContractVersion : undefined
   };
 }
 

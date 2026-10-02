@@ -31,3 +31,11 @@ test("GET /return redirects to BabySteps and clears session cookies", async ({ r
   expect([302, 303]).toContain(res.status());
   expect(res.headers()["location"]).toContain("babystepsindia.com");
 });
+
+test("POST /api/babysteps-progress is a no-op outside a BabySteps session", async ({ request }) => {
+  const res = await request.post("/api/babysteps-progress", {
+    data: { levelKey: "1", nextLevelKey: "2" }
+  });
+  expect(res.status()).toBe(200);
+  expect(await res.json()).toEqual({ synced: false, reason: "not_launched_from_babysteps" });
+});
