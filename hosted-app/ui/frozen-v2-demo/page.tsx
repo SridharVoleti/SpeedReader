@@ -51,6 +51,8 @@ import { advanceFromWorld1 } from "../../lib/v2/world1-completion";
 import { checkCertificationEvidence, selectEquivalentForm, type ReadinessForm } from "../../lib/v2/readiness-forms";
 import { RECENCY_POLICY_V1, applyRecency, evidenceRecency } from "../../lib/v2/evidence-recency";
 import { LIFECYCLE_STATES, THRESHOLD_REGISTRY, changeThreshold, transitionThreshold } from "../../lib/v2/threshold-lifecycle";
+import { recordNewProgressionAttempt, validateAttemptRecord } from "../../lib/v2/attempt-record";
+import { ATTEMPT_TYPES } from "../../lib/v2/attempt-types";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -551,6 +553,20 @@ const checks: Check[] = [
       const frozen = THRESHOLD_REGISTRY.filter((e) => e.frozen).length;
       const calibratable = THRESHOLD_REGISTRY.filter((e) => !e.frozen).length;
       return `${LIFECYCLE_STATES.length} states; ${frozen} frozen + ${calibratable} calibratable thresholds; change ASR confidence: ${tryIt(() => changeThreshold(find("asr-min-confidence"), 0.65, audit))}; change 75% GREEN threshold: ${tryIt(() => changeThreshold(find("green-threshold"), 0.6, audit))}; PROVISIONAL->APPROVED directly: ${tryIt(() => transitionThreshold(find("weight-spoken"), "PRODUCTION_APPROVED", audit))}`;
+    })()
+  },
+  {
+    id: "FR-047",
+    title: "attempt records carry every required field",
+    result: (() => {
+      const scored = scoreComprehension(structuredEvidence([{ itemId: "q1", score: 0.9 }, { itemId: "q2", score: 0.9 }]), { score: 0.9 });
+      let learner = newLearnerAggregate("learner-1", 90);
+      let last = recordNewProgressionAttempt(learner, { attemptId: "r0", passageId: "P001", displayedWpm: 90, passageWords: 100, recordedAt: "2026-10-03T10:00:00Z", comprehension: scored });
+      learner = last.learner;
+      for (let i = 1; i < 5; i += 1) { last = recordNewProgressionAttempt(learner, { attemptId: `r${i}`, passageId: `P00${i + 1}`, displayedWpm: 90, passageWords: 100, recordedAt: "2026-10-03T10:00:00Z", comprehension: scored }); learner = last.learner; }
+      const r = last.record;
+      const bad = validateAttemptRecord({ ...r, attemptType: "NEWS_READER" });
+      return `${learner.ledger.length} frozen records; last: ${r.attemptType} ${r.passageId} @${r.displayedWpm}WPM ${r.passageWords}w, spoken ${r.spokenStatus}, Level-Up ${r.levelUpBefore.wpm}->${r.levelUpAfter.wpm} (${r.levelUpAfter.event}), ${Object.keys(r.ruleVersions).length} rule versions; types ${ATTEMPT_TYPES.length}; News Reader record with comprehension rejected=${bad.length > 0}`;
     })()
   }
 ];

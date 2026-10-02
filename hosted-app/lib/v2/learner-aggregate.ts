@@ -10,6 +10,7 @@ import { completeNewPassage, type InternalAttemptRecord, type PassageCompletionO
 import { newNewsReaderState, type NewsReaderState } from "./news-reader";
 import { passageWords, WORLD1_LAST_PASSAGE } from "./stamina";
 import type { LearnerFeedback } from "./learner-feedback";
+import type { AttemptRecord } from "./attempt-record";
 
 export type LearnerAggregate = {
   learnerId: string;
@@ -22,6 +23,8 @@ export type LearnerAggregate = {
   newsReader: NewsReaderState;
   /** Immutable internal attempt log (FR-047/FR-048). */
   attempts: readonly InternalAttemptRecord[];
+  /** Full FR-047 attempt records (immutable ledger), written by recordNewProgressionAttempt. */
+  ledger: readonly AttemptRecord[];
 };
 
 export type NewPassageEvent = CoreWpmEvent | "LEVEL_UP_DEFERRED_BY_LENGTH_STEP";
@@ -29,7 +32,7 @@ export type NewPassageEvent = CoreWpmEvent | "LEVEL_UP_DEFERRED_BY_LENGTH_STEP";
 export function newLearnerAggregate(learnerId: string, startingWpm: number): LearnerAggregate {
   return {
     learnerId, baselineWpm: startingWpm, core: newCoreWpmState(startingWpm), canonicalPointer: 1,
-    newsReader: newNewsReaderState(), attempts: []
+    newsReader: newNewsReaderState(), attempts: [], ledger: []
   };
 }
 
