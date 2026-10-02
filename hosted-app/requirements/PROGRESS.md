@@ -167,3 +167,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-032 | Level-Up celebration | Done | a062bf7 |
 | FR-033 | Book-time impact | Done | 1173870 |
 | FR-034 | Parallel track | Done | 4867c6f |
+| FR-035 | Independence from core progression | Done | 3ba8d12 |
