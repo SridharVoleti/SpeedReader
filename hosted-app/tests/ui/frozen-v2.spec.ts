@@ -84,3 +84,10 @@ test("FR-012 oral/News Reader signals cannot affect the WPM gate", async ({ page
     "oral/news/pronunciation/confidence at 0 -> same gate evidence: true; gate sees 4 fields"
   );
 });
+
+test("FR-013 75% GREEN threshold, counted per passage", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-013")).toHaveText(
+    "threshold 75%; 75%=GREEN; 74.99%=NOT_GREEN; [100,100,74,60,70] GREEN count=2 (average ignored)"
+  );
+});

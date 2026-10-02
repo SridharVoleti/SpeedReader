@@ -16,6 +16,7 @@ import { assertPersonalOnly, personalImprovement } from "../../lib/v2/personal-t
 import { clampToCeiling, developmentContinuesAtCeiling, isSchedulableWpm, WORLD1_MAX_WPM } from "../../lib/v2/speed-ceiling";
 import { dimensionCelebration, levelUpAchievement, levelUpCount, levelUpsForWpmChange } from "../../lib/v2/level-semantics";
 import { toGateEvidence } from "../../lib/v2/gate-evidence";
+import { classifyComprehension, greenCount, GREEN_THRESHOLD } from "../../lib/v2/comprehension-threshold";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -111,6 +112,11 @@ const checks: Check[] = [
       const noisy = toGateEvidence({ attemptId: "a", wpm: 90, comprehensionScore: 0.8, oralQuality: 0, newsReaderScore: 0, pronunciation: 0, confidence: 0 });
       return `oral/news/pronunciation/confidence at 0 -> same gate evidence: ${JSON.stringify(clean) === JSON.stringify(noisy)}; gate sees ${Object.keys(noisy).length} fields`;
     })()
+  },
+  {
+    id: "FR-013",
+    title: "Passage GREEN threshold",
+    result: `threshold ${GREEN_THRESHOLD * 100}%; 75%=${classifyComprehension(0.75)}; 74.99%=${classifyComprehension(0.7499)}; [100,100,74,60,70] GREEN count=${greenCount([1, 1, 0.74, 0.6, 0.7])} (average ignored)`
   }
 ];
 
