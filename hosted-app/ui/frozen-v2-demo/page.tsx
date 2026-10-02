@@ -41,6 +41,7 @@ import { NEWS_READER_PURPOSES, newNewsReaderState, newsReaderGatesCoreProgressio
 import { applyNewPassage, newLearnerAggregate } from "../../lib/v2/learner-aggregate";
 import { assertComprehensionEvidence, comprehensionEvidenceForPassage, emptyEvidenceStore, oralEvidenceForPassage, recordCoreEvidence, recordNewsReaderEvidence } from "../../lib/v2/evidence-store";
 import { REFERENCE_QUALITIES, resolveReferenceAudio, type Platform, type ReferenceAudio } from "../../lib/v2/reference-audio";
+import { twoReadCoaching } from "../../lib/v2/news-reader-coaching";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -441,6 +442,18 @@ const checks: Check[] = [
       const urls = new Set(platforms.map((p) => { const r = resolveReferenceAudio([audio], "P001", p); return r.ok ? r.audio.url : "none"; }));
       const device = resolveReferenceAudio([{ ...audio, source: "DEVICE_TTS" }], "P001", "ios");
       return `${REFERENCE_QUALITIES.length} reference qualities; ${platforms.length} platforms resolve ${urls.size} identical asset; device TTS reference rejected=${!device.ok}`;
+    })()
+  },
+  {
+    id: "FR-038",
+    title: "oral two-read coaching",
+    result: (() => {
+      const read = (id: string, readNumber: 1 | 2, clarity: number) => ({ attemptId: id, passageId: "P001", readNumber, metrics: { clarity, pronunciation: clarity }, technicalState: "OK" as const, recordedAt: "2026-10-03T10:00:00Z" });
+      const pair = (a: number, b: number) => twoReadCoaching(recordNewsReaderAttempt(recordNewsReaderAttempt(newNewsReaderState(), read("r1", 1, a)), read("r2", 2, b)), "P001");
+      const up = pair(0.4, 0.7);
+      const down = pair(0.7, 0.4);
+      if (up.status !== "COMPLETE" || down.status !== "COMPLETE") return "incomplete";
+      return `reads stored independently; delta ${up.meanDelta.toFixed(1)} improved=${up.improved}; lower second read improved=${down.improved}; both framed as practice=${/practice/i.test(up.coaching) && /practice/i.test(down.coaching)}; punishing words=${/worse|wrong|fail/i.test(up.coaching + down.coaching)}`;
     })()
   }
 ];

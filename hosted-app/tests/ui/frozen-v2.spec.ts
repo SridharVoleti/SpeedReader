@@ -259,3 +259,10 @@ test("FR-037 canonical pre-generated reference audio", async ({ page }) => {
     "7 reference qualities; 4 platforms resolve 1 identical asset; device TTS reference rejected=true"
   );
 });
+
+test("FR-038 oral two-read coaching", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-038")).toHaveText(
+    "reads stored independently; delta 0.3 improved=true; lower second read improved=false; both framed as practice=true; punishing words=false"
+  );
+});
