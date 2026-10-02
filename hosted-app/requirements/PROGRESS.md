@@ -133,4 +133,5 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 
 | Requirement | Title | Status | Commit |
 |---|---|---|---|
-| FR-001 | Five content-difficulty Worlds | In progress | - |
+| FR-001 | Five content-difficulty Worlds | Done | 2cb419f |
+| FR-002 | World 2+ strategy direction | Done | 5a769a0 |

@@ -5,6 +5,7 @@
 // site can be checked end to end (see hosted-app/tests/ui/frozen-v2.spec.ts).
 
 import { startingWorld, WORLDS } from "../../lib/v2/worlds";
+import { worldStrategies } from "../../lib/v2/world-strategies";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -14,6 +15,11 @@ const checks: Check[] = [
     id: "FR-001",
     title: "Five content-difficulty Worlds",
     result: `${WORLDS.map((w) => `${w.id}:${w.difficulty}`).join(" | ")}; every learner starts in World ${startingWorld({ age: 7 }).id}`
+  },
+  {
+    id: "FR-002",
+    title: "World 2+ strategy direction",
+    result: [2, 3, 4, 5].map((id) => `W${id}=${worldStrategies(id).join("+")}`).join(" | ")
   }
 ];
 
