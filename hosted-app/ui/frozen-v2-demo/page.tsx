@@ -21,6 +21,7 @@ import { evaluateFirstFive } from "../../lib/v2/first-five";
 import { newCoreWpmState, recordNewPassage, type CoreWpmState } from "../../lib/v2/core-wpm";
 import { CORE_PROGRESSION_OUTCOMES, SUPERSEDED_DECREMENT_RULES } from "../../lib/v2/no-decrement";
 import { applyAttemptToCore, newCoreWpmState as newCoreState, type AttemptType } from "../../lib/v2/attempt-types";
+import { recordPracticeAttempt, selectFamiliarPassage, type LearnerRecord } from "../../lib/v2/familiar-practice";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -167,6 +168,19 @@ const checks: Check[] = [
       const practice = Array<AttemptType>(50).fill("FAMILIAR_PRACTICE");
       const four = Array<AttemptType>(4).fill("NEW_PROGRESSION");
       return `50 GREEN practice -> ${run(practice)} WPM; 4 new + 3 practice -> ${run([...four, "FAMILIAR_PRACTICE", "FAMILIAR_PRACTICE", "FAMILIAR_PRACTICE"])} WPM; 5 new -> ${run([...four, "NEW_PROGRESSION"])} WPM`;
+    })()
+  },
+  {
+    id: "FR-018",
+    title: "familiar practice at current WPM, pointer unchanged",
+    result: (() => {
+      const completed = [1, 2, 3].map((n) => ({ sequence: n, passageId: `P00${n}`, originalScore: 0.9, completedAt: "2026-10-01T10:00:00Z" }));
+      const serve = selectFamiliarPassage(completed, 97)!;
+      let stalled: CoreWpmState = newCoreWpmState(97);
+      for (let i = 0; i < 6; i += 1) stalled = recordNewPassage(stalled, "NOT_GREEN").state;
+      let rec: LearnerRecord = { core: stalled, canonicalPointer: 4, originalAttempts: { P001: { score: 0.9 }, P002: { score: 0.9 }, P003: { score: 0.9 } }, practiceAnalytics: [] };
+      for (let i = 0; i < 5; i += 1) rec = recordPracticeAttempt(rec, { attemptId: `p${i}`, passageId: serve.passageId, wpm: serve.wpm, classification: "GREEN" });
+      return `serve ${serve.passageId} at ${serve.wpm} WPM as ${serve.attemptType}; after 5 practice: pointer ${rec.canonicalPointer}, WPM ${rec.core.wpm}, ${rec.practiceAnalytics.length} analytics rows`;
     })()
   }
 ];

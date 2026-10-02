@@ -119,3 +119,10 @@ test("FR-017 only new passages prove progress", async ({ page }) => {
     "50 GREEN practice -> 90 WPM; 4 new + 3 practice -> 90 WPM; 5 new -> 91 WPM"
   );
 });
+
+test("FR-018 familiar practice at current WPM, pointer unchanged", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-018")).toHaveText(
+    "serve P003 at 97 WPM as FAMILIAR_PRACTICE; after 5 practice: pointer 4, WPM 97, 5 analytics rows"
+  );
+});
