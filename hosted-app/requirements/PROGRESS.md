@@ -157,3 +157,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-022 | Structured question alignment | Done | 68704eb |
 | FR-023 | Spoken comprehension expression | Done | 1b32d1c |
 | FR-024 | ASR uncertainty | Done | 01dbf0d |
+| FR-025 | Best Possible Comprehension after every passage | Done | 23cadbb |
