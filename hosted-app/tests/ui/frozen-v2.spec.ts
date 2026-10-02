@@ -105,3 +105,10 @@ test("FR-015 post-five rule", async ({ page }) => {
     "NNNNN+GGG -> 91 WPM; NNNNN+GGNGG -> 90 WPM (streak reset); NNNGGG -> 90 WPM"
   );
 });
+
+test("FR-016 earned WPM is never removed", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-016")).toHaveText(
+    "12 NOT_GREEN passages from 90 WPM -> 90 WPM; outcomes NONE/LEVEL_UP/HOLD_AFTER_FIVE; 3 decrement rules superseded"
+  );
+});

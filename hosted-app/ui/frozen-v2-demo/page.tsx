@@ -19,6 +19,7 @@ import { toGateEvidence } from "../../lib/v2/gate-evidence";
 import { classifyComprehension, greenCount, GREEN_THRESHOLD } from "../../lib/v2/comprehension-threshold";
 import { evaluateFirstFive } from "../../lib/v2/first-five";
 import { newCoreWpmState, recordNewPassage, type CoreWpmState } from "../../lib/v2/core-wpm";
+import { CORE_PROGRESSION_OUTCOMES, SUPERSEDED_DECREMENT_RULES } from "../../lib/v2/no-decrement";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -140,6 +141,15 @@ const checks: Check[] = [
         return state.wpm;
       };
       return `NNNNN+GGG -> ${run("NNNNNGGG")} WPM; NNNNN+GGNGG -> ${run("NNNNNGGNGG")} WPM (streak reset); NNNGGG -> ${run("NNNGGG")} WPM`;
+    })()
+  },
+  {
+    id: "FR-016",
+    title: "Earned WPM is never removed",
+    result: (() => {
+      let state: CoreWpmState = newCoreWpmState(90);
+      for (let i = 0; i < 12; i += 1) state = recordNewPassage(state, "NOT_GREEN").state;
+      return `12 NOT_GREEN passages from 90 WPM -> ${state.wpm} WPM; outcomes ${CORE_PROGRESSION_OUTCOMES.join("/")}; ${Object.keys(SUPERSEDED_DECREMENT_RULES).length} decrement rules superseded`;
     })()
   }
 ];
