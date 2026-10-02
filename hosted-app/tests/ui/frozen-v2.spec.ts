@@ -336,3 +336,10 @@ test("FR-048 evidence separation guards", async ({ page }) => {
     "edit after model answer blocked=true; technical retry stored as failure=false; original record kept (a1 score 0.6) while effective view uses a1-corrected; original frozen=true"
   );
 });
+
+test("FR-049 Level Up and HOLD decisions are explainable", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-049")).toHaveText(
+    "LEVEL_UP: first_five_green_count=4/5; HOLD: first_five_green_count=3/5; LEVEL_UP: post_five_consecutive_green=3; replay consistent with stored state=true"
+  );
+});

@@ -54,6 +54,7 @@ import { LIFECYCLE_STATES, THRESHOLD_REGISTRY, changeThreshold, transitionThresh
 import { recordNewProgressionAttempt, validateAttemptRecord } from "../../lib/v2/attempt-record";
 import { ATTEMPT_TYPES } from "../../lib/v2/attempt-types";
 import { assertResponseEditable, correctAttempt, effectiveAttempts, isSilentFailureRecord } from "../../lib/v2/evidence-governance";
+import { explainFromLedger, lastDecision } from "../../lib/v2/explainability";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -586,6 +587,23 @@ const checks: Check[] = [
       const corr = correctAttempt(first.learner.ledger, [], "a1", fixed, { correctedAt: "2026-10-04", reason: "scoring defect", correctedBy: "qa-1" });
       const view = effectiveAttempts(first.learner.ledger, corr)[0];
       return `edit after model answer blocked=${editBlocked}; technical retry stored as failure=${isSilentFailureRecord(technical.record)}; original record kept (${first.learner.ledger[0].attemptId} score ${first.learner.ledger[0].comprehensionScore}) while effective view uses ${view.attemptId}; original frozen=${Object.isFrozen(first.record)}`;
+    })()
+  },
+  {
+    id: "FR-049",
+    title: "Level Up and HOLD decisions are explainable",
+    result: (() => {
+      const play = (scores: number[]) => {
+        let learner = newLearnerAggregate("l", 90);
+        scores.forEach((s, i) => {
+          learner = recordNewProgressionAttempt(learner, { attemptId: `e${i}`, passageId: `P${i + 1}`, displayedWpm: learner.core.wpm, passageWords: 100, recordedAt: "2026-10-03T10:00:00Z", comprehension: scoreComprehension(structuredEvidence([{ itemId: "q1", score: s }]), { score: s }) }).learner;
+        });
+        return explainFromLedger(learner.ledger, 90);
+      };
+      const four = play([0.9, 0.9, 0.5, 0.9, 0.9]);
+      const three = play([0.9, 0.5, 0.9, 0.5, 0.9]);
+      const post = play([0.5, 0.5, 0.5, 0.5, 0.5, 0.9, 0.9, 0.9]);
+      return `${lastDecision(four)?.reason}; ${lastDecision(three)?.reason}; ${lastDecision(post)?.reason}; replay consistent with stored state=${four.consistent && three.consistent && post.consistent}`;
     })()
   }
 ];
