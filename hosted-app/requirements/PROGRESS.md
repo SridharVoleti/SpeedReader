@@ -136,3 +136,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-001 | Five content-difficulty Worlds | Done | 2cb419f |
 | FR-002 | World 2+ strategy direction | Done | 5a769a0 |
 | FR-003 | 1,500 canonical passages | Done | 240302a |
+| FR-004 | First 150 passages | Done | 1e73287 |

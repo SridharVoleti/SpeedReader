@@ -21,3 +21,10 @@ test("FR-003 1,500 canonical passages", async ({ page }) => {
     "1500 sequential passages, 0 structural errors; first 150 = 15 RS x 10 P"
   );
 });
+
+test("FR-004 first 150 passages are 100 words, one word at a time", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-004")).toHaveText(
+    "P150 = 100 words, ONE_WORD_AT_A_TIME, RS15/P10; sample text errors 0; 100 single-word steps"
+  );
+});
