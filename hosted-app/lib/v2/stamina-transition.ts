@@ -6,7 +6,8 @@
 
 import { passageWords, WORLD1_LAST_PASSAGE } from "./stamina";
 
-export const WORLD1_SPEED_CEILING_WPM = 150; // FR-010
+import { WORLD1_MAX_WPM } from "./speed-ceiling";
+export const WORLD1_SPEED_CEILING_WPM = WORLD1_MAX_WPM; // FR-010
 
 export type TransitionInput = { completedSequence: number; currentWpm: number; levelUpEligible: boolean };
 

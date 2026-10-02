@@ -13,6 +13,7 @@ import { planNextPassage } from "../../lib/v2/stamina-transition";
 import { evaluateStaminaTransitions, STAMINA_TRANSITIONS, SUPERSEDED_RULES } from "../../lib/v2/ac53r";
 import { runAssessment } from "../../lib/v2/initial-assessment";
 import { assertPersonalOnly, personalImprovement } from "../../lib/v2/personal-trajectory";
+import { clampToCeiling, developmentContinuesAtCeiling, isSchedulableWpm, WORLD1_MAX_WPM } from "../../lib/v2/speed-ceiling";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -89,6 +90,11 @@ const checks: Check[] = [
       try { assertPersonalOnly({ peerRank: 3 }); } catch { rejected = true; }
       return `learner A ${a.startWpm}->${a.currentWpm} (+${a.gainWpm}); learner B ${b.startWpm}->${b.currentWpm} (+${b.gainWpm}); peer comparison rejected=${rejected}`;
     })()
+  },
+  {
+    id: "FR-010",
+    title: "World 1 speed ceiling",
+    result: `max ${WORLD1_MAX_WPM} WPM; 151 schedulable=${isSchedulableWpm(151)}; clamp(180)=${clampToCeiling(180)}; at 150 other development continues=${developmentContinuesAtCeiling(150).otherDevelopmentContinues}`
   }
 ];
 

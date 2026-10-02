@@ -63,3 +63,10 @@ test("FR-009 progress is personal, never peer-compared", async ({ page }) => {
     "learner A 40->42 (+2); learner B 110->113 (+3); peer comparison rejected=true"
   );
 });
+
+test("FR-010 World 1 speed ceiling", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-010")).toHaveText(
+    "max 150 WPM; 151 schedulable=false; clamp(180)=150; at 150 other development continues=true"
+  );
+});
