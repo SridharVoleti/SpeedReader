@@ -55,6 +55,7 @@ import { recordNewProgressionAttempt, validateAttemptRecord } from "../../lib/v2
 import { ATTEMPT_TYPES } from "../../lib/v2/attempt-types";
 import { assertResponseEditable, correctAttempt, effectiveAttempts, isSilentFailureRecord } from "../../lib/v2/evidence-governance";
 import { explainFromLedger, lastDecision } from "../../lib/v2/explainability";
+import { SCAN_ALLOWLIST, STALE_RULE_PATTERNS, scanForStaleRules } from "../../lib/v2/stale-rules";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -604,6 +605,24 @@ const checks: Check[] = [
       const three = play([0.9, 0.5, 0.9, 0.5, 0.9]);
       const post = play([0.5, 0.5, 0.5, 0.5, 0.5, 0.9, 0.9, 0.9]);
       return `${lastDecision(four)?.reason}; ${lastDecision(three)?.reason}; ${lastDecision(post)?.reason}; replay consistent with stored state=${four.consistent && three.consistent && post.consistent}`;
+    })()
+  },
+  {
+    id: "AC-C01",
+    title: "stale-rule scan",
+    result: (() => {
+      const stale = [
+        "const bothPassed = comprehension === 'PASS' && oralQuality === 'PASS';",
+        "if (event.oralQuality !== 'PASS') return hold;",
+        "state = { ...state, wpm: state.wpm - 1 };",
+        "if (passages >= 10 && !levelUp) wpm - 1",
+        "if (a.attemptType === 'FAMILIAR_PRACTICE') recordNewPassage(state, a.result)",
+        "const startWpm = age < 10 ? 60 : 90;",
+        "stamina: direct 100 -> 200 jump"
+      ];
+      const detected = stale.filter((code) => scanForStaleRules([{ path: "demo.ts", text: code }]).length > 0).length;
+      const compliant = scanForStaleRules([{ path: "demo.ts", text: "const next = Math.min(state.wpm + 1, 150);\nconst wpm = assessment.startingWpm;" }]).length;
+      return `${STALE_RULE_PATTERNS.length} stale-rule patterns; detects ${detected}/${stale.length} stale snippets; compliant code findings=${compliant}; allowlisted registry files=${Object.keys(SCAN_ALLOWLIST).length}`;
     })()
   }
 ];

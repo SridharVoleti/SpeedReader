@@ -343,3 +343,10 @@ test("FR-049 Level Up and HOLD decisions are explainable", async ({ page }) => {
     "LEVEL_UP: first_five_green_count=4/5; HOLD: first_five_green_count=3/5; LEVEL_UP: post_five_consecutive_green=3; replay consistent with stored state=true"
   );
 });
+
+test("AC-C01 stale-rule scan", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-AC-C01")).toHaveText(
+    "7 stale-rule patterns; detects 7/7 stale snippets; compliant code findings=0; allowlisted registry files=5"
+  );
+});
