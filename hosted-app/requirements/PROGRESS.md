@@ -176,3 +176,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-041 | 150 WPM is not mandatory | Done | f94a8dd |
 | FR-042 | Level Ups do not substitute for readiness | Done | 44988e1 |
 | FR-043 | News Reader does not block World progression | Done | 65e567c |
+| FR-044 | Readiness-critical forms | Done | bc6350b |
