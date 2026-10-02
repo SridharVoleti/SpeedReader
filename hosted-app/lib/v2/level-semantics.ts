@@ -34,5 +34,5 @@ export function dimensionCelebration(dimension: CelebratedDimension): Achievemen
 }
 
 export function usesForbiddenLevelTerm(text: string): boolean {
-  return FORBIDDEN_LEVEL_TERMS.some((term) => new RegExp(`\b${term}`, "i").test(text));
+  return FORBIDDEN_LEVEL_TERMS.some((term) => new RegExp("\\b" + term, "i").test(text));
 }

@@ -9,6 +9,8 @@
 // and connected. It returns component evidence, evidence coverage, an uncertainty/technical state, and
 // short positive coaching signals.
 
+import { stem } from "./stem";
+
 export type IdeaRole = "KEY_EVENT" | "DETAIL" | "CAUSE_EFFECT" | "MOTIVATION";
 
 export type AuthoredIdea = {
@@ -60,15 +62,6 @@ export type SpokenEvaluation = {
 };
 
 const CONNECTIVES = ["because", "so", "then", "after", "before", "when", "but", "and then", "finally", "first", "next", "since", "that is why", "so that"];
-
-function stem(word: string): string {
-  return word
-    .toLowerCase()
-    .replace(/[^a-z']/g, "")
-    .replace(/'s$/, "")
-    .replace(/(ied|ies)$/, "y")
-    .replace(/(ing|ed|es|s)$/, "");
-}
 
 function sentencesOf(text: string): string[] {
   return text.split(/[.!?\n]+/).map((s) => s.trim()).filter(Boolean);

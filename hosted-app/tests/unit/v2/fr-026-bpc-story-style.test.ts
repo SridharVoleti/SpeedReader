@@ -9,7 +9,7 @@ const source = {
 };
 
 const story =
-  "Mia was flying her kite when a strong wind pulled it out of her hand, so it floated away over the hill. She felt sad, because she loved that kite. Then her brother Sam noticed and offered to help. Together they walked up the hill, and at the end they found the kite caught in a tree. This shows that people who care about you will help when you are upset, and that a problem can feel smaller when you share it.";
+  "Mia was flying her kite when the wind pulled it out of her hand, so the kite floated away over the hill. Mia felt sad, so she sat down. Then her brother Sam saw her and came to help. Together they climbed the hill, and they found the kite in a tree. This shows that things got better for Mia when Sam helped her.";
 
 // FR-026 - Story-style explanation [FROZEN]
 describe("FR-026 Best Possible Comprehension is story-style", () => {

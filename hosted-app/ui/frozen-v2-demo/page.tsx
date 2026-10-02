@@ -31,6 +31,7 @@ import { evaluateSpokenExpression, type SpokenPassageMeta } from "../../lib/v2/s
 import { comprehensionFromOutcome, resolveSpokenEvidence, technicalRecoveryAction } from "../../lib/v2/spoken-evidence";
 import { bestComprehensionFor, lockScoring, newBpcAttempt, submitAttempt } from "../../lib/v2/best-comprehension";
 import { lintBpcStyle } from "../../lib/v2/bpc-style";
+import { checkBpcFidelity } from "../../lib/v2/bpc-fidelity";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -289,8 +290,20 @@ const checks: Check[] = [
     result: (() => {
       const passageText = "Mia flew her red kite on a windy day. The wind pulled the string from her hand. The kite flew over the hill. Mia felt sad and sat down. Her brother Sam saw her and came to help. They climbed the hill together. They found the kite in a tree.";
       const source = { passageText, questionAnswers: ["The wind pulled the kite away", "Sam helped her", "The kite was in a tree"] };
-      const story = "Mia was flying her kite when a strong wind pulled it out of her hand, so it floated away over the hill. She felt sad, because she loved that kite. Then her brother Sam noticed and offered to help. Together they walked up the hill, and at the end they found the kite caught in a tree. This shows that people who care about you will help when you are upset, and that a problem can feel smaller when you share it.";
+      const story = "Mia was flying her kite when the wind pulled it out of her hand, so the kite floated away over the hill. Mia felt sad, so she sat down. Then her brother Sam saw her and came to help. Together they climbed the hill, and they found the kite in a tree. This shows that things got better for Mia when Sam helped her.";
       return `story-style explanation findings: ${lintBpcStyle(story, source).length}; passage copied back: ${lintBpcStyle(passageText, source).includes("SENTENCE_BY_SENTENCE_COPY") ? "rejected" : "accepted"}; answer key: ${lintBpcStyle("1. The wind pulled the kite away.\n2. Sam helped her.", source).includes("ANSWER_KEY_FORM") ? "rejected" : "accepted"}`;
+    })()
+  },
+  {
+    id: "FR-027",
+    title: "BPC never invents unsupported content",
+    result: (() => {
+      const passageText = "Mia flew her red kite on a windy day. The wind pulled the string from her hand. The kite flew over the hill. Mia felt sad and sat down. Her brother Sam saw her and came to help. They climbed the hill together. They found the kite in a tree.";
+      const faithful = "Mia was flying her kite when the wind pulled it out of her hand, so the kite floated away over the hill. Mia felt sad, so she sat down. Then her brother Sam saw her and came to help. Together they climbed the hill, and they found the kite in a tree. This shows that things got better for Mia when Sam helped her.";
+      const ok = checkBpcFidelity(faithful, { passageText, qaAllowedExtras: ["flying", "floated", "helped"] });
+      const motive = checkBpcFidelity("Mia felt sad because she loved that kite.", { passageText });
+      const fact = checkBpcFidelity("Sam brought a ladder and a dog yesterday.", { passageText });
+      return `faithful explanation supported=${ok.supported}; invented motive flagged: ${motive.inventionCues.join(",")}; invented facts flagged: ${fact.unsupportedTerms.join(",")}`;
     })()
   }
 ];

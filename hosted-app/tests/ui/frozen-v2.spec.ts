@@ -182,3 +182,10 @@ test("FR-026 BPC is a story-style explanation", async ({ page }) => {
     "story-style explanation findings: 0; passage copied back: rejected; answer key: rejected"
   );
 });
+
+test("FR-027 BPC never invents unsupported content", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-027")).toHaveText(
+    "faithful explanation supported=true; invented motive flagged: loved; invented facts flagged: brought,ladder,dog,yesterday"
+  );
+});
