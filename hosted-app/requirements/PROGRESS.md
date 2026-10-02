@@ -178,3 +178,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-043 | News Reader does not block World progression | Done | 65e567c |
 | FR-044 | Readiness-critical forms | Done | bc6350b |
 | FR-045 | Evidence recency | Done | 6665be8 |
+| FR-046 | Threshold lifecycle | Done | ba9199c |
