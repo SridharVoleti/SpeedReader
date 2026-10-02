@@ -160,3 +160,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-025 | Best Possible Comprehension after every passage | Done | 23cadbb |
 | FR-026 | Story-style explanation | Done | 4193618 |
 | FR-027 | Best Possible Comprehension fidelity | Done | 0c3a98a |
+| FR-028 | Permanent cross-World feature | Done | b5d9569 |
