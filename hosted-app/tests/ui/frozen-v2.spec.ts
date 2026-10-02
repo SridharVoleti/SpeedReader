@@ -231,3 +231,10 @@ test("FR-033 book-time impact on Level Up", async ({ page }) => {
     "90->91 WPM: 50,000-word book 9 hours 9 minutes, saves about 6 minutes; since baseline about 4 hours 44 minutes; wording estimated+about=true; shown on Level Up=true"
   );
 });
+
+test("FR-034 News Reader is a separate parallel track", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-034")).toHaveText(
+    "9 oral purposes; gates core=false; 5 zero-score News Reader attempts stored (5) and core stays 90 WPM with 0 evidence; mic unavailable stored as MIC_UNAVAILABLE"
+  );
+});

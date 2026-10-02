@@ -37,6 +37,7 @@ import { assertNoInternalLeak, buildLearnerFeedback } from "../../lib/v2/learner
 import { completeNewPassage } from "../../lib/v2/passage-completion";
 import { CELEBRATION_RANK } from "../../lib/v2/learner-feedback";
 import { bookTimeImpact, formatDuration } from "../../lib/v2/book-time";
+import { NEWS_READER_PURPOSES, newNewsReaderState, newsReaderGatesCoreProgression, recordNewsReaderAttempt } from "../../lib/v2/news-reader";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -381,6 +382,19 @@ const checks: Check[] = [
       core = last.coreAfter;
       for (let k = 1; k < 5; k += 1) { last = completeNewPassage(`b${k}`, scored(0.9), core, 90); core = last.coreAfter; }
       return `${i.previousWpm}->${i.newWpm} WPM: 50,000-word book ${formatDuration(i.estimatedAtNewWpm)}, saves about ${formatDuration(i.savedVsPrevious)}; since baseline about ${formatDuration(i.cumulativeSavedVsBaseline!)}; wording estimated+about=${/estimated/.test(i.message) && /about/.test(i.message)}; shown on Level Up=${last.learner.bookTime !== undefined}`;
+    })()
+  },
+  {
+    id: "FR-034",
+    title: "News Reader is a separate parallel track",
+    result: (() => {
+      const core = newCoreWpmState(90);
+      let nr = newNewsReaderState();
+      for (let i = 0; i < 5; i += 1) {
+        nr = recordNewsReaderAttempt(nr, { attemptId: `n${i}`, passageId: "P001", readNumber: 1, metrics: { clarity: 0, pronunciation: 0 }, technicalState: "OK", recordedAt: "2026-10-03T10:00:00Z" });
+      }
+      const mic = recordNewsReaderAttempt(newNewsReaderState(), { attemptId: "m", passageId: "P001", readNumber: 1, metrics: {}, technicalState: "MIC_UNAVAILABLE", recordedAt: "2026-10-03T10:00:00Z" });
+      return `${NEWS_READER_PURPOSES.length} oral purposes; gates core=${newsReaderGatesCoreProgression()}; 5 zero-score News Reader attempts stored (${nr.attempts.length}) and core stays ${core.wpm} WPM with ${core.newAttempts.length} evidence; mic unavailable stored as ${mic.attempts[0].technicalState}`;
     })()
   }
 ];
