@@ -29,6 +29,7 @@ import { alignItem, P_LEVEL_QUESTION_TYPES, questionTypeForPLevel, scoreAlignedI
 import type { AssessmentItem } from "../../lib/item-types";
 import { evaluateSpokenExpression, type SpokenPassageMeta } from "../../lib/v2/spoken-expression";
 import { comprehensionFromOutcome, resolveSpokenEvidence, technicalRecoveryAction } from "../../lib/v2/spoken-evidence";
+import { bestComprehensionFor, lockScoring, newBpcAttempt, submitAttempt } from "../../lib/v2/best-comprehension";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -266,6 +267,19 @@ const checks: Check[] = [
       const silent = resolveSpokenEvidence("", { usable: true, confidence: 0.9, speechDetected: false }, meta);
       const outcome = comprehensionFromOutcome(structured, low);
       return `low confidence -> ${low.status} (${low.status === "UNRESOLVED_TECHNICAL" ? low.audit.reason : ""}); silence -> ${silent.status === "UNRESOLVED_TECHNICAL" ? silent.audit.reason : silent.status}; comprehension ${outcome.status}, classification ${outcome.classification}; retries 0/1/2 -> ${[0, 1, 2].map((n) => technicalRecoveryAction(n)).join("/")}`;
+    })()
+  },
+  {
+    id: "FR-025",
+    title: "Best Possible Comprehension only after scoring",
+    result: (() => {
+      const catalog = [{ passageId: "P001", text: "Mia lost her kite ...", qaApproved: true, version: "bpc-1" }];
+      const a0 = newBpcAttempt("a1", "P001");
+      const a1 = submitAttempt(a0);
+      const states = [a0, a1].map((a) => { const r = bestComprehensionFor(a, catalog); return r.available ? "available" : r.reason; });
+      const greenOut = bestComprehensionFor(lockScoring(a1, { score: 0.9, classification: "GREEN" }), catalog).available;
+      const notGreenOut = bestComprehensionFor(lockScoring(a1, { score: 0.4, classification: "NOT_GREEN" }), catalog).available;
+      return `before submit ${states[0]}; after submit ${states[1]}; locked GREEN available=${greenOut}; locked NOT_GREEN available=${notGreenOut}`;
     })()
   }
 ];

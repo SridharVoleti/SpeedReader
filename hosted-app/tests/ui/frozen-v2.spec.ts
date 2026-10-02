@@ -168,3 +168,10 @@ test("FR-024 ASR uncertainty is never learner error", async ({ page }) => {
     "low confidence -> UNRESOLVED_TECHNICAL (ASR_LOW_CONFIDENCE); silence -> NO_SPEECH_DETECTED; comprehension AWAITING_SPOKEN_EVIDENCE, classification null; retries 0/1/2 -> RETRY/RETRY/CONTINUE_WITHOUT_PROGRESSION_EVIDENCE"
   );
 });
+
+test("FR-025 Best Possible Comprehension only after scoring", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-025")).toHaveText(
+    "before submit NOT_SUBMITTED; after submit SCORING_NOT_LOCKED; locked GREEN available=true; locked NOT_GREEN available=true"
+  );
+});
