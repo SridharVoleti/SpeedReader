@@ -12,6 +12,7 @@ import { passageWords, staircaseTable } from "../../lib/v2/stamina";
 import { planNextPassage } from "../../lib/v2/stamina-transition";
 import { evaluateStaminaTransitions, STAMINA_TRANSITIONS, SUPERSEDED_RULES } from "../../lib/v2/ac53r";
 import { runAssessment } from "../../lib/v2/initial-assessment";
+import { assertPersonalOnly, personalImprovement } from "../../lib/v2/personal-trajectory";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -75,6 +76,18 @@ const checks: Check[] = [
       const a = run(95);
       const b = run(45);
       return `limit 95 -> start ${a.startingWpm} WPM in ${a.attempts.length} attempts; limit 45 -> start ${b.startingWpm} WPM; budget 600s`;
+    })()
+  },
+  {
+    id: "FR-009",
+    title: "Personal trajectory",
+    result: (() => {
+      const pts = (...w: number[]) => w.map((wpm, i) => ({ attemptId: `a${i}`, wpm, valid: true }));
+      const a = personalImprovement(pts(40, 41, 42));
+      const b = personalImprovement(pts(110, 111, 113));
+      let rejected = false;
+      try { assertPersonalOnly({ peerRank: 3 }); } catch { rejected = true; }
+      return `learner A ${a.startWpm}->${a.currentWpm} (+${a.gainWpm}); learner B ${b.startWpm}->${b.currentWpm} (+${b.gainWpm}); peer comparison rejected=${rejected}`;
     })()
   }
 ];

@@ -141,3 +141,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-006 | Stamina transition precedence | Done | 157d2ac |
 | FR-007 | AC-53R progressive stamina-transition validity | Done | 10bbef5 |
 | FR-008 | Ten-minute initial assessment | Done | f0578d6 |
+| FR-009 | Personal trajectory | Done | 6226855 |

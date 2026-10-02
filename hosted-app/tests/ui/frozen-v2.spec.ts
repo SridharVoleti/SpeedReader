@@ -56,3 +56,10 @@ test("FR-008 ten-minute initial assessment finds a sustainable starting WPM", as
     "limit 95 -> start 90 WPM in 10 attempts; limit 45 -> start 40 WPM; budget 600s"
   );
 });
+
+test("FR-009 progress is personal, never peer-compared", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-009")).toHaveText(
+    "learner A 40->42 (+2); learner B 110->113 (+3); peer comparison rejected=true"
+  );
+});

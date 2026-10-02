@@ -18,7 +18,7 @@ git add "$P"; git commit -q --amend --no-edit
 H=$(git rev-parse --short HEAD)
 git push -q origin main 2>&1 | grep -v warning || true
 for i in $(seq 1 20); do
-  if curl -s https://speedreader.babystepsindia.com/frozen-v2-demo | grep -qF "$NEEDLE"; then echo "LIVE OK $FR ($H)"; exit 0; fi
+  if curl -s https://speedreader.babystepsindia.com/frozen-v2-demo | sed "s/&gt;/>/g;s/&amp;/&/g" | grep -qF "$NEEDLE"; then echo "LIVE OK $FR ($H)"; exit 0; fi
   sleep 12
 done
 echo "LIVE CHECK FAILED $FR"; exit 1
