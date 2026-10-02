@@ -172,3 +172,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-037 | Reference delivery | Done | ec4acfe |
 | FR-038 | Oral two-read coaching | Done | ebfc04d |
 | FR-039 | Supersession of oral-as-core-gate | Done | e74164f |
+| FR-040 | Passage 1500 is not sufficient by itself | Done | 649b41a |
