@@ -30,6 +30,7 @@ import type { AssessmentItem } from "../../lib/item-types";
 import { evaluateSpokenExpression, type SpokenPassageMeta } from "../../lib/v2/spoken-expression";
 import { comprehensionFromOutcome, resolveSpokenEvidence, technicalRecoveryAction } from "../../lib/v2/spoken-evidence";
 import { bestComprehensionFor, lockScoring, newBpcAttempt, submitAttempt } from "../../lib/v2/best-comprehension";
+import { lintBpcStyle } from "../../lib/v2/bpc-style";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -280,6 +281,16 @@ const checks: Check[] = [
       const greenOut = bestComprehensionFor(lockScoring(a1, { score: 0.9, classification: "GREEN" }), catalog).available;
       const notGreenOut = bestComprehensionFor(lockScoring(a1, { score: 0.4, classification: "NOT_GREEN" }), catalog).available;
       return `before submit ${states[0]}; after submit ${states[1]}; locked GREEN available=${greenOut}; locked NOT_GREEN available=${notGreenOut}`;
+    })()
+  },
+  {
+    id: "FR-026",
+    title: "BPC is a story-style explanation",
+    result: (() => {
+      const passageText = "Mia flew her red kite on a windy day. The wind pulled the string from her hand. The kite flew over the hill. Mia felt sad and sat down. Her brother Sam saw her and came to help. They climbed the hill together. They found the kite in a tree.";
+      const source = { passageText, questionAnswers: ["The wind pulled the kite away", "Sam helped her", "The kite was in a tree"] };
+      const story = "Mia was flying her kite when a strong wind pulled it out of her hand, so it floated away over the hill. She felt sad, because she loved that kite. Then her brother Sam noticed and offered to help. Together they walked up the hill, and at the end they found the kite caught in a tree. This shows that people who care about you will help when you are upset, and that a problem can feel smaller when you share it.";
+      return `story-style explanation findings: ${lintBpcStyle(story, source).length}; passage copied back: ${lintBpcStyle(passageText, source).includes("SENTENCE_BY_SENTENCE_COPY") ? "rejected" : "accepted"}; answer key: ${lintBpcStyle("1. The wind pulled the kite away.\n2. Sam helped her.", source).includes("ANSWER_KEY_FORM") ? "rejected" : "accepted"}`;
     })()
   }
 ];

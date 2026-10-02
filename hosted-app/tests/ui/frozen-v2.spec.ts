@@ -175,3 +175,10 @@ test("FR-025 Best Possible Comprehension only after scoring", async ({ page }) =
     "before submit NOT_SUBMITTED; after submit SCORING_NOT_LOCKED; locked GREEN available=true; locked NOT_GREEN available=true"
   );
 });
+
+test("FR-026 BPC is a story-style explanation", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-026")).toHaveText(
+    "story-style explanation findings: 0; passage copied back: rejected; answer key: rejected"
+  );
+});
