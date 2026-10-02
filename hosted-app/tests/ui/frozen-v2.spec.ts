@@ -308,3 +308,10 @@ test("FR-044 readiness-critical forms are pre-approved", async ({ page }) => {
     "approved form: accepted; runtime-generated id: UNKNOWN_FORM; version mismatch: FORM_VERSION_MISMATCH; unapproved form: FORM_NOT_APPROVED; next unused equivalent after A: RS03-B"
   );
 });
+
+test("FR-045 readiness evidence recency", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-045")).toHaveText(
+    "recent evidence current=true; 21-month-old current=false; 500 sessions later current=false; policy PROVISIONAL_PILOT v=recency-2026-10-pilot-1; one stale competency -> SEQUENCE_COMPLETE_READINESS_PENDING (missing RS06)"
+  );
+});

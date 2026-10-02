@@ -49,6 +49,7 @@ import { ceilingIsCompletionRequirement } from "../../lib/v2/speed-ceiling";
 import { missingReadiness } from "../../lib/v2/world1-completion";
 import { advanceFromWorld1 } from "../../lib/v2/world1-completion";
 import { checkCertificationEvidence, selectEquivalentForm, type ReadinessForm } from "../../lib/v2/readiness-forms";
+import { RECENCY_POLICY_V1, applyRecency, evidenceRecency } from "../../lib/v2/evidence-recency";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -523,6 +524,20 @@ const checks: Check[] = [
       const catalog = [form(), form({ formId: "RS03-B" })];
       const verdict = (ref: { formId: string; version: string }, cat = catalog) => { const r = checkCertificationEvidence(ref, cat); return r.ok ? "accepted" : r.reason.split(":")[0]; };
       return `approved form: ${verdict({ formId: "RS03-A", version: "1.0" })}; runtime-generated id: ${verdict({ formId: "runtime-gen-1", version: "1.0" })}; version mismatch: ${verdict({ formId: "RS03-A", version: "0.9" })}; unapproved form: ${verdict({ formId: "RS03-A", version: "1.0" }, [form({ qaApproved: false })])}; next unused equivalent after A: ${selectEquivalentForm(catalog, "RS03", ["RS03-A"])?.formId}`;
+    })()
+  },
+  {
+    id: "FR-045",
+    title: "readiness evidence recency",
+    result: (() => {
+      const now = "2026-10-03T00:00:00Z";
+      const recent = evidenceRecency({ gatheredAt: "2026-09-20T00:00:00Z", sessionsSince: 5 }, now);
+      const old = evidenceRecency({ gatheredAt: "2025-01-01T00:00:00Z", sessionsSince: 0 }, now);
+      const inactive = evidenceRecency({ gatheredAt: "2026-09-30T00:00:00Z", sessionsSince: 500 }, now);
+      const dated = RS_IDS.map((rsId) => ({ rsId, confirmed: true, formId: `form-${rsId}-v1`, gatheredAt: "2026-09-20T00:00:00Z", sessionsSince: 5 }));
+      dated[5] = { ...dated[5], gatheredAt: "2025-01-01T00:00:00Z" };
+      const after = world1Status({ canonicalPointer: 1501, readiness: applyRecency(dated, now) });
+      return `recent evidence current=${recent.current}; 21-month-old current=${old.current}; 500 sessions later current=${inactive.current}; policy ${RECENCY_POLICY_V1.status} v=${recent.policyVersion}; one stale competency -> ${after.status}${after.status === "SEQUENCE_COMPLETE_READINESS_PENDING" ? ` (missing ${after.missingReadiness.join(",")})` : ""}`;
     })()
   }
 ];
