@@ -39,7 +39,8 @@ export const SCAN_ALLOWLIST: Readonly<Record<string, string>> = Object.freeze({
   "hosted-app/lib/v2/no-decrement.ts": "names the superseded decrement rules in order to forbid them",
   "hosted-app/lib/v2/gate-evidence.ts": "lists non-gate signals in order to exclude them",
   "hosted-app/lib/v2/ac53r.ts": "registers the superseded AC-53",
-  "hosted-app/lib/v2/stale-rules.ts": "the scanner's own patterns"
+  "hosted-app/lib/v2/stale-rules.ts": "the scanner's own patterns",
+  "hosted-app/lib/v2/stale-rules-fixtures.ts": "deliberately stale snippets used only to prove the scanner works"
 });
 
 export function scanForStaleRules(files: readonly SourceFile[], patterns: readonly StaleRulePattern[] = STALE_RULE_PATTERNS): StaleFinding[] {

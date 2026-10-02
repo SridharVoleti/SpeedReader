@@ -347,7 +347,7 @@ test("FR-049 Level Up and HOLD decisions are explainable", async ({ page }) => {
 test("AC-C01 stale-rule scan", async ({ page }) => {
   await page.goto("/frozen-v2-demo");
   await expect(page.getByTestId("result-AC-C01")).toHaveText(
-    "7 stale-rule patterns; detects 7/7 stale snippets; compliant code findings=0; allowlisted registry files=5"
+    "7 stale-rule patterns; detects 7/7 stale snippets; compliant code findings=0; allowlisted registry files=6"
   );
 });
 
@@ -355,5 +355,12 @@ test("AC-C05 Level Up and evidence commit atomically", async ({ page }) => {
   await page.goto("/frozen-v2-demo");
   await expect(page.getByTestId("result-AC-C05")).toHaveText(
     "failed mid-commit ok=false -> unchanged 90 WPM/4 records/v1; retry ok=true -> 91 WPM/5 records/v2; WPM/evidence disagreement rejected=true"
+  );
+});
+
+test("AC-C08 operational observability", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-AC-C08")).toHaveText(
+    "7 ops event kinds; logged: LEARNER_NOT_GREEN,PRACTICE_SCHEDULING,ASR_TECHNICAL_UNCERTAINTY,CONTENT_DEFECT; technical retry logged as learner NOT_GREEN=false; learner-visible ops events=0"
   );
 });

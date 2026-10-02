@@ -12,12 +12,16 @@ export const PROHIBITED_LEARNER_TERMS: readonly string[] = Object.freeze([
 ]);
 
 const NUMERIC_COMPREHENSION = /\b\d{1,3}\s?%/;
+/** Two or more ALL-CAPS segments joined by underscores, e.g. LEARNER_NOT_GREEN. */
+const INTERNAL_IDENTIFIER = /\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/;
 
 /** Returns the prohibited terms (or percentage pattern) found in learner-facing text. */
 export function learnerLanguageViolations(text: string): string[] {
   const lower = text.toLowerCase();
   const hits = PROHIBITED_LEARNER_TERMS.filter((term) => new RegExp(`(^|[^a-z_])${term.replace(/ /g, "\\s+")}([^a-z_]|$)`).test(lower));
   if (NUMERIC_COMPREHENSION.test(text)) hits.push("numeric percentage");
+  // Internal identifiers (LEARNER_NOT_GREEN, ASR_LOW_CONFIDENCE, ...) must never reach a learner.
+  if (INTERNAL_IDENTIFIER.test(text)) hits.push("internal identifier");
   return hits;
 }
 

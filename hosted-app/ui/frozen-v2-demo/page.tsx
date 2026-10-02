@@ -58,6 +58,8 @@ import { explainFromLedger, lastDecision } from "../../lib/v2/explainability";
 import { SCAN_ALLOWLIST, STALE_RULE_PATTERNS, scanForStaleRules } from "../../lib/v2/stale-rules";
 import { ProgressStore } from "../../lib/v2/progress-store";
 import { LearnerAggregate } from "../../lib/v2/learner-aggregate";
+import { COMPLIANT_SNIPPETS, STALE_SNIPPETS } from "../../lib/v2/stale-rules-fixtures";
+import { OPS_EVENT_KINDS, OpsLog, contentDefectEvent, learnerVisibleOps, opsEventsForAttempt } from "../../lib/v2/ops-log";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -613,15 +615,7 @@ const checks: Check[] = [
     id: "AC-C01",
     title: "stale-rule scan",
     result: (() => {
-      const stale = [
-        "const bothPassed = comprehension === 'PASS' && oralQuality === 'PASS';",
-        "if (event.oralQuality !== 'PASS') return hold;",
-        "state = { ...state, wpm: state.wpm - 1 };",
-        "if (passages >= 10 && !levelUp) wpm - 1",
-        "if (a.attemptType === 'FAMILIAR_PRACTICE') recordNewPassage(state, a.result)",
-        "const startWpm = age < 10 ? 60 : 90;",
-        "stamina: direct 100 -> 200 jump"
-      ];
+      const stale = STALE_SNIPPETS;
       const detected = stale.filter((code) => scanForStaleRules([{ path: "demo.ts", text: code }]).length > 0).length;
       const compliant = scanForStaleRules([{ path: "demo.ts", text: "const next = Math.min(state.wpm + 1, 150);\nconst wpm = assessment.startingWpm;" }]).length;
       return `${STALE_RULE_PATTERNS.length} stale-rule patterns; detects ${detected}/${stale.length} stale snippets; compliant code findings=${compliant}; allowlisted registry files=${Object.keys(SCAN_ALLOWLIST).length}`;
@@ -642,6 +636,20 @@ const checks: Check[] = [
       const retried = store.commit(next);
       const forged = new ProgressStore(before).commit({ ...next, core: { ...next.core, wpm: 95 } });
       return `failed mid-commit ok=${failed.ok} -> unchanged ${afterFail}; retry ok=${retried.ok} -> ${store.snapshot.learner.core.wpm} WPM/${store.snapshot.learner.ledger.length} records/v${store.snapshot.version}; WPM/evidence disagreement rejected=${!forged.ok}`;
+    })()
+  },
+  {
+    id: "AC-C08",
+    title: "operational observability",
+    result: (() => {
+      const scored = (s: number) => scoreComprehension(structuredEvidence([{ itemId: "q1", score: s }]), { score: s });
+      const base = { passageId: "P001", displayedWpm: 90, passageWords: 100, recordedAt: "2026-10-03T10:00:00Z" };
+      const low = recordNewProgressionAttempt(newLearnerAggregate("l", 90), { ...base, attemptId: "o1", comprehension: scored(0.5) }).record;
+      const tech = recordNewProgressionAttempt(newLearnerAggregate("l", 90), { ...base, attemptId: "o2", comprehension: scoreComprehension(structuredEvidence([{ itemId: "q1", score: 0 }]), null), spokenReason: "ASR_LOW_CONFIDENCE" }).record;
+      const log = new OpsLog();
+      log.emit(...opsEventsForAttempt(low, true), ...opsEventsForAttempt(tech), contentDefectEvent("P077", "missing approved BPC", "2026-10-03T00:00:00Z"));
+      const kinds = [...new Set(log.all().map((e) => e.kind))];
+      return `${OPS_EVENT_KINDS.length} ops event kinds; logged: ${kinds.join(",")}; technical retry logged as learner NOT_GREEN=${log.byKind("LEARNER_NOT_GREEN").some((e) => e.attemptId === "o2")}; learner-visible ops events=${learnerVisibleOps(log.all()).length}`;
     })()
   }
 ];

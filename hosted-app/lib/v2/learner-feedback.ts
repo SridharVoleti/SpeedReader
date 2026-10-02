@@ -52,7 +52,8 @@ const INTERNAL_KEYS = new Set([
   "score", "comprehensionScore", "classification", "threshold", "greenThreshold", "percent", "percentage",
   "pass", "passed", "fail", "failed", "result", "isGreen", "green", "notGreen"
 ]);
-const INTERNAL_VALUES = /\b(NOT_GREEN|GREEN|PASS|FAIL)\b|\b\d{1,3}\s?%/;
+// \w includes "_", so identifiers such as LEARNER_NOT_GREEN are caught by the ALL_CAPS_UNDERSCORE branch.
+const INTERNAL_VALUES = /\b(NOT_GREEN|GREEN|PASS|FAIL)\b|\b\d{1,3}\s?%|\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/;
 
 /** Throws if learner-bound data carries an internal key or an internal-looking value. */
 export function assertNoInternalLeak(value: unknown, path = "learnerView"): void {
