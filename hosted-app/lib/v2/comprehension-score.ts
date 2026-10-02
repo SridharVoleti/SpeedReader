@@ -4,7 +4,7 @@
 // internal comprehension score. Structured questions carry the larger weight. The weights come
 // from the versioned calibration (never hard-coded here) and the version used is stored.
 
-import { classifyComprehension, type Classification } from "./comprehension-threshold";
+import { classifyComprehension, roundScore, type Classification } from "./comprehension-threshold";
 import { CURRENT_CALIBRATION, type CalibrationConfig } from "./calibration";
 
 export type StructuredEvidence = { items: { itemId: string; score: number }[]; score: number };
@@ -51,7 +51,7 @@ export function scoreComprehension(
   }
   assertUnit(spoken.score, "spoken score");
   const weights = { ...calibration.comprehensionWeights };
-  const score = weights.structured * structured.score + weights.spoken * spoken.score;
+  const score = roundScore(weights.structured * structured.score + weights.spoken * spoken.score);
   return {
     status: "SCORED", structured, spoken, weights, calibrationVersion: calibration.version,
     score, classification: classifyComprehension(score)

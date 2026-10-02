@@ -7,9 +7,16 @@
 export const GREEN_THRESHOLD = 0.75;
 export type Classification = "GREEN" | "NOT_GREEN";
 
+/** Round a score to 1e-9 so stored/compared scores are free of floating-point noise. */
+export function roundScore(score: number): number {
+  return Math.round(score * 1e9) / 1e9;
+}
+
 export function classifyComprehension(score: number): Classification {
   if (!(score >= 0 && score <= 1)) throw new RangeError("comprehension score must be 0..1");
-  return score >= GREEN_THRESHOLD ? "GREEN" : "NOT_GREEN";
+  // Scores are compared at 1e-9 precision so a blend that is exactly 75% in decimal arithmetic is
+  // never pushed below the threshold by binary floating-point error (e.g. 0.7*0.75 + 0.3*0.75).
+  return roundScore(score) >= GREEN_THRESHOLD ? "GREEN" : "NOT_GREEN";
 }
 
 /** GREEN passages out of a set, counted passage by passage - never via an average. */

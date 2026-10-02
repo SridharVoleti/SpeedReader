@@ -203,3 +203,10 @@ test("FR-029 numeric comprehension is private", async ({ page }) => {
     "3 passages shown to learner with 0 numeric/state leaks; internal score kept (0.75); leak guard trips on score=true"
   );
 });
+
+test("FR-030 >=75% is a celebration", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-030")).toHaveText(
+    "GREEN stored as GREEN with exact score kept=true; celebration SMALL; BPC offered=true; message mentions number=false; five GREEN -> 91 WPM (LEVEL_UP)"
+  );
+});

@@ -34,6 +34,7 @@ import { lintBpcStyle } from "../../lib/v2/bpc-style";
 import { checkBpcFidelity } from "../../lib/v2/bpc-fidelity";
 import { EXPRESSION_FOCUS_BY_WORLD, expressionFocusFor, permanentFeaturesFor } from "../../lib/v2/expression-by-world";
 import { assertNoInternalLeak, buildLearnerFeedback } from "../../lib/v2/learner-feedback";
+import { completeNewPassage } from "../../lib/v2/passage-completion";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -327,6 +328,19 @@ const checks: Check[] = [
       let guard = false;
       try { assertNoInternalLeak({ score: 0.8 }); } catch { guard = true; }
       return `${rows.length} passages shown to learner with ${leaks} numeric/state leaks; internal score kept (${rows[0].score}); leak guard trips on score=${guard}`;
+    })()
+  },
+  {
+    id: "FR-030",
+    title: ">=75% is a celebration",
+    result: (() => {
+      const scored = (s: number) => scoreComprehension(structuredEvidence([{ itemId: "q1", score: s }]), { score: s });
+      let core = newCoreWpmState(90);
+      let last = completeNewPassage("a0", scored(0.8), core);
+      core = last.coreAfter;
+      for (let i = 1; i < 5; i += 1) { last = completeNewPassage(`a${i}`, scored(0.8), core); core = last.coreAfter; }
+      const single = completeNewPassage("b1", scored(0.75), newCoreWpmState(90));
+      return `GREEN stored as ${single.record.classification} with exact score kept=${single.record.score !== null}; celebration ${single.learner.celebration}; BPC offered=${single.learner.showBestPossibleComprehension}; message mentions number=${/\d|%/.test(single.learner.message)}; five GREEN -> ${core.wpm} WPM (${last.coreEvent})`;
     })()
   }
 ];
