@@ -186,3 +186,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | AC-C05 | Transaction safety (atomic Level Up + evidence commit) | Done | ebd517b |
 | AC-C08 | Observability (ops events distinguish defects, technical uncertainty and learner outcomes) | Done | 7dcc5da |
 | AC-C06 | Boundary tests (13-scenario matrix) | Done | 43a2d78 |
+| AC-C03 | Separate state | Done | d35b693 |
