@@ -152,3 +152,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-017 | New passages prove progress; earlier passages practise progress | Done | 1971ded |
 | FR-018 | Familiar practice behaviour | Done | d00c9fd |
 | FR-019 | Support is invisible | Done | 074d395 |
+| FR-020 | Hybrid evidence model | Done | 092ec55 |
