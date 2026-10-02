@@ -9,6 +9,7 @@ import { worldStrategies } from "../../lib/v2/world-strategies";
 import { first150Architecture, validateWorld1Catalog, WORLD1_PASSAGE_COUNT } from "../../lib/v2/catalog";
 import { foundationSpec, presentationChunks, validateFoundationPassageText } from "../../lib/v2/foundation";
 import { passageWords, staircaseTable } from "../../lib/v2/stamina";
+import { planNextPassage } from "../../lib/v2/stamina-transition";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -42,6 +43,15 @@ const checks: Check[] = [
     id: "FR-005",
     title: "Stamina staircase",
     result: `P1=${passageWords(1)} P151=${passageWords(151)} P176=${passageWords(176)} P226=${passageWords(226)} P376=${passageWords(376)} P1500=${passageWords(1500)}; ${staircaseTable().length} steps`
+  },
+  {
+    id: "FR-006",
+    title: "Stamina transition precedence",
+    result: (() => {
+      const boundary = planNextPassage({ completedSequence: 150, currentWpm: 90, levelUpEligible: true });
+      const normal = planNextPassage({ completedSequence: 160, currentWpm: 90, levelUpEligible: true });
+      return `P151 at ${boundary.nextWords}w ${boundary.nextWpm}WPM (level-up deferred=${boundary.levelUpDeferred}); P161 at ${normal.nextWords}w ${normal.nextWpm}WPM (level-up applied=${normal.levelUpApplied})`;
+    })()
   }
 ];
 

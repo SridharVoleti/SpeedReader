@@ -35,3 +35,10 @@ test("FR-005 stamina staircase", async ({ page }) => {
     "P1=100 P151=125 P176=150 P226=200 P376=300 P1500=1000; 37 steps"
   );
 });
+
+test("FR-006 length increase takes precedence over a same-passage Level Up", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-006")).toHaveText(
+    "P151 at 125w 90WPM (level-up deferred=true); P161 at 125w 91WPM (level-up applied=true)"
+  );
+});

@@ -138,3 +138,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-003 | 1,500 canonical passages | Done | 240302a |
 | FR-004 | First 150 passages | Done | 1e73287 |
 | FR-005 | Stamina staircase | Done | 8249fd6 |
+| FR-006 | Stamina transition precedence | Done | 157d2ac |
