@@ -17,7 +17,7 @@ git add "$P"
 git commit -q -m "Update progress: $FR done" -m "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 git push -q origin main 2>&1 | grep -v warning || true
 for i in $(seq 1 30); do
-  if curl -s https://speedreader.babystepsindia.com/frozen-v2-demo | sed "s/&gt;/>/g;s/&amp;/\&/g" | grep -qF "$NEEDLE"; then echo "LIVE OK $FR ($H)"; exit 0; fi
+  if curl -s https://speedreader.babystepsindia.com/frozen-v2-demo | sed "s/&gt;/>/g;s/&lt;/</g;s/&amp;/\&/g" | grep -qF "$NEEDLE"; then echo "LIVE OK $FR ($H)"; exit 0; fi
   sleep 12
 done
 echo "LIVE CHECK FAILED $FR"; exit 1

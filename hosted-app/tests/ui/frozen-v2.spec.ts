@@ -196,3 +196,10 @@ test("FR-028 expression and BPC are permanent across Worlds", async ({ page }) =
     "both features active in 5/5 Worlds; sophistication 1<2<3<4<5; W1 focus: 5 expectations; W4 includes arguments"
   );
 });
+
+test("FR-029 numeric comprehension is private", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-029")).toHaveText(
+    "3 passages shown to learner with 0 numeric/state leaks; internal score kept (0.75); leak guard trips on score=true"
+  );
+});

@@ -33,6 +33,7 @@ import { bestComprehensionFor, lockScoring, newBpcAttempt, submitAttempt } from 
 import { lintBpcStyle } from "../../lib/v2/bpc-style";
 import { checkBpcFidelity } from "../../lib/v2/bpc-fidelity";
 import { EXPRESSION_FOCUS_BY_WORLD, expressionFocusFor, permanentFeaturesFor } from "../../lib/v2/expression-by-world";
+import { assertNoInternalLeak, buildLearnerFeedback } from "../../lib/v2/learner-feedback";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -311,6 +312,22 @@ const checks: Check[] = [
     id: "FR-028",
     title: "expression and BPC are permanent across Worlds",
     result: `both features active in ${WORLDS.filter((w) => permanentFeaturesFor(w.id).bestPossibleComprehension && permanentFeaturesFor(w.id).comprehensionExpression).length}/5 Worlds; sophistication ${EXPRESSION_FOCUS_BY_WORLD.map((f) => f.sophistication).join("<")}; W1 focus: ${expressionFocusFor(1).expectation.length} expectations; W4 includes ${expressionFocusFor(4).expectation[0]}`
+  },
+  {
+    id: "FR-029",
+    title: "numeric comprehension is private",
+    result: (() => {
+      const rows: { attemptId: string; score: number | null; classification: "GREEN" | "NOT_GREEN" | null }[] = [
+        { attemptId: "a1", score: 0.75, classification: "GREEN" },
+        { attemptId: "a2", score: 0.7499, classification: "NOT_GREEN" },
+        { attemptId: "a3", score: null, classification: null }
+      ];
+      const shown = rows.map((r) => JSON.stringify(buildLearnerFeedback(r)));
+      const leaks = shown.filter((t) => /GREEN|PASS|FAIL|%|\d/.test(t)).length;
+      let guard = false;
+      try { assertNoInternalLeak({ score: 0.8 }); } catch { guard = true; }
+      return `${rows.length} passages shown to learner with ${leaks} numeric/state leaks; internal score kept (${rows[0].score}); leak guard trips on score=${guard}`;
+    })()
   }
 ];
 
