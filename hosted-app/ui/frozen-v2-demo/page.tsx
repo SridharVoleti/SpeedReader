@@ -22,6 +22,7 @@ import { newCoreWpmState, recordNewPassage, type CoreWpmState } from "../../lib/
 import { CORE_PROGRESSION_OUTCOMES, SUPERSEDED_DECREMENT_RULES } from "../../lib/v2/no-decrement";
 import { applyAttemptToCore, newCoreWpmState as newCoreState, type AttemptType } from "../../lib/v2/attempt-types";
 import { recordPracticeAttempt, selectFamiliarPassage, type LearnerRecord } from "../../lib/v2/familiar-practice";
+import { ALL_INTERNAL_STATES, learnerCopyFor, learnerLanguageViolations } from "../../lib/v2/learner-language";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -181,6 +182,16 @@ const checks: Check[] = [
       let rec: LearnerRecord = { core: stalled, canonicalPointer: 4, originalAttempts: { P001: { score: 0.9 }, P002: { score: 0.9 }, P003: { score: 0.9 } }, practiceAnalytics: [] };
       for (let i = 0; i < 5; i += 1) rec = recordPracticeAttempt(rec, { attemptId: `p${i}`, passageId: serve.passageId, wpm: serve.wpm, classification: "GREEN" });
       return `serve ${serve.passageId} at ${serve.wpm} WPM as ${serve.attemptType}; after 5 practice: pointer ${rec.canonicalPointer}, WPM ${rec.core.wpm}, ${rec.practiceAnalytics.length} analytics rows`;
+    })()
+  },
+  {
+    id: "FR-019",
+    title: "support is invisible to the learner",
+    result: (() => {
+      const shown = ["FAMILIAR_PRACTICE_ACTIVE", "HOLD_AFTER_FIVE", "NOT_GREEN"] as const;
+      const copy = shown.map((s) => learnerCopyFor(s));
+      const violations = copy.flatMap((c) => learnerLanguageViolations(c));
+      return `${ALL_INTERNAL_STATES.length} internal states -> learner copy; violations in shown copy: ${violations.length}; "struggling" flagged=${learnerLanguageViolations("struggling").length > 0}`;
     })()
   }
 ];

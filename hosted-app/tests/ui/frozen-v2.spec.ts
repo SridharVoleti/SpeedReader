@@ -126,3 +126,10 @@ test("FR-018 familiar practice at current WPM, pointer unchanged", async ({ page
     "serve P003 at 97 WPM as FAMILIAR_PRACTICE; after 5 practice: pointer 4, WPM 97, 5 analytics rows"
   );
 });
+
+test("FR-019 support is invisible to the learner", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-019")).toHaveText(
+    "8 internal states -> learner copy; violations in shown copy: 0; \"struggling\" flagged=true"
+  );
+});
