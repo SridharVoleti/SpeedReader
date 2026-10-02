@@ -164,3 +164,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-029 | Numeric comprehension is private | Done | 36e80ef |
 | FR-030 | >=75% is a celebration | Done | 0bda3dd |
 | FR-031 | Below 75% remains positive | Done | 799581d |
+| FR-032 | Level-Up celebration | Done | a062bf7 |
