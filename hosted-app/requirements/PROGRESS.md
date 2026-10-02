@@ -187,3 +187,13 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | AC-C08 | Observability (ops events distinguish defects, technical uncertainty and learner outcomes) | Done | 7dcc5da |
 | AC-C06 | Boundary tests (13-scenario matrix) | Done | 43a2d78 |
 | AC-C03 | Separate state | Done | d35b693 |
+
+### v2.0 status (read before treating anything above as "done")
+
+All 49 FRs and the testable engineering-gate criteria (AC-C01/03/05/06/08) are implemented as domain modules in
+`hosted-app/lib/v2/`, unit-tested, and checked live on `/frozen-v2-demo`. That is **not** production readiness:
+the v2 engine is not yet wired into the learner screens, AC-P29 fails on the legacy UI/harness pages, and the
+required content (1,500 passages, approved BPC texts, readiness forms, reference audio), ASR, persistence and the
+independent QA certification (AC-C10) do not exist yet. See
+`requirements/SpeedReader_v2_Traceability_Report.md` (regenerate with `python tools/gen-traceability.py`).
+
