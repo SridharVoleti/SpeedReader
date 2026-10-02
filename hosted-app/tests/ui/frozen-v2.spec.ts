@@ -98,3 +98,10 @@ test("FR-014 first-five rule", async ({ page }) => {
     "5/5=LEVEL_UP 4/5=LEVEL_UP 3/5=HOLD 1/5=HOLD 0/5=HOLD"
   );
 });
+
+test("FR-015 post-five rule", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-015")).toHaveText(
+    "NNNNN+GGG -> 91 WPM; NNNNN+GGNGG -> 90 WPM (streak reset); NNNGGG -> 90 WPM"
+  );
+});

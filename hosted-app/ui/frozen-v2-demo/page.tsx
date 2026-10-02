@@ -18,6 +18,7 @@ import { dimensionCelebration, levelUpAchievement, levelUpCount, levelUpsForWpmC
 import { toGateEvidence } from "../../lib/v2/gate-evidence";
 import { classifyComprehension, greenCount, GREEN_THRESHOLD } from "../../lib/v2/comprehension-threshold";
 import { evaluateFirstFive } from "../../lib/v2/first-five";
+import { newCoreWpmState, recordNewPassage, type CoreWpmState } from "../../lib/v2/core-wpm";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -127,6 +128,18 @@ const checks: Check[] = [
       const G = "GREEN" as const;
       const N = "NOT_GREEN" as const;
       return [show([G, G, G, G, G]), show([G, G, N, G, G]), show([G, N, G, N, G]), show([N, N, G, N, N]), show([N, N, N, N, N])].join(" ");
+    })()
+  },
+  {
+    id: "FR-015",
+    title: "Post-five rule",
+    result: (() => {
+      const run = (seq: string) => {
+        let state: CoreWpmState = newCoreWpmState(90);
+        for (const c of seq) state = recordNewPassage(state, c === "G" ? "GREEN" : "NOT_GREEN").state;
+        return state.wpm;
+      };
+      return `NNNNN+GGG -> ${run("NNNNNGGG")} WPM; NNNNN+GGNGG -> ${run("NNNNNGGNGG")} WPM (streak reset); NNNGGG -> ${run("NNNGGG")} WPM`;
     })()
   }
 ];
