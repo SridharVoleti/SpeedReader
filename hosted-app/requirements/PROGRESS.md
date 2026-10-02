@@ -149,3 +149,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-014 | First-five rule | Done | af998b0 |
 | FR-015 | Post-five rule | Done | dd6c1fe |
 | FR-016 | Earned WPM is never removed | Done | b1e4977 |
+| FR-017 | New passages prove progress; earlier passages practise progress | Done | 1971ded |
