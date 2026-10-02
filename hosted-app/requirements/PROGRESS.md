@@ -147,3 +147,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-012 | Comprehension is the only WPM gate | Done | b2b0dcf |
 | FR-013 | Passage GREEN threshold | Done | 670036c |
 | FR-014 | First-five rule | Done | af998b0 |
+| FR-015 | Post-five rule | Done | dd6c1fe |
