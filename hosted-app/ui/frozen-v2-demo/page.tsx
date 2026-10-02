@@ -8,6 +8,7 @@ import { startingWorld, WORLDS } from "../../lib/v2/worlds";
 import { worldStrategies } from "../../lib/v2/world-strategies";
 import { first150Architecture, validateWorld1Catalog, WORLD1_PASSAGE_COUNT } from "../../lib/v2/catalog";
 import { foundationSpec, presentationChunks, validateFoundationPassageText } from "../../lib/v2/foundation";
+import { passageWords, staircaseTable } from "../../lib/v2/stamina";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -36,6 +37,11 @@ const checks: Check[] = [
       const spec = foundationSpec(150);
       return `P150 = ${spec.words} words, ${spec.display}, ${spec.coordinate.rsId}/P${spec.coordinate.pLevel}; sample text errors ${validateFoundationPassageText(sample).length}; ${presentationChunks(sample).length} single-word steps`;
     })()
+  },
+  {
+    id: "FR-005",
+    title: "Stamina staircase",
+    result: `P1=${passageWords(1)} P151=${passageWords(151)} P176=${passageWords(176)} P226=${passageWords(226)} P376=${passageWords(376)} P1500=${passageWords(1500)}; ${staircaseTable().length} steps`
   }
 ];
 
