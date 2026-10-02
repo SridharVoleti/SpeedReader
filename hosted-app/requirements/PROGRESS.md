@@ -169,3 +169,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-034 | Parallel track | Done | 4867c6f |
 | FR-035 | Independence from core progression | Done | 3ba8d12 |
 | FR-036 | Shared content, separate state | Done | 3b9adf1 |
+| FR-037 | Reference delivery | Done | ec4acfe |
