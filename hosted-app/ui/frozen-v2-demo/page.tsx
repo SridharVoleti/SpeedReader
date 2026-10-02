@@ -15,6 +15,7 @@ import { runAssessment } from "../../lib/v2/initial-assessment";
 import { assertPersonalOnly, personalImprovement } from "../../lib/v2/personal-trajectory";
 import { clampToCeiling, developmentContinuesAtCeiling, isSchedulableWpm, WORLD1_MAX_WPM } from "../../lib/v2/speed-ceiling";
 import { dimensionCelebration, levelUpAchievement, levelUpCount, levelUpsForWpmChange } from "../../lib/v2/level-semantics";
+import { toGateEvidence } from "../../lib/v2/gate-evidence";
 import styles from "../page.module.css";
 
 type Check = { id: string; title: string; result: string };
@@ -101,6 +102,15 @@ const checks: Check[] = [
     id: "FR-011",
     title: "Level semantics",
     result: `+1 WPM = ${levelUpsForWpmChange(90, 91)} Level Up; 60->75 WPM = ${levelUpCount(60, 75)} Level Ups; "${levelUpAchievement().kind === "LEVEL_UP" ? "You Levelled Up!" : ""}"; stamina celebration numbered=${dimensionCelebration("stamina").numbered}`
+  },
+  {
+    id: "FR-012",
+    title: "Comprehension is the only WPM gate",
+    result: (() => {
+      const clean = toGateEvidence({ attemptId: "a", wpm: 90, comprehensionScore: 0.8 });
+      const noisy = toGateEvidence({ attemptId: "a", wpm: 90, comprehensionScore: 0.8, oralQuality: 0, newsReaderScore: 0, pronunciation: 0, confidence: 0 });
+      return `oral/news/pronunciation/confidence at 0 -> same gate evidence: ${JSON.stringify(clean) === JSON.stringify(noisy)}; gate sees ${Object.keys(noisy).length} fields`;
+    })()
   }
 ];
 

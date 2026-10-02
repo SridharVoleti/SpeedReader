@@ -77,3 +77,10 @@ test("FR-011 +1 WPM is one Level Up; other dimensions are not numbered", async (
     '+1 WPM = 1 Level Up; 60->75 WPM = 15 Level Ups; "You Levelled Up!"; stamina celebration numbered=false'
   );
 });
+
+test("FR-012 oral/News Reader signals cannot affect the WPM gate", async ({ page }) => {
+  await page.goto("/frozen-v2-demo");
+  await expect(page.getByTestId("result-FR-012")).toHaveText(
+    "oral/news/pronunciation/confidence at 0 -> same gate evidence: true; gate sees 4 fields"
+  );
+});

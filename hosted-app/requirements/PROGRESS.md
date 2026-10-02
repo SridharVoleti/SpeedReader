@@ -144,3 +144,4 @@ speedreader.babystepsindia.com. Modules live in `hosted-app/lib/v2/`.
 | FR-009 | Personal trajectory | Done | 6226855 |
 | FR-010 | World 1 speed ceiling | Done | bdacc68 |
 | FR-011 | Level semantics | Done | cc6ca37 |
+| FR-012 | Comprehension is the only WPM gate | Done | 354e269 |
