@@ -197,3 +197,14 @@ required content (1,500 passages, approved BPC texts, readiness forms, reference
 independent QA certification (AC-C10) do not exist yet. See
 `requirements/SpeedReader_v2_Traceability_Report.md` (regenerate with `python tools/gen-traceability.py`).
 
+
+## Text-to-speech on every screen (post-v2.0 amendment)
+
+| Item | Title | Status | Commit |
+|---|---|---|---|
+| TTS-1 | Listen bar on every screen (`ReadAloud`, `lib/narrator.ts`): touch-safe start, cancel-based pause, Neerja/neural female voice first, sentence chunking | Done | 2749d5d |
+| FR-037 A1 / AC-P30 | News reader uses device TTS at 145 WPM, female voice, until approved audio exists (approved audio still wins; invalid asset is an error) | Done | 2749d5d |
+| TTS-2 | "Read along like a news reader" highlight follows the voice (start event, word boundaries, measured pace) | Done, awaiting device test | 6770f0c |
+
+Open: sync quality on real Edge/Neerja depends on the voice sending word-boundary events; confirm on a device.
+Unit tests: `narrator`, `read-along-voice`, `fr-037-reference-delivery`; UI: `read-aloud.spec.ts`.
