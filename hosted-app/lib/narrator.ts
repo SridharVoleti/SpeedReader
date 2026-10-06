@@ -135,7 +135,8 @@ export function isNeerjaVoice(voice: VoiceLike | null): boolean {
   return name.includes("neerja") || name.includes("neeraja");
 }
 
-export type NarrationSegment = { text: string; id?: string };
+/** `speech` (when given) is spoken verbatim, so callers that map boundary offsets control the exact text. */
+export type NarrationSegment = { text: string; id?: string; speech?: string };
 export type NarratorStatus = "idle" | "speaking" | "paused";
 
 type UtteranceLike = {
@@ -146,6 +147,8 @@ type UtteranceLike = {
   volume: number;
   onend: (() => void) | null;
   onerror: ((event: { error?: string }) => void) | null;
+  onstart?: (() => void) | null;
+  onboundary?: ((event: { charIndex?: number; name?: string }) => void) | null;
 };
 
 export type SynthLike = {
@@ -170,6 +173,12 @@ export type NarratorOptions = {
   /** If an utterance never ends (silent/broken engine) it is treated as finished after this long. */
   watchdogMs?: (segment: NarrationSegment) => number;
   onSegmentStart?: (segment: NarrationSegment, index: number, total: number) => void;
+  /** The engine has actually begun producing sound (cloud voices lag the speak() call). */
+  onSegmentSpoken?: (segment: NarrationSegment, index: number) => void;
+  /** Word-boundary event: charIndex is an offset into the spoken text. */
+  onBoundary?: (segment: NarrationSegment, charIndex: number) => void;
+  /** If the engine never reports a start event, treat speech as started after this long. */
+  startFallbackMs?: number;
   onSegmentEnd?: (segment: NarrationSegment, index: number, elapsedMs: number) => void;
   onStatus?: (status: NarratorStatus, message: string) => void;
   onDone?: () => void;
@@ -221,7 +230,7 @@ export function createNarrator(options: NarratorOptions): Narrator {
     }
     const segment = queue[index];
     options.onSegmentStart?.(segment, index, queue.length);
-    const utterance = createUtterance(toSpokenText(segment.text));
+    const utterance = createUtterance(segment.speech ?? toSpokenText(segment.text));
     if (voice) {
       utterance.voice = voice;
       utterance.lang = voice.lang || "en-IN";
@@ -232,14 +241,31 @@ export function createNarrator(options: NarratorOptions): Narrator {
     utterance.rate = options.rateFor ? options.rateFor(segment, index) : rate;
     utterance.pitch = 1;
     utterance.volume = 1;
-    const startedAt = Date.now();
+    let startedAt = Date.now();
     const segmentIndex = index;
     let finished = false;
+    let spoken = false;
+    let startTimer: ReturnType<typeof setTimeout> | undefined;
+    const markSpoken = () => {
+      if (spoken || finished || myToken !== token) return;
+      spoken = true;
+      if (startTimer !== undefined) clearTimeout(startTimer);
+      startedAt = Date.now(); // pace is measured from real speech, not from the speak() request
+      options.onSegmentSpoken?.(segment, segmentIndex);
+    };
+    utterance.onstart = markSpoken;
+    utterance.onboundary = (event) => {
+      if (myToken !== token || typeof event?.charIndex !== "number") return;
+      if (event.name && event.name !== "word") return;
+      markSpoken();
+      options.onBoundary?.(segment, event.charIndex);
+    };
     let watchdog: ReturnType<typeof setTimeout> | undefined;
     const finish = () => {
       if (finished || myToken !== token) return;
       finished = true;
       if (watchdog !== undefined) clearTimeout(watchdog);
+      if (startTimer !== undefined) clearTimeout(startTimer);
       retryIndex = -1;
       retryCount = 0;
       options.onSegmentEnd?.(segment, segmentIndex, Date.now() - startedAt);
@@ -248,10 +274,12 @@ export function createNarrator(options: NarratorOptions): Narrator {
     };
     utterance.onend = finish;
     if (options.watchdogMs) watchdog = setTimeout(finish, options.watchdogMs(segment));
+    if (options.onSegmentSpoken) startTimer = setTimeout(markSpoken, options.startFallbackMs ?? 1800);
     utterance.onerror = (event) => {
       if (myToken !== token) return;
       finished = true;
       if (watchdog !== undefined) clearTimeout(watchdog);
+      if (startTimer !== undefined) clearTimeout(startTimer);
       const recoverable = event?.error === "interrupted" || event?.error === "canceled";
       if (recoverable && !paused) {
         if (retryIndex !== index) {

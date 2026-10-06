@@ -6,7 +6,7 @@ import { levels, ProgressionLevel } from "../../lib/progression";
 import { planReadingTiming, recordActualDuration, ReadingTimingRecord } from "../../lib/reading-timing";
 import { PassageData, ScoreResult, scoreComprehension } from "../../lib/scoring";
 import { browserSpeech, createNarrator, type Narrator, type NarrationSegment } from "../../lib/narrator";
-import { adaptRate, expectedMs, initialRate, READ_ALONG_WPM, sentenceSegments, type ReadAlongSegment } from "../../lib/read-along-voice";
+import { adaptRate, expectedMs, initialRate, READ_ALONG_WPM, sentenceSegments, updateMsPerWord, wordIndexAtChar, wordSchedule, wordsStartedBy, type ReadAlongSegment } from "../../lib/read-along-voice";
 import styles from "../page.module.css";
 
 type Phase = "intro" | "reading" | "readAlong" | "quiz" | "results";
@@ -111,9 +111,18 @@ export default function LevelPlayer({
   const [readAlongPlaying, setReadAlongPlaying] = useState(false);
   const narratorRef = useRef<Narrator | null>(null);
   const readAlongRateRef = useRef(initialRate());
-  // Last word of the sentence being spoken: the word timer never runs past it, so the voice stays
-  // the master clock at sentence boundaries. Infinity = voice unavailable, timer only.
-  const sentenceEndRef = useRef(Infinity);
+  // The voice is the clock. activeSegRef is the sentence being spoken; speechStartRef is set only
+  // when the engine really starts producing sound (cloud voices lag the speak() call), so the
+  // highlight never runs ahead of the voice. Word-boundary events pin the exact word; without them
+  // the highlight is interpolated from that real start using this voice's measured speed.
+  const activeSegRef = useRef<ReadAlongSegment | null>(null);
+  const speechStartRef = useRef<number | null>(null);
+  const scheduleRef = useRef<number[]>([]);
+  const boundarySeenRef = useRef(false);
+  const msPerWordRef = useRef(60000 / READ_ALONG_WPM);
+  const [speechTick, setSpeechTick] = useState(0);
+  // "timer" = no usable voice, fall back to the silent fixed-pace highlighter.
+  const [voiceMode, setVoiceMode] = useState<"voice" | "timer">("timer");
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
@@ -162,21 +171,38 @@ export default function LevelPlayer({
       gapMs: 0,
       rateFor: () => readAlongRateRef.current,
       watchdogMs: (segment) => expectedMs((segment as ReadAlongSegment).text.split(/\s+/).length) * 1.8 + 2500,
+      startFallbackMs: 1500,
       onSegmentStart: (segment) => {
-        const { startWord, endWord } = segment as NarrationSegment & ReadAlongSegment;
-        sentenceEndRef.current = endWord;
-        setReadAlongIndex(startWord);
+        const seg = segment as NarrationSegment & ReadAlongSegment;
+        activeSegRef.current = seg;
+        speechStartRef.current = null;
+        boundarySeenRef.current = false;
+        setReadAlongIndex(seg.startWord);
       },
-      onSegmentEnd: (segment, _index, elapsedMs) => {
-        const { text } = segment as NarrationSegment & ReadAlongSegment;
-        readAlongRateRef.current = adaptRate(readAlongRateRef.current, text.split(/\s+/).length, elapsedMs);
+      onSegmentSpoken: (segment) => {
+        const seg = segment as NarrationSegment & ReadAlongSegment;
+        const count = seg.endWord - seg.startWord + 1;
+        scheduleRef.current = wordSchedule(words.slice(seg.startWord, seg.endWord + 1), count * msPerWordRef.current);
+        speechStartRef.current = performance.now();
+        setSpeechTick((tick) => tick + 1);
+      },
+      onBoundary: (segment, charIndex) => {
+        const seg = segment as NarrationSegment & ReadAlongSegment;
+        boundarySeenRef.current = true;
+        setReadAlongIndex(Math.min(seg.endWord, seg.startWord + wordIndexAtChar(seg.wordOffsets, charIndex)));
+      },
+      onSegmentEnd: (segment, _index, speechMs) => {
+        const seg = segment as NarrationSegment & ReadAlongSegment;
+        const count = seg.endWord - seg.startWord + 1;
+        readAlongRateRef.current = adaptRate(readAlongRateRef.current, count, speechMs);
+        msPerWordRef.current = updateMsPerWord(msPerWordRef.current, count, speechMs);
       },
       onStatus: (status) => {
         // Engine error / blocked audio: fall back to the silent highlighter rather than stall.
-        if (status === "idle") sentenceEndRef.current = Infinity;
+        if (status === "idle") setVoiceMode("timer");
       },
       onDone: () => {
-        sentenceEndRef.current = Infinity;
+        activeSegRef.current = null;
         setReadAlongIndex(Number.MAX_SAFE_INTEGER);
         setReadAlongPlaying(false);
       }
@@ -186,23 +212,36 @@ export default function LevelPlayer({
       narrator.dispose();
       narratorRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Voice mode, no word-boundary events from this voice: interpolate from the real speech start.
   useEffect(() => {
-    if (phase !== "readAlong" || !readAlongPlaying) return;
+    if (phase !== "readAlong" || !readAlongPlaying || voiceMode !== "voice") return;
+    const interval = window.setInterval(() => {
+      const seg = activeSegRef.current;
+      const startedAt = speechStartRef.current;
+      if (!seg || startedAt === null || boundarySeenRef.current) return;
+      const started = wordsStartedBy(scheduleRef.current, performance.now() - startedAt);
+      const index = Math.min(seg.endWord, seg.startWord + Math.max(0, started - 1));
+      setReadAlongIndex((value) => (value >= seg.startWord && value < index ? index : value));
+    }, 40);
+    return () => window.clearInterval(interval);
+  }, [phase, readAlongPlaying, voiceMode, speechTick]);
+
+  // Timer mode (speech unsupported or failed): the original fixed-pace highlighter.
+  useEffect(() => {
+    if (phase !== "readAlong" || !readAlongPlaying || voiceMode !== "timer") return;
     if (readAlongIndex >= words.length) {
       setReadAlongPlaying(false);
       return;
     }
-    // Hold on the sentence's last word until the voice finishes it; the voice then moves us on.
-    if (readAlongIndex >= sentenceEndRef.current) return;
-    const baseMs = msPerChunk(READ_ALONG_WPM, 1);
     const timer = window.setTimeout(
-      () => setReadAlongIndex((value) => Math.min(value + 1, sentenceEndRef.current)),
-      readAlongDelay(words[readAlongIndex], baseMs)
+      () => setReadAlongIndex((value) => value + 1),
+      readAlongDelay(words[readAlongIndex], msPerChunk(READ_ALONG_WPM, 1))
     );
     return () => window.clearTimeout(timer);
-  }, [phase, readAlongPlaying, readAlongIndex, words]);
+  }, [phase, readAlongPlaying, voiceMode, readAlongIndex, words]);
 
   useEffect(() => {
     setSpeechSupported(getSpeechRecognitionConstructor() !== null);
@@ -269,7 +308,10 @@ export default function LevelPlayer({
   // Everything below runs inside the learner's tap, so the first speak() is allowed on mobile.
   function speakReadAlong() {
     readAlongRateRef.current = initialRate();
-    sentenceEndRef.current = readAlongSegments.length ? readAlongSegments[0].endWord : Infinity;
+    msPerWordRef.current = 60000 / READ_ALONG_WPM;
+    activeSegRef.current = null;
+    speechStartRef.current = null;
+    setVoiceMode(narratorRef.current?.supported ? "voice" : "timer");
     narratorRef.current?.start(readAlongSegments);
   }
 

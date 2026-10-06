@@ -11,8 +11,22 @@ async function installFakeSpeech(page: Page) {
       onend: (() => void) | null = null; onerror: ((e: { error: string }) => void) | null = null;
       constructor(text: string) { this.text = text; }
     }
+    const w = window as unknown as { __speakMs?: number; __startLagMs?: number; __boundaries?: boolean; __events?: string[] };
     const fake = {
-      speak(u: FakeUtterance) { spoken.push(u.text); setTimeout(() => u.onend?.(), (window as unknown as { __speakMs?: number }).__speakMs ?? 20); },
+      speak(u: FakeUtterance & { onstart?: () => void; onboundary?: (e: { charIndex: number; name: string }) => void }) {
+        spoken.push(u.text);
+        const total = w.__speakMs ?? 20;
+        const lag = w.__startLagMs ?? 0;
+        setTimeout(() => {
+          u.onstart?.();
+          if (w.__boundaries) {
+            const offsets: number[] = [];
+            u.text.replace(/\S+/g, (m, at: number) => { offsets.push(at); return m; });
+            offsets.forEach((charIndex, i) => setTimeout(() => u.onboundary?.({ charIndex, name: "word" }), (i / offsets.length) * total * 0.9));
+          }
+          setTimeout(() => u.onend?.(), total);
+        }, lag);
+      },
       cancel() { cancels += 1; },
       resume() {},
       pause() {},
@@ -92,4 +106,34 @@ test("read along like a news reader speaks sentence by sentence and the highligh
   await page.getByTestId("read-along-restart").click();
   await expect(page.getByTestId("read-along-active-word")).toHaveText("Ravi");
   await expect.poll(async () => (await spokenText(page)).split(" | ").filter((t) => t === first).length).toBe(2);
+});
+
+test("read-along highlight waits for the voice to start, then follows the spoken words", async ({ page }) => {
+  await installFakeSpeech(page);
+  await page.addInitScript(() => {
+    const w = window as unknown as { __speakMs: number; __startLagMs: number; __boundaries: boolean };
+    w.__speakMs = 4000; w.__startLagMs = 1200; w.__boundaries = true; // slow cloud voice with word events
+  });
+  await page.goto("/");
+  await page.getByTestId("level-node-1").click();
+  await page.getByTestId("read-along-start").click();
+  // During the 1.2 s start-up lag nothing has been said, so the highlight must still be on word one.
+  await page.waitForTimeout(900);
+  await expect(page.getByTestId("read-along-active-word")).toHaveText("Ravi");
+  // Once the voice is going, the highlight advances with the boundaries.
+  await expect(page.getByTestId("read-along-active-word")).not.toHaveText("Ravi", { timeout: 4000 });
+});
+
+test("read-along without word events still ends the sentence's highlight with the voice", async ({ page }) => {
+  await installFakeSpeech(page);
+  await page.addInitScript(() => {
+    const w = window as unknown as { __speakMs: number; __startLagMs: number };
+    w.__speakMs = 3000; w.__startLagMs = 800; // no boundaries: interpolation only
+  });
+  await page.goto("/");
+  await page.getByTestId("level-node-1").click();
+  await page.getByTestId("read-along-start").click();
+  await page.waitForTimeout(500);
+  await expect(page.getByTestId("read-along-active-word")).toHaveText("Ravi"); // voice has not started
+  await expect(page.getByTestId("read-along-active-word")).not.toHaveText("Ravi", { timeout: 3500 });
 });

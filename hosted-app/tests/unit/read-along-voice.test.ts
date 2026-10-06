@@ -84,3 +84,87 @@ describe("narrator read-along hooks", () => {
     expect(cancel).not.toHaveBeenCalled();
   });
 });
+
+import { sentenceSegments as segmentsOf, updateMsPerWord, wordIndexAtChar, wordSchedule, wordsStartedBy } from "../../lib/read-along-voice";
+
+describe("read-along stays in sync with the voice", () => {
+  it("maps a boundary charIndex back to the right word, even when acronyms are expanded", () => {
+    const [seg] = segmentsOf("The API is ready now.".split(" "));
+    expect(seg.speech).toBe("The A P I is ready now.");
+    expect(seg.wordOffsets).toEqual([0, 4, 10, 13, 19]);
+    expect(wordIndexAtChar(seg.wordOffsets, 0)).toBe(0);
+    expect(wordIndexAtChar(seg.wordOffsets, 6)).toBe(1); // inside "A P I"
+    expect(wordIndexAtChar(seg.wordOffsets, 13)).toBe(3);
+    expect(wordIndexAtChar(seg.wordOffsets, 999)).toBe(4);
+  });
+
+  it("schedules every word in order, ending inside the measured speech duration", () => {
+    const words = "Ravi walked slowly, then he ran home.".split(" ");
+    const schedule = wordSchedule(words, 3000);
+    expect(schedule[0]).toBe(0);
+    expect(schedule.every((t, i) => i === 0 || t > schedule[i - 1])).toBe(true);
+    expect(schedule[schedule.length - 1]).toBeLessThan(3000);
+    // nothing has started before the voice produced sound; the last word waits until near the end
+    expect(wordsStartedBy(schedule, -1)).toBe(0);
+    expect(wordsStartedBy(schedule, 0)).toBe(1);
+    expect(wordsStartedBy(schedule, 3000)).toBe(words.length);
+    expect(wordsStartedBy(schedule, 1500)).toBeGreaterThan(2);
+    expect(wordsStartedBy(schedule, 1500)).toBeLessThan(words.length - 1);
+  });
+
+  it("gives long words and punctuation more time than short plain words", () => {
+    const [a, b, c] = wordSchedule(["a", "extraordinary,", "go"], 1000);
+    expect(b - a).toBeLessThan(c - b);
+  });
+
+  it("learns this voice's real speed from measured speech", () => {
+    expect(updateMsPerWord(413, 10, 6000)).toBeGreaterThan(413);
+    expect(updateMsPerWord(413, 10, 3000)).toBeLessThan(413);
+    expect(updateMsPerWord(413, 2, 100)).toBe(413);
+  });
+});
+
+describe("narrator start/boundary events", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  function engine(extra: object) {
+    const spoken: { text: string; onstart: (() => void) | null; onboundary: ((e: { charIndex: number; name?: string }) => void) | null; onend: (() => void) | null }[] = [];
+    const synth = { speak: (u: never) => { spoken.push(u); }, cancel: vi.fn(), resume: vi.fn(), getVoices: () => [] } as unknown as SynthLike;
+    const make = (text: string) => ({ text, voice: null, lang: "", rate: 1, pitch: 1, volume: 1, onend: null, onerror: null, onstart: null, onboundary: null });
+    return { spoken, n: createNarrator({ synth, createUtterance: make as never, touchDevice: true, gapMs: 0, ...extra }) };
+  }
+
+  it("does not report speech as started until the engine says so, and measures pace from that moment", () => {
+    const spokenAt: number[] = [];
+    const paces: number[] = [];
+    const { spoken, n } = engine({ onSegmentSpoken: () => spokenAt.push(Date.now()), onSegmentEnd: (_s: unknown, _i: number, ms: number) => paces.push(ms), startFallbackMs: 5000 });
+    n.start([{ text: "One two three four.", speech: "One two three four." }]);
+    vi.advanceTimersByTime(900); // cloud voice still warming up
+    expect(spokenAt).toEqual([]);
+    spoken[0].onstart?.();
+    vi.advanceTimersByTime(2000);
+    spoken[0].onend?.();
+    expect(paces).toEqual([2000]); // the 900 ms start-up lag is not counted as speaking time
+  });
+
+  it("forwards word boundaries (and ignores sentence boundaries) and speaks the given speech text verbatim", () => {
+    const seen: number[] = [];
+    const { spoken, n } = engine({ onBoundary: (_s: unknown, c: number) => seen.push(c) });
+    n.start([{ text: "The API", speech: "The A P I" }]);
+    expect(spoken[0].text).toBe("The A P I");
+    spoken[0].onboundary?.({ charIndex: 4, name: "word" });
+    spoken[0].onboundary?.({ charIndex: 9, name: "sentence" });
+    expect(seen).toEqual([4]);
+  });
+
+  it("falls back to 'started' when an engine never fires a start event, so the highlight cannot freeze", () => {
+    const started = vi.fn();
+    const { n } = engine({ onSegmentSpoken: started, startFallbackMs: 1500 });
+    n.start([{ text: "Silent engine here." }]);
+    vi.advanceTimersByTime(1499);
+    expect(started).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(2);
+    expect(started).toHaveBeenCalledTimes(1);
+  });
+});
