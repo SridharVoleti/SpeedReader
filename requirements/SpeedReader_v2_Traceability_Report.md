@@ -75,7 +75,7 @@ and, just as importantly, what is NOT done.
 | FR-034 | News Reader parallel track | news-reader.ts | `fr-034-news-reader-parallel.test.ts` | PARTIAL | State namespace and metrics only; no recording UI. |
 | FR-035 | Independence from core progression | learner-aggregate.ts | `fr-035-news-reader-independence.test.ts` | DOMAIN PASS |  |
 | FR-036 | Shared content, separate state | evidence-store.ts | `fr-036-shared-content-separate-state.test.ts` | DOMAIN PASS |  |
-| FR-037 | Reference delivery | reference-audio.ts | `fr-037-reference-delivery.test.ts` | PARTIAL | Validation and platform-independent resolution only; no reference audio assets exist. |
+| FR-037 | Reference delivery | reference-audio.ts | `fr-037-reference-delivery.test.ts` | PARTIAL | Validation and platform-independent resolution; per Amendment A1 (2026-10-06) with no approved audio asset the reference is on-device TTS at 145 WPM, female voice (`narrator.ts`, read-along). No pre-generated audio assets exist yet. |
 | FR-038 | Oral two-read coaching | news-reader-coaching.ts | `fr-038-two-read-coaching.test.ts` | PARTIAL | Coaching calculation only; no recording UI. |
 | FR-039 | Oral-as-core-gate superseded | supersession.ts | `fr-039-oral-gate-superseded.test.ts` | DOMAIN PASS |  |
 | FR-040 | Passage 1500 not sufficient | world1-completion.ts | `fr-040-p1500-not-sufficient.test.ts` | PARTIAL | Readiness requirement modelled as the 15 RS competencies confirmed on approved forms (an interpretation; the exact readiness definition lives in the KM package, which is not in the repo). |
@@ -139,7 +139,7 @@ and, just as importantly, what is NOT done.
 | AC-P27 | Approved reassessment forms | DOMAIN PASS | FR-044; B13. No approved forms exist yet. |
 | AC-P28 | Auditability | DOMAIN PASS | FR-049 replay from the immutable ledger. |
 | AC-P29 | Confidence-first language | NOT DONE | Zero negative labels in v2 modules, but the shipped legacy UI/harness pages fail the scan (headline gap 2). |
-| AC-P30 | Cross-platform consistency | PARTIAL | Decisions are pure domain functions (identical for identical evidence) and reference audio is a single canonical asset (FR-037); there is no server API yet. |
+| AC-P30 | Cross-platform consistency | PARTIAL | Decisions are pure domain functions (identical for identical evidence) and reference delivery follows one policy on every platform: approved audio else TTS at 145 WPM female (FR-037 A1); there is no server API yet. |
 
 ## Acceptance criteria - Codex engineering gate (AC-C01 .. AC-C10)
 

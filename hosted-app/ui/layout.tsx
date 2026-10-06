@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Inter } from "next/font/google";
 import "./globals.css";
+import ReadAloud from "./components/ReadAloud";
 
 // BabySteps Design Standard v1.0 (brand/Babysteps_Design_Standard_Final_v1.0.docx):
 // Manrope for headings, Inter for functional UI/body text.
@@ -25,7 +26,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ReadAloud />
+      </body>
     </html>
   );
 }

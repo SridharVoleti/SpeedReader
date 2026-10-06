@@ -253,10 +253,10 @@ test("FR-036 shared content, separate state", async ({ page }) => {
   );
 });
 
-test("FR-037 canonical pre-generated reference audio", async ({ page }) => {
+test("FR-037 reference delivery: pre-generated audio, else TTS at 145 WPM female", async ({ page }) => {
   await page.goto("/frozen-v2-demo");
   await expect(page.getByTestId("result-FR-037")).toHaveText(
-    "7 reference qualities; 4 platforms resolve 1 identical asset; device TTS reference rejected=true"
+    "7 reference qualities; 4 platforms resolve 1 identical asset; device TTS asset rejected=true; no asset -> TTS 145 WPM female=true"
   );
 });
 

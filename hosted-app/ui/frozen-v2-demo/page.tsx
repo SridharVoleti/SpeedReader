@@ -40,7 +40,7 @@ import { bookTimeImpact, formatDuration } from "../../lib/v2/book-time";
 import { NEWS_READER_PURPOSES, newNewsReaderState, newsReaderGatesCoreProgression, recordNewsReaderAttempt } from "../../lib/v2/news-reader";
 import { applyNewPassage, newLearnerAggregate } from "../../lib/v2/learner-aggregate";
 import { assertComprehensionEvidence, comprehensionEvidenceForPassage, emptyEvidenceStore, oralEvidenceForPassage, recordCoreEvidence, recordNewsReaderEvidence } from "../../lib/v2/evidence-store";
-import { REFERENCE_QUALITIES, resolveReferenceAudio, type Platform, type ReferenceAudio } from "../../lib/v2/reference-audio";
+import { REFERENCE_QUALITIES, resolveReferenceAudio, resolveReferenceDelivery, type Platform, type ReferenceAudio } from "../../lib/v2/reference-audio";
 import { twoReadCoaching } from "../../lib/v2/news-reader-coaching";
 import { CORE_WPM_GATES, SUPERSESSION_REGISTER, assertNoOralGate, supersededRuleFor } from "../../lib/v2/supersession";
 import { world1Status } from "../../lib/v2/world1-completion";
@@ -453,14 +453,16 @@ const checks: Check[] = [
   },
   {
     id: "FR-037",
-    title: "canonical pre-generated reference audio",
+    title: "reference delivery (pre-generated audio, else TTS at 145 WPM female)",
     result: (() => {
       const qualities = Object.fromEntries(REFERENCE_QUALITIES.map((q) => [q, true])) as ReferenceAudio["qaQualities"];
       const audio: ReferenceAudio = { passageId: "P001", assetId: "ref-P001-v1", url: "https://cdn.example/reference/P001-v1.mp3", version: "v1", sha256: "a".repeat(64), source: "PRE_GENERATED", qaQualities: qualities, qaApproved: true };
       const platforms: Platform[] = ["ios", "android", "web", "desktop"];
       const urls = new Set(platforms.map((p) => { const r = resolveReferenceAudio([audio], "P001", p); return r.ok ? r.audio.url : "none"; }));
       const device = resolveReferenceAudio([{ ...audio, source: "DEVICE_TTS" }], "P001", "ios");
-      return `${REFERENCE_QUALITIES.length} reference qualities; ${platforms.length} platforms resolve ${urls.size} identical asset; device TTS reference rejected=${!device.ok}`;
+      const interim = platforms.map((p) => resolveReferenceDelivery([], "P001", p));
+      const tts = interim.every((d) => d.mode === "TTS" && d.wpm === 145 && d.voiceGender === "female");
+      return `${REFERENCE_QUALITIES.length} reference qualities; ${platforms.length} platforms resolve ${urls.size} identical asset; device TTS asset rejected=${!device.ok}; no asset -> TTS 145 WPM female=${tts}`;
     })()
   },
   {

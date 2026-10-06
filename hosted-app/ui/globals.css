@@ -64,3 +64,24 @@ textarea:focus-visible {
 button:disabled:focus-visible {
   outline: none;
 }
+
+/* Text-to-speech: the block currently being read aloud (ReadAloud.tsx). */
+[data-narrating="true"] {
+  background: #fff6c8;
+  outline: 3px solid #f5b800;
+  outline-offset: 3px;
+  border-radius: 6px;
+  scroll-margin: 96px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-narrating="true"] { transition: none; }
+}
+
+/* Long unbroken tokens (ids, score lists) must wrap, or phones get a horizontal scroll and the
+   fixed read-aloud bar slides off-screen. */
+main li,
+main p,
+main span {
+  overflow-wrap: anywhere;
+}

@@ -5,13 +5,15 @@ import { chunkWords } from "../../lib/chunking";
 import { levels, ProgressionLevel } from "../../lib/progression";
 import { planReadingTiming, recordActualDuration, ReadingTimingRecord } from "../../lib/reading-timing";
 import { PassageData, ScoreResult, scoreComprehension } from "../../lib/scoring";
+import { browserSpeech, createNarrator, type Narrator, type NarrationSegment } from "../../lib/narrator";
+import { adaptRate, expectedMs, initialRate, READ_ALONG_WPM, sentenceSegments, type ReadAlongSegment } from "../../lib/read-along-voice";
 import styles from "../page.module.css";
 
 type Phase = "intro" | "reading" | "readAlong" | "quiz" | "results";
 
 // Read-along is a fluency demo, not a timed drill: every passage plays at the same natural
-// newscaster pace regardless of the level's training WPM, with brief pauses at punctuation.
-const READ_ALONG_WPM = 150;
+// newscaster pace (READ_ALONG_WPM = 145) regardless of the level's training WPM, with brief
+// pauses at punctuation. A voice reads each sentence aloud and the highlight follows it.
 
 function readAlongDelay(word: string, baseMs: number) {
   if (/[.!?]$/.test(word)) return baseMs * 1.8;
@@ -107,6 +109,11 @@ export default function LevelPlayer({
   const [result, setResult] = useState<ScoreResult | null>(null);
   const [readAlongIndex, setReadAlongIndex] = useState(0);
   const [readAlongPlaying, setReadAlongPlaying] = useState(false);
+  const narratorRef = useRef<Narrator | null>(null);
+  const readAlongRateRef = useRef(initialRate());
+  // Last word of the sentence being spoken: the word timer never runs past it, so the voice stays
+  // the master clock at sentence boundaries. Infinity = voice unavailable, timer only.
+  const sentenceEndRef = useRef(Infinity);
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
@@ -143,15 +150,55 @@ export default function LevelPlayer({
     return () => window.clearTimeout(timer);
   }, [phase, chunkIndex, totalChunks, timingPlan]);
 
+  const readAlongSegments = useMemo(() => sentenceSegments(words), [words]);
+
+  // One narrator for the lifetime of the player. Created on mount (not on tap) so that the tap
+  // handler can call start() synchronously, as mobile autoplay rules require.
+  useEffect(() => {
+    const speech = browserSpeech();
+    if (!speech) return;
+    const narrator = createNarrator({
+      ...speech,
+      gapMs: 0,
+      rateFor: () => readAlongRateRef.current,
+      watchdogMs: (segment) => expectedMs((segment as ReadAlongSegment).text.split(/\s+/).length) * 1.8 + 2500,
+      onSegmentStart: (segment) => {
+        const { startWord, endWord } = segment as NarrationSegment & ReadAlongSegment;
+        sentenceEndRef.current = endWord;
+        setReadAlongIndex(startWord);
+      },
+      onSegmentEnd: (segment, _index, elapsedMs) => {
+        const { text } = segment as NarrationSegment & ReadAlongSegment;
+        readAlongRateRef.current = adaptRate(readAlongRateRef.current, text.split(/\s+/).length, elapsedMs);
+      },
+      onStatus: (status) => {
+        // Engine error / blocked audio: fall back to the silent highlighter rather than stall.
+        if (status === "idle") sentenceEndRef.current = Infinity;
+      },
+      onDone: () => {
+        sentenceEndRef.current = Infinity;
+        setReadAlongIndex(Number.MAX_SAFE_INTEGER);
+        setReadAlongPlaying(false);
+      }
+    });
+    narratorRef.current = narrator;
+    return () => {
+      narrator.dispose();
+      narratorRef.current = null;
+    };
+  }, []);
+
   useEffect(() => {
     if (phase !== "readAlong" || !readAlongPlaying) return;
     if (readAlongIndex >= words.length) {
       setReadAlongPlaying(false);
       return;
     }
+    // Hold on the sentence's last word until the voice finishes it; the voice then moves us on.
+    if (readAlongIndex >= sentenceEndRef.current) return;
     const baseMs = msPerChunk(READ_ALONG_WPM, 1);
     const timer = window.setTimeout(
-      () => setReadAlongIndex((value) => value + 1),
+      () => setReadAlongIndex((value) => Math.min(value + 1, sentenceEndRef.current)),
       readAlongDelay(words[readAlongIndex], baseMs)
     );
     return () => window.clearTimeout(timer);
@@ -213,27 +260,40 @@ export default function LevelPlayer({
   }
 
   function startReading() {
+    narratorRef.current?.stop();
     setChunkIndex(0);
     readingStartedAtRef.current = Date.now();
     setPhase("reading");
+  }
+
+  // Everything below runs inside the learner's tap, so the first speak() is allowed on mobile.
+  function speakReadAlong() {
+    readAlongRateRef.current = initialRate();
+    sentenceEndRef.current = readAlongSegments.length ? readAlongSegments[0].endWord : Infinity;
+    narratorRef.current?.start(readAlongSegments);
   }
 
   function startReadAlong() {
     setReadAlongIndex(0);
     setReadAlongPlaying(true);
     setPhase("readAlong");
+    speakReadAlong();
   }
 
   function toggleReadAlongPlaying() {
+    if (readAlongPlaying) narratorRef.current?.pause();
+    else narratorRef.current?.resume(); // restarts the current sentence; the highlight rewinds with it
     setReadAlongPlaying((value) => !value);
   }
 
   function restartReadAlong() {
     setReadAlongIndex(0);
     setReadAlongPlaying(true);
+    speakReadAlong();
   }
 
   function exitReadAlong() {
+    narratorRef.current?.stop();
     setReadAlongPlaying(false);
     setPhase("intro");
   }
@@ -309,10 +369,13 @@ export default function LevelPlayer({
       )}
 
       {phase === "readAlong" && (
-        <section className={styles.stageCard} data-testid="read-along">
+        <section className={styles.stageCard} data-testid="read-along" data-narration-lock="read-along">
           <p className={styles.kicker}>Read along</p>
           <h3>{passage.title}</h3>
-          <div className={styles.reader} data-testid="reader">
+          <p className={styles.stageHint} data-testid="read-along-voice-note">
+            A female news-reader voice at {READ_ALONG_WPM} words per minute.
+          </p>
+          <div className={styles.reader} data-testid="reader" data-narrate-skip>
             <div className={styles.contextLine} aria-hidden="true">
               {words.map((word, index) => (
                 <span
@@ -390,7 +453,7 @@ export default function LevelPlayer({
       )}
 
       {phase === "reading" && (
-        <section className={styles.stageCard}>
+        <section className={styles.stageCard} data-narration-lock="timed-reading" data-narrate-skip>
           <div className={styles.reader} data-testid="reader">
             <div className={styles.contextLine} aria-hidden="true">
               {words.map((word, index) => {
@@ -434,6 +497,7 @@ export default function LevelPlayer({
                 type="button"
                 className={isListening ? styles.primaryButton : styles.secondaryButton}
                 data-testid="speech-to-text-toggle"
+                data-narration-stop
                 aria-pressed={isListening}
                 onClick={toggleListening}
               >

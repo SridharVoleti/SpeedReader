@@ -126,7 +126,7 @@ NOTES = {
     "FR-032": "Domain feedback object; no animation/UI.",
     "FR-033": "Domain message; no UI.",
     "FR-034": "State namespace and metrics only; no recording UI.",
-    "FR-037": "Validation and platform-independent resolution only; no reference audio assets exist.",
+    "FR-037": "Validation and platform-independent resolution; per Amendment A1 (2026-10-06) with no approved audio asset the reference is on-device TTS at 145 WPM, female voice (`narrator.ts`, read-along). No pre-generated audio assets exist yet.",
     "FR-038": "Coaching calculation only; no recording UI.",
     "FR-040": "Readiness requirement modelled as the 15 RS competencies confirmed on approved forms (an interpretation; the exact readiness definition lives in the KM package, which is not in the repo).",
     "FR-044": "Validation/selection logic only; no approved forms exist.",
@@ -187,7 +187,7 @@ AC_P = [
     ("AC-P27", "Approved reassessment forms", "DOMAIN PASS", "FR-044; B13. No approved forms exist yet."),
     ("AC-P28", "Auditability", "DOMAIN PASS", "FR-049 replay from the immutable ledger."),
     ("AC-P29", "Confidence-first language", "NOT DONE", "Zero negative labels in v2 modules, but the shipped legacy UI/harness pages fail the scan (headline gap 2)."),
-    ("AC-P30", "Cross-platform consistency", "PARTIAL", "Decisions are pure domain functions (identical for identical evidence) and reference audio is a single canonical asset (FR-037); there is no server API yet."),
+    ("AC-P30", "Cross-platform consistency", "PARTIAL", "Decisions are pure domain functions (identical for identical evidence) and reference delivery follows one policy on every platform: approved audio else TTS at 145 WPM female (FR-037 A1); there is no server API yet."),
 ]
 w("## Acceptance criteria - product behaviour (AC-P01 .. AC-P30)")
 w("")

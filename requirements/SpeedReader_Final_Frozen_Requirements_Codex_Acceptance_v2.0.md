@@ -513,7 +513,14 @@ The News Reader reference should model professional, clear Indian-English newsre
 - controlled pitch and intonation;
 - no exaggerated drama.
 
-Use the same canonical pre-generated reference audio across supported platforms. Do not rely on device-specific runtime TTS for the normative reference performance.
+~~Use the same canonical pre-generated reference audio across supported platforms. Do not rely on device-specific runtime TTS for the normative reference performance.~~ *(Superseded by Amendment A1, below.)*
+
+**Amendment A1 (2026-10-06) — interim text-to-speech reference.** Until canonical pre-generated reference audio exists, the News Reader reference is produced by on-device text-to-speech:
+- speech pace is **145 words per minute**;
+- the voice is **female**, following the Course 1 audio reference: Microsoft Neerja when the browser exposes it, otherwise the best available female English voice (Indian English preferred); male voices are never selected;
+- the same pace and voice policy apply on every supported platform; the exact timbre depends on the voices installed on the device;
+- the highlighted word follows the voice, sentence by sentence;
+- when canonical pre-generated reference audio is approved for a passage (valid asset, hash, version and QA of all seven qualities above), that audio takes precedence over text-to-speech.
 
 ## FR-038 — Oral two-read coaching [FROZEN]
 
@@ -913,7 +920,7 @@ On technical uncertainty:
 **PASS:** QA scan finds zero prohibited learner-facing negative state labels and zero peer-comparison mechanics in core progression.
 
 ## AC-P30 — Cross-platform consistency
-**PASS:** Core progression decisions are server/domain-rule driven and identical for equivalent evidence across supported clients; News Reader reference audio is canonical rather than device-dependent.
+**PASS:** Core progression decisions are server/domain-rule driven and identical for equivalent evidence across supported clients; News Reader reference delivery follows one policy on every platform: approved canonical pre-generated audio where it exists, otherwise text-to-speech at 145 WPM with a female voice (FR-037, Amendment A1).
 
 ---
 

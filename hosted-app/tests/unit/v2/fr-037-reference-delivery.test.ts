@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { REFERENCE_QUALITIES, resolveReferenceAudio, validateReferenceAudio, type Platform, type ReferenceAudio } from "../../../lib/v2/reference-audio";
+import { NEWS_READER_TTS, REFERENCE_QUALITIES, resolveReferenceAudio, resolveReferenceDelivery, validateReferenceAudio, type Platform, type ReferenceAudio } from "../../../lib/v2/reference-audio";
 
 const allQualities = Object.fromEntries(REFERENCE_QUALITIES.map((q) => [q, true])) as ReferenceAudio["qaQualities"];
 const good: ReferenceAudio = {
@@ -28,7 +28,7 @@ describe("FR-037 News Reader reference delivery", () => {
     expect(validateReferenceAudio(good)).toEqual([]);
   });
 
-  it("rejects device-specific or runtime TTS as the normative reference", () => {
+  it("rejects device or runtime TTS as a pre-generated audio asset", () => {
     expect(validateReferenceAudio({ ...good, source: "DEVICE_TTS" })).toContain("reference audio must be PRE_GENERATED, got DEVICE_TTS");
     expect(validateReferenceAudio({ ...good, source: "RUNTIME_TTS" })).toContain("reference audio must be PRE_GENERATED, got RUNTIME_TTS");
   });
@@ -52,17 +52,36 @@ describe("FR-037 News Reader reference delivery", () => {
     }
   });
 
-  it("reports missing or invalid reference audio as a content error, never falling back to device TTS", () => {
+  it("reports missing or invalid reference audio as a content error at the asset level", () => {
     expect(resolveReferenceAudio([good], "P999", "web")).toEqual({ ok: false, reason: "NO_REFERENCE_AUDIO", errors: [] });
     const bad = resolveReferenceAudio([{ ...good, source: "DEVICE_TTS" }], "P001", "ios");
     expect(bad.ok).toBe(false);
     if (!bad.ok) expect(bad.reason).toBe("REFERENCE_AUDIO_INVALID");
   });
 
-  it("the shipped UI and library code never call device speech synthesis", () => {
+  // Amendment A1 (2026-10-06): until pre-generated audio exists, the News Reader reference is
+  // text-to-speech at 145 WPM with a female voice. The speech API stays confined to the narrator
+  // engine and ReadAloud; the pure reference-audio policy module never touches it.
+  it("interim policy: no approved asset means TTS at 145 WPM, female voice, on every platform", () => {
+    expect(NEWS_READER_TTS).toMatchObject({ wpm: 145, voiceGender: "female", preferredVoice: "Microsoft Neerja" });
+    for (const platform of ["ios", "android", "web", "desktop"] as Platform[]) {
+      expect(resolveReferenceDelivery([], "P001", platform)).toEqual({ mode: "TTS", wpm: 145, voiceGender: "female" });
+    }
+  });
+
+  it("approved pre-generated audio takes precedence over TTS; a broken asset is an error, not a silent fallback", () => {
+    expect(resolveReferenceDelivery([good], "P001", "web")).toEqual({ mode: "AUDIO", audio: good });
+    const broken = resolveReferenceDelivery([{ ...good, qaApproved: false }], "P001", "web");
+    expect(broken.mode).toBe("ERROR");
+  });
+
+  it("device speech synthesis is confined to the on-screen narrator and never feeds reference audio", () => {
     const root = resolve(__dirname, "../../..");
     const files = [...sourceFiles(join(root, "ui")), ...sourceFiles(join(root, "lib"))];
-    const offenders = files.filter((f) => /speechSynthesis|SpeechSynthesisUtterance/.test(readFileSync(f, "utf8")));
+    const allowed = new Set([join(root, "lib", "narrator.ts"), join(root, "ui", "components", "ReadAloud.tsx")]);
+    const offenders = files.filter((f) => !allowed.has(f) && /speechSynthesis|SpeechSynthesisUtterance/.test(readFileSync(f, "utf8")));
     expect(offenders).toEqual([]);
+    const referenceSource = readFileSync(join(root, "lib", "v2", "reference-audio.ts"), "utf8");
+    expect(referenceSource).not.toMatch(/narrator|ReadAloud|speechSynthesis/);
   });
 });
