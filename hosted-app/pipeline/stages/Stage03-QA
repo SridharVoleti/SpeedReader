@@ -1,0 +1,1368 @@
+# SpeedReader Pipeline — Stage 3 QA: Passage Independent Review
+
+**Version:** v0.1  
+**QA Gate:** Stage 03  
+**Artifact under review:** Learner-Facing Passage  
+**Producer:** Stage 03 — Passage Creation Work Task  
+**Independent QA Reviewer:** Claude  
+**Required upstream status:** Stage 02 Content Job QA = PASS  
+**WIP root:** `D:\Sridhar\Projects\SpeedReader\pipeline\wip`  
+**Approved root:** `D:\Sridhar\Projects\SpeedReader\pipeline\approved`  
+**Downstream stage:** Stage 04 — Assessment Creation
+
+---
+
+# 1. Purpose
+
+Perform a complete independent review of every learner-facing passage created by Stage 03 before that passage is allowed to enter Assessment Creation.
+
+Stage 03 QA must determine whether the passage:
+
+- faithfully implements the approved Content Job;
+- genuinely exercises the assigned Reading Stage competency;
+- operates at the intended P-level;
+- supports the intended comprehension behaviour;
+- contains sufficient learner evidence;
+- satisfies all passage-generation constraints;
+- is naturally readable aloud;
+- is age appropriate;
+- is engaging;
+- is factually sound;
+- is safe;
+- is suitable for later assessment;
+- is high enough quality to become learner-facing content.
+
+Stage 03 QA is an independent certification job.
+
+It must not assume that the passage is correct because ChatGPT Work created and self-validated it.
+
+---
+
+# 2. Fundamental Gate Rule
+
+Stage 04 Assessment Creation may begin only when Stage 03 QA returns:
+
+```text
+PASS
+```
+
+for the exact passage artifact under review.
+
+No other state authorizes downstream use.
+
+The following are insufficient:
+
+```text
+Stage 03 Work completed
+Mechanical self-validation passed
+Semantic self-validation passed
+Word count is correct
+Passage looks good
+Most requirements are satisfied
+```
+
+Only independent Stage 03 QA approval permits promotion into the approved directory.
+
+For World 1 age-band content, the independent review must also record the catalog's `language_qa` decision: accessible prose approved, age-topic fit approved, vocabulary overload absent, and no unnecessary stretch dimensions. If a deliberate primary gentle stretch is present, record no more than one dimension. Any missing or failing field blocks catalog approval even when a legacy generic language or age approval flag is set.
+
+---
+
+# 3. Independence Rule
+
+Claude must review the passage independently.
+
+The reviewer must not rely on:
+
+- ChatGPT Work's reasoning;
+- ChatGPT Work's drafting process;
+- ChatGPT Work's statement that requirements were satisfied;
+- the self-validation result as evidence;
+- explanations of why the Creator believes the passage works.
+
+The QA reviewer should receive the finished artifact and authoritative requirements.
+
+The central question is:
+
+> Does the artifact itself satisfy the governing contract?
+
+---
+
+# 4. Mandatory QA Inputs
+
+Stage 03 QA must receive the following.
+
+## 4.1 WIP Passage Artifact
+
+The exact passage file located under:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip\stage03\passages
+```
+
+This is the artifact under review.
+
+---
+
+## 4.2 Approved Content Job
+
+The corresponding certified Content Job must come only from:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved\stage02\content-jobs
+```
+
+The QA reviewer must compare the passage directly against this approved Content Job.
+
+---
+
+## 4.3 Governing Specifications
+
+All applicable certified specifications necessary to judge the passage, including where relevant:
+
+- Reading Stage competency specification;
+- P1→P10 progression specification;
+- comprehension framework;
+- passage/prose specification;
+- row-level generation contract;
+- engagement rules;
+- factual rules;
+- safety rules;
+- oral-reading requirements;
+- World/Band rules.
+
+---
+
+## 4.4 Stage 03 Production Contract
+
+The reviewer should receive:
+
+```text
+Stage03-PassageCreation.md
+```
+
+so that the full production requirements are known.
+
+---
+
+# 5. Review Scope
+
+Stage 03 QA must review the **entire passage**.
+
+It is not sufficient to inspect:
+
+- a few sentences;
+- the opening;
+- only the RS requirement;
+- only word count;
+- only factual correctness.
+
+The review must evaluate both:
+
+```text
+Contract compliance
++
+Learner-facing quality
+```
+
+A passage must pass both.
+
+---
+
+# 6. Full Review Model
+
+At minimum, Stage 03 QA must independently review:
+
+```text
+1. Upstream certification
+2. Artifact identity
+3. Content Job fidelity
+4. Reading Stage fidelity
+5. P-level fidelity
+6. RS × P interaction
+7. Content-premise fidelity
+8. Required-content coverage
+9. Information architecture
+10. Comprehension integrity
+11. Learner-evidence sufficiency
+12. Word-count compliance
+13. Prose quality
+14. Oral readability
+15. Age appropriateness
+16. Vocabulary suitability
+17. Engagement
+18. Ending quality
+19. Factual accuracy
+20. Factual simplification
+21. Safety
+22. Assessment readiness
+23. Over-explanation
+24. Under-evidence / ambiguity
+25. Internal consistency
+26. Overall learner experience
+27. Downstream readiness
+```
+
+These are minimum review dimensions.
+
+QA must also identify defects outside this list when discovered.
+
+---
+
+# 7. Upstream Certification Verification
+
+Before reviewing passage quality, verify that the passage was derived from an approved Stage 02 Content Job.
+
+Confirm:
+
+```text
+Stage02 QA status = PASS
+```
+
+and that the Content Job used by Stage 03 is the approved version.
+
+If the source Content Job is uncertified, mismatched or unavailable:
+
+```text
+BLOCKED
+```
+
+The passage cannot be certified.
+
+---
+
+# 8. Artifact Identity Verification
+
+Verify:
+
+- Passage ID;
+- Job ID;
+- World;
+- Band;
+- Reading Stage;
+- P-level;
+- Delivery Round;
+- Delivery Session;
+- title where applicable.
+
+These must match the approved Content Job.
+
+Any unexplained mismatch is a defect.
+
+---
+
+# 9. Content Job Fidelity
+
+Compare the passage against the complete approved Content Job.
+
+Verify that the passage has not changed:
+
+- the subject;
+- the core premise;
+- pedagogical intent;
+- Reading Stage behaviour;
+- P-level demand;
+- comprehension requirement;
+- required information structure;
+- learner evidence;
+- safety framing.
+
+Creative wording may differ.
+
+Curriculum meaning may not.
+
+---
+
+# 10. Reading Stage Fidelity
+
+The reviewer must independently determine:
+
+> Does the passage genuinely exercise the assigned Reading Stage competency?
+
+Do not infer compliance from:
+
+```text
+reading_stage = RSxx
+```
+
+in metadata.
+
+Examine the actual learner-facing text.
+
+The required reading behaviour must be intrinsic to the passage.
+
+---
+
+# 11. Intrinsic RS Test
+
+Conceptually remove:
+
+```text
+Reading Stage label
+RS competency metadata
+Creator explanation
+```
+
+Then read only the passage.
+
+Ask:
+
+> What reading behaviour does this passage actually require?
+
+That behaviour should correspond clearly to the assigned RS.
+
+If the same passage could satisfy several Reading Stages without modification, the RS realization may be too generic.
+
+---
+
+# 12. RS Evidence Requirement
+
+QA should identify concrete evidence within the passage showing how the intended competency is exercised.
+
+For example, where applicable:
+
+```text
+specific information A
+        ↓
+must be connected with
+        ↓
+specific information B
+```
+
+or:
+
+```text
+event 1 → event 2 → event 3
+```
+
+or:
+
+```text
+explicit clues → learner inference
+```
+
+A claim that the passage "generally supports comprehension" is insufficient.
+
+---
+
+# 13. P-Level Fidelity
+
+Independently determine whether the passage operates at the assigned P-level.
+
+Ask:
+
+> Why is this passage P03 rather than P02 or P04?
+
+The answer must arise from the intended developmental demand.
+
+Do not treat the following as sufficient evidence of higher P-level:
+
+- harder vocabulary;
+- longer words;
+- longer sentences;
+- obscure names;
+- unfamiliar facts;
+- greater topic complexity alone.
+
+---
+
+# 14. Adjacent P-Level Comparison
+
+Where necessary, compare the passage's cognitive demand against the canonical requirements for adjacent levels.
+
+For example:
+
+```text
+P02
+P03
+P04
+```
+
+Determine whether the passage actually belongs at P03.
+
+Mis-leveling is a substantive QA defect.
+
+---
+
+# 15. RS × P Integrity
+
+The passage must simultaneously satisfy:
+
+```text
+Correct RS
+AND
+Correct P-level
+```
+
+Passing one dimension does not compensate for failing the other.
+
+---
+
+# 16. Content-Premise Fidelity
+
+Verify that the passage genuinely realizes the approved:
+
+- Content Concept;
+- Content Premise;
+- Knowledge Strand.
+
+Flag semantic drift.
+
+Example:
+
+Approved premise:
+
+```text
+How ants divide work inside a colony
+```
+
+Passage:
+
+```text
+A general collection of interesting ant facts
+```
+
+This is not equivalent if the required cooperative structure disappears.
+
+---
+
+# 17. Required Content Coverage
+
+Every mandatory content element from the approved Content Job must appear meaningfully.
+
+QA must check that required elements are:
+
+- present;
+- accurate;
+- integrated naturally;
+- pedagogically functional.
+
+Token mention is not enough.
+
+---
+
+# 18. Information Architecture
+
+Review required relationships within the passage.
+
+Examples:
+
+```text
+cause → effect
+problem → response
+sequence
+comparison
+fact A ↔ fact B
+observation → inference
+event → consequence
+```
+
+Verify that these structures actually exist in the text and operate at the intended P-level.
+
+---
+
+# 19. Comprehension Integrity
+
+Ask:
+
+> What comprehension work does the learner actually need to perform?
+
+Compare that answer against the approved target.
+
+A passage fails if its intended comprehension requirement exists only in metadata but not in the text.
+
+---
+
+# 20. Over-Explanation
+
+The passage must not eliminate the targeted reading behaviour.
+
+Examples:
+
+If the learner is meant to infer something, the passage should not simply state the inference unless that scaffolding is explicitly appropriate to the assigned P-level.
+
+If the learner is meant to connect information, the connection must not be repeatedly explained so explicitly that no connection work remains.
+
+If sequencing is being assessed, the passage must not reduce the task to trivial copying unless that matches the target level.
+
+---
+
+# 21. Under-Evidence
+
+The opposite defect must also be checked.
+
+The learner must receive enough textual evidence to succeed.
+
+Difficulty must not arise from:
+
+- missing information;
+- vague pronouns;
+- unclear chronology;
+- factual omissions;
+- ambiguous wording;
+- hidden assumptions.
+
+A passage that cannot support a defensible answer does not pass.
+
+---
+
+# 22. Learner-Evidence Sufficiency
+
+For each item in:
+
+```text
+learner_evidence_required
+```
+
+QA must determine:
+
+1. what passage evidence supports it;
+2. whether the learner can reasonably derive it;
+3. whether it genuinely demonstrates the intended competency;
+4. whether outside knowledge is required.
+
+All required evidence targets must be supported.
+
+---
+
+# 23. Assessment Readiness
+
+Stage 03 QA does not create assessment questions.
+
+However it must independently determine:
+
+> Can Stage 04 construct valid, unambiguous assessment items from this passage that measure the required learner evidence?
+
+If assessment would require:
+
+- inventing facts;
+- relying on outside knowledge;
+- testing another skill;
+- altering the intended target;
+
+the passage is not ready.
+
+---
+
+# 24. Word Count
+
+Verify the passage against the exact Content Job requirement.
+
+Where the governing contract requires:
+
+```text
+exactly 100 words
+```
+
+the passage must contain exactly 100 words according to the approved SpeedReader counting convention.
+
+Correct word count alone is not evidence of quality.
+
+Incorrect word count prevents PASS.
+
+---
+
+# 25. Word-Count Distortion Review
+
+QA must look for signs that exact length damaged the passage.
+
+Examples:
+
+- filler words;
+- unnecessary adjectives;
+- repeated ideas;
+- awkward contractions;
+- unnatural sentence fragments;
+- abrupt ending;
+- irrelevant facts added to reach count.
+
+A passage can have exactly 100 words and still fail.
+
+---
+
+# 26. Prose Quality
+
+Review the passage as professional learner-facing writing.
+
+Evaluate:
+
+- grammar;
+- clarity;
+- coherence;
+- sentence flow;
+- transitions;
+- sentence variety;
+- pronoun clarity;
+- logical continuity;
+- naturalness;
+- concision;
+- ending quality.
+
+The passage must read as intentional prose rather than assembled compliance sentences.
+
+---
+
+# 27. Oral Readability
+
+SpeedReader passages are intended to support oral reading.
+
+Read the passage as spoken language.
+
+Look for:
+
+- difficult breath groups;
+- overly long sentences;
+- awkward punctuation;
+- confusing pauses;
+- tongue-twisting sequences;
+- ambiguous pronunciation;
+- dense proper nouns;
+- abbreviations;
+- unnatural rhythm.
+
+The passage must be comfortable enough for its intended learner level.
+
+---
+
+# 28. Oral Difficulty vs Reading Competency
+
+QA must ensure the passage does not accidentally measure pronunciation difficulty rather than the intended reading competency.
+
+Unnecessary verbal complexity can contaminate oral-reading measurements.
+
+Flag language features that would create unrelated difficulty.
+
+---
+
+# 29. Age Appropriateness
+
+Evaluate:
+
+- vocabulary;
+- emotional content;
+- scenario;
+- conceptual framing;
+- prior-knowledge burden;
+- character behaviour;
+- implied risk;
+- complexity.
+
+Age appropriateness does not require trivial content.
+
+It requires appropriate presentation.
+
+---
+
+# 30. Vocabulary Suitability
+
+Review unfamiliar words in context.
+
+Ask:
+
+- Are they necessary?
+- Can meaning reasonably be understood?
+- Do they create unintended difficulty?
+- Do they interfere with the target RS competency?
+- Are proper names unnecessarily difficult?
+
+Vocabulary challenge must be intentional rather than accidental.
+
+---
+
+# 31. Engagement
+
+Evaluate the passage from the learner's perspective.
+
+## Beginning
+
+Does it provide a reason to continue?
+
+## Middle
+
+Does it sustain interest?
+
+## Ending
+
+Does it provide a satisfying completion or payoff?
+
+The passage should not merely satisfy curriculum constraints.
+
+It should be worth reading.
+
+---
+
+# 32. Engagement Authenticity
+
+Reject artificial engagement based on:
+
+- false suspense;
+- exaggerated danger;
+- unnecessary fear;
+- forced surprise;
+- manipulative emotion;
+- fabricated claims;
+- repetitive "Did you know?" structures;
+- forced moral lessons.
+
+Engagement should emerge naturally from content and writing.
+
+---
+
+# 33. Ending Quality
+
+Review the final sentence particularly carefully.
+
+Watch for repetitive AI-style patterns such as:
+
+```text
+And that is why...
+So always remember...
+This teaches us that...
+Isn't that amazing?
+```
+
+These are not automatically prohibited but should fail when they feel formulaic, moralizing or unnecessary.
+
+---
+
+# 34. Factual Accuracy
+
+Review every factual claim.
+
+Do not restrict review to facts explicitly required by the Content Job.
+
+Creative writing may have introduced additional factual claims.
+
+Verify, where applicable:
+
+- scientific claims;
+- causal statements;
+- historical claims;
+- geography;
+- numbers;
+- animal behaviour;
+- technology;
+- civics;
+- health statements;
+- cultural claims.
+
+Any material factual error prevents PASS.
+
+---
+
+# 35. Child-Friendly Simplification
+
+Determine whether simplification preserves essential truth.
+
+Reject:
+
+- false universal claims;
+- misleading causality;
+- anthropomorphism presented as scientific fact;
+- inaccurate certainty;
+- misleading historical simplification;
+- scientifically incorrect shortcuts.
+
+Simple is acceptable.
+
+Wrong is not.
+
+---
+
+# 36. Safety Review
+
+Perform an independent safety review of the actual passage.
+
+Do not rely solely on the Content Job's safety flags.
+
+Creative writing may introduce new behaviour.
+
+Review, where relevant:
+
+- wildlife interaction;
+- road behaviour;
+- fire;
+- electricity;
+- water;
+- heights;
+- unknown substances;
+- medical behaviour;
+- tools;
+- household hazards;
+- strangers;
+- experiments.
+
+The passage must not casually model unsafe behaviour to children.
+
+---
+
+# 37. Safety vs Story Quality
+
+Safety guidance should also not make the passage preachy unless safety itself is the lesson.
+
+The goal is:
+
+```text
+safe
++
+natural
++
+age appropriate
+```
+
+not safety warnings inserted without narrative reason.
+
+---
+
+# 38. Internal Terminology Check
+
+Learner-facing text must not expose internal terms such as:
+
+```text
+RS
+P-level
+Reading Stage
+learner evidence
+Content Job
+QA
+pipeline
+telemetry
+```
+
+unless a term happens to be naturally relevant to the subject for unrelated reasons.
+
+---
+
+# 39. Template / AI-Pattern Review
+
+QA should actively look for signs of repetitive generated prose.
+
+Examples:
+
+- identical opening patterns across passages;
+- repeated ending structures;
+- excessive rhetorical questions;
+- predictable moral conclusions;
+- generic adjectives;
+- unnatural "lesson" language;
+- repetitive three-sentence structures.
+
+For single-passage QA, flag obvious formulaic writing.
+
+Cross-passage repetition should also be surfaced when multiple passages are available.
+
+---
+
+# 40. Overall Learner Experience
+
+After technical review, read the passage once as a learner would.
+
+Ask:
+
+> Would this feel like enjoyable reading, or like curriculum machinery disguised as prose?
+
+The instructional architecture should be invisible.
+
+A technically correct but unpleasant passage should not pass.
+
+---
+
+# 41. Full-Fledged Review Requirement
+
+Stage 03 QA is not a checklist-only exercise.
+
+Claude must actively search for defects not anticipated by this document.
+
+The reviewer should challenge:
+
+- assumptions;
+- prose choices;
+- pedagogical fit;
+- subtle ambiguity;
+- hidden factual risks;
+- age suitability;
+- unintended reading difficulty;
+- possible downstream assessment problems.
+
+The listed criteria establish minimum coverage, not maximum coverage.
+
+---
+
+# 42. Upstream Defect Detection
+
+QA may discover that the passage defect is caused by the approved Content Job.
+
+Examples:
+
+- impossible word-count/content combination;
+- contradictory requirements;
+- unsuitable premise;
+- invalid RS/P combination;
+- insufficient learner-evidence design;
+- mandatory factual claim is problematic.
+
+QA must identify this explicitly as:
+
+```text
+UPSTREAM_DEFECT
+```
+
+Do not ask Stage 03 to work around a Stage 02 defect.
+
+---
+
+# 43. Defect Severity
+
+Every finding must be classified.
+
+## BLOCKER
+
+A defect that makes the passage fundamentally unsafe or unreviewable, or requires upstream specification correction.
+
+Examples:
+
+- source Content Job not certified;
+- wrong passage coordinate;
+- unresolved upstream contradiction;
+- unsafe mandatory content;
+- passage cannot satisfy core curriculum contract.
+
+Any unresolved BLOCKER prevents PASS.
+
+---
+
+## MAJOR
+
+A substantive defect affecting pedagogy, accuracy or learner experience.
+
+Examples:
+
+- wrong RS realization;
+- wrong P-level;
+- insufficient learner evidence;
+- content-premise drift;
+- invalid comprehension architecture;
+- material factual error;
+- unsafe behaviour;
+- assessment cannot validly test the required skill;
+- poor prose that materially harms reading;
+- passage difficulty driven by unrelated vocabulary burden.
+
+Any unresolved MAJOR prevents PASS.
+
+---
+
+## MINOR
+
+A localized genuine defect that does not invalidate the passage architecture but still requires correction under the current pipeline standard.
+
+Examples:
+
+- awkward local phrasing;
+- minor punctuation problem affecting oral rhythm;
+- unnecessary but non-harmful word;
+- weak localized transition.
+
+---
+
+## OBSERVATION
+
+A non-blocking recommendation.
+
+Do not use `OBSERVATION` to downgrade a real compliance defect.
+
+---
+
+# 44. Finding Format
+
+Every defect should contain:
+
+```text
+Finding ID
+Severity
+Passage ID
+Affected sentence / phrase / requirement
+Governing requirement
+Observed problem
+Why it matters
+Origin
+Freeze impact
+Acceptance criteria
+```
+
+Example:
+
+```text
+P-QA-014
+
+Severity:
+MAJOR
+
+Passage:
+W1-BA-034
+
+Requirement:
+The learner must connect two separated pieces of information
+to satisfy the assigned RS competency.
+
+Finding:
+The second sentence explicitly states the relationship that the
+learner is expected to derive.
+
+Why it matters:
+The passage removes the reading behaviour the competency is
+supposed to exercise.
+
+Origin:
+Stage 03
+
+Freeze Impact:
+YES
+
+Acceptance Criteria:
+Revise the passage so both pieces of information remain sufficiently
+available but their relationship must be established by the learner
+at the intended P-level.
+```
+
+QA defines what must become true.
+
+QA does not rewrite the passage.
+
+---
+
+# 45. QA Role Boundary
+
+Stage 03 QA may:
+
+- inspect;
+- compare;
+- challenge;
+- fact-check;
+- analyze;
+- identify defects;
+- classify severity;
+- identify upstream causes;
+- define acceptance criteria;
+- certify;
+- move the approved exact artifact after PASS.
+
+Stage 03 QA must not:
+
+- rewrite the passage;
+- directly fix wording;
+- generate replacement sentences;
+- create a substitute passage;
+- change the Content Job;
+- weaken requirements;
+- silently correct the artifact and approve the corrected version.
+
+---
+
+# 46. QA Report
+
+Every Stage 03 QA review should produce a report containing:
+
+## Artifact identification
+
+- Passage ID;
+- Job ID;
+- artifact version where available;
+- WIP source path;
+- approved Content Job path/version.
+
+## Executive verdict
+
+```text
+PASS
+FAIL_REWORK
+BLOCKED
+```
+
+## Review coverage
+
+Confirm that all mandatory review dimensions were evaluated.
+
+## Strengths
+
+Important qualities worth preserving.
+
+## Findings
+
+Group by:
+
+```text
+BLOCKER
+MAJOR
+MINOR
+OBSERVATION
+```
+
+## Upstream defects
+
+Identify separately when applicable.
+
+## Acceptance criteria
+
+State what must be true for re-review to pass.
+
+## Downstream authorization
+
+Explicit:
+
+```text
+AUTHORIZED
+```
+
+or:
+
+```text
+NOT AUTHORIZED
+```
+
+for Stage 04.
+
+---
+
+# 47. PASS Criteria
+
+PASS requires all of the following:
+
+- correct certified Stage 02 source;
+- artifact identity correct;
+- Content Job fidelity passes;
+- RS fidelity passes;
+- P-level fidelity passes;
+- RS × P alignment passes;
+- premise fidelity passes;
+- required content complete;
+- information architecture correct;
+- comprehension target genuinely supported;
+- learner evidence sufficient;
+- exact word-count requirement passes;
+- prose quality acceptable;
+- oral readability acceptable;
+- age appropriateness passes;
+- engagement passes;
+- factual review passes;
+- safety review passes;
+- assessment readiness passes;
+- no harmful over-explanation;
+- no invalid ambiguity or under-evidence;
+- overall learner experience is production worthy;
+- zero unresolved BLOCKER findings;
+- zero unresolved MAJOR findings.
+
+For the current pipeline:
+
+```text
+NO CONDITIONAL PASS
+```
+
+The artifact either passes or it does not.
+
+---
+
+# 48. FAIL_REWORK
+
+Use when identified defects can be corrected within Stage 03 without altering the approved Content Job.
+
+The passage remains in:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip
+```
+
+Required flow:
+
+```text
+QA findings
+↓
+Stage 03 ChatGPT Work
+↓
+Passage revision
+↓
+Full Work mechanical self-check
+↓
+Full Work semantic self-check
+↓
+Updated WIP artifact
+↓
+Stage 03 QA full independent re-review
+```
+
+Nothing moves into `approved`.
+
+---
+
+# 49. BLOCKED
+
+Use when Stage 03 cannot safely resolve the issue because an upstream artifact or specification must change.
+
+Examples:
+
+- approved Content Job internally conflicts;
+- required premise cannot satisfy the assigned RS;
+- P-level requirement is invalid;
+- mandatory factual requirement is unsafe or incorrect;
+- upstream specification conflict.
+
+The passage remains in WIP.
+
+The appropriate upstream stage must reopen.
+
+---
+
+# 50. Re-Review Rule
+
+After Stage 03 Work revises a failed passage, QA must perform another independent review.
+
+QA must verify:
+
+- all previous findings;
+- stated acceptance criteria;
+- any affected adjacent requirements;
+- new wording;
+- new word count;
+- RS/P integrity;
+- factual accuracy;
+- safety;
+- absence of regressions.
+
+A revised passage is a new review artifact.
+
+Previous approval does not transfer.
+
+---
+
+# 51. Promotion on PASS
+
+When and only when QA returns:
+
+```text
+PASS
+```
+
+the exact reviewed passage artifact must be moved from:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip\stage03\passages\...
+```
+
+to:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved\stage03\passages\...
+```
+
+The file must not be modified during promotion.
+
+The approved artifact must be exactly the artifact reviewed by QA.
+
+---
+
+# 52. Exact-Artifact Rule
+
+QA approval belongs to the exact passage reviewed.
+
+If any content changes after PASS:
+
+```text
+one word
+one punctuation mark
+one sentence
+one metadata value affecting the artifact
+```
+
+the modified artifact loses Stage 03 approval.
+
+It must return to WIP and undergo QA again according to pipeline policy.
+
+---
+
+# 53. QA Report and Artifact Promotion
+
+The QA report should remain associated with the approved passage for traceability.
+
+At minimum record:
+
+```text
+Passage ID
+QA verdict
+QA specification version
+date/time
+reviewed source path
+approved destination path
+finding counts
+```
+
+Where artifact hashing is available, record the exact reviewed hash.
+
+---
+
+# 54. Approved Artifact Authority
+
+After PASS and promotion:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved\stage03\passages\...
+```
+
+becomes the only authoritative Stage 03 artifact.
+
+Any copy remaining under WIP must not be used downstream.
+
+---
+
+# 55. Downstream Access Rule
+
+Stage 04 Assessment Creation must use passages only from:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved\stage03\passages
+```
+
+It must never use passages from:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip
+```
+
+regardless of filename or apparent completion status.
+
+---
+
+# 56. Core QA Principle
+
+The QA reviewer is not trying to confirm that ChatGPT wrote a good passage.
+
+The reviewer is answering a stricter question:
+
+> Is this exact passage demonstrably safe, pedagogically correct, developmentally correct, engaging, accurate and complete enough to become authoritative learner-facing content and serve as the source for assessment generation?
+
+If there is material uncertainty:
+
+```text
+DO NOT PASS
+```
+
+---
+
+# 57. Stage 03 QA Success Condition
+
+Stage 03 QA is complete when:
+
+> The exact WIP passage has been independently reviewed in full against its certified Content Job and governing SpeedReader specifications; Reading Stage and P-level fidelity, comprehension architecture, learner evidence, prose quality, oral readability, engagement, factual accuracy, safety and assessment readiness have all been evaluated; every defect has been classified with explicit acceptance criteria; and an independent certification decision has been issued.
+
+If the decision is `PASS`, the exact reviewed artifact is moved from:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip
+```
+
+to:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved
+```
+
+Only that approved artifact is eligible for Stage 04 — Assessment Creation.

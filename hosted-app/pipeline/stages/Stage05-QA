@@ -1,0 +1,1329 @@
+# SpeedReader Pipeline — Stage 5 QA: Production Package Independent Review
+
+**Version:** v0.1  
+**QA Gate:** Stage 05  
+**Artifact under review:** Production Package  
+**Producer:** Stage 05 — Production Package Work Task  
+**Independent QA Reviewer:** Claude  
+**Required upstream status:** Stage 02, Stage 03 and Stage 04 QA = PASS  
+**WIP root:** `D:\Sridhar\Projects\SpeedReader\pipeline\wip`  
+**Approved root:** `D:\Sridhar\Projects\SpeedReader\pipeline\approved`  
+**Downstream use:** Deployment / Integration pipeline
+
+---
+
+# 1. Purpose
+
+Perform a complete independent review of the final SpeedReader Production Package before it is allowed to become an authoritative deployable artifact.
+
+Stage 05 QA determines whether the production package:
+
+- contains only independently approved upstream artifacts;
+- preserves approved learner-facing content exactly;
+- preserves approved assessment meaning and scoring exactly;
+- maintains correct World/Band/RS/P/delivery identity;
+- satisfies the production/runtime schema;
+- contains complete traceability and provenance;
+- introduces no unauthorized transformation;
+- contains no dependency on WIP artifacts;
+- correctly separates learner-facing and internal information;
+- can be safely handed to the deployment/integration pipeline.
+
+Stage 05 QA reviews and certifies.
+
+It must not create, rewrite or repair upstream content.
+
+---
+
+# 2. Fundamental Gate Rule
+
+No Production Package may leave the content pipeline unless Stage 05 QA returns:
+
+```text
+PASS
+```
+
+for the exact package artifact reviewed.
+
+The following are insufficient:
+
+```text
+Stage 05 Work completed
+Package schema validated
+Upstream files were approved
+Content appears unchanged
+Package seems deployable
+```
+
+Only independent Stage 05 QA approval makes the package authoritative.
+
+---
+
+# 3. Independence Rule
+
+Claude must review the Production Package independently.
+
+The reviewer must not rely on:
+
+- ChatGPT Work's self-validation conclusion;
+- packaging explanations from Stage 05;
+- assumptions that upstream artifacts were copied correctly;
+- statements that no content changed;
+- claims that runtime mappings are valid.
+
+The reviewer must establish these facts independently from the artifact and its approved sources.
+
+---
+
+# 4. Mandatory QA Inputs
+
+Stage 05 QA must receive the following.
+
+## 4.1 WIP Production Package
+
+The exact artifact located under:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip\stage05\production-packages
+```
+
+---
+
+## 4.2 Approved Content Job
+
+From:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved\stage02\content-jobs
+```
+
+---
+
+## 4.3 Approved Passage
+
+From:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved\stage03\passages
+```
+
+---
+
+## 4.4 Approved Assessment
+
+From:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved\stage04\assessments
+```
+
+---
+
+## 4.5 QA Certifications
+
+Where maintained separately, the reviewer must receive or verify the Stage 02, Stage 03 and Stage 04 QA approvals corresponding to the exact upstream artifacts.
+
+---
+
+## 4.6 Runtime / Production Schema
+
+The certified SpeedReader runtime schema or application package contract must be available.
+
+If no authoritative runtime schema exists where one is required:
+
+```text
+BLOCKED
+```
+
+Do not certify an improvised production format.
+
+---
+
+## 4.7 Stage 05 Production Contract
+
+The reviewer must receive:
+
+```text
+Stage05-ProductionPackage.md
+```
+
+---
+
+# 5. Review Scope
+
+QA must review the complete Production Package.
+
+This includes:
+
+```text
+package identity
++
+learner-facing passage
++
+assessment content
++
+answer/scoring data
++
+runtime metadata
++
+delivery metadata
++
+source references
++
+QA provenance
++
+schema structure
++
+learner/internal separation
+```
+
+Sampling is insufficient.
+
+---
+
+# 6. Full Review Model
+
+At minimum independently verify:
+
+```text
+1. Upstream certification
+2. Artifact identity
+3. Coordinate integrity
+4. Passage preservation
+5. Assessment preservation
+6. Content Job metadata preservation
+7. Delivery integrity
+8. Runtime schema compliance
+9. Runtime metadata validity
+10. Learner/internal separation
+11. Assessment security/separation
+12. Source provenance
+13. QA provenance
+14. WIP dependency absence
+15. Character/encoding integrity
+16. Data integrity
+17. Word-count preservation
+18. Scoring preservation
+19. Cross-artifact consistency
+20. Runtime self-containment
+21. Unauthorized transformation
+22. Version integrity
+23. Upstream change detection
+24. Whole-package coherence
+25. Deployment readiness
+```
+
+This is minimum scope, not maximum scope.
+
+---
+
+# 7. Upstream Certification Verification
+
+Before package review begins, independently establish:
+
+```text
+Stage02 QA = PASS
+Stage03 QA = PASS
+Stage04 QA = PASS
+```
+
+for the exact source artifacts referenced by the package.
+
+Verify where available:
+
+- artifact ID;
+- version;
+- hash;
+- certification ID;
+- path;
+- repository commit/reference.
+
+If the package uses an artifact that is:
+
+- uncertified;
+- mismatched;
+- superseded;
+- unavailable;
+- located only in WIP;
+
+then:
+
+```text
+BLOCKED
+```
+
+---
+
+# 8. Source Location Rule
+
+Every authoritative source used by the package must originate from:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved
+```
+
+No authoritative source may originate from:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip
+```
+
+QA must actively search for WIP paths or WIP dependencies.
+
+Any such dependency prevents PASS.
+
+---
+
+# 9. Artifact Identity
+
+Verify:
+
+- Package ID;
+- Passage ID;
+- Job ID;
+- Assessment ID;
+- World;
+- Band;
+- Reading Stage;
+- P-level;
+- Delivery Round;
+- Delivery Session;
+- Knowledge Strand where packaged.
+
+All must correspond to the same approved passage coordinate.
+
+---
+
+# 10. Cross-Artifact Identity
+
+Compare the source artifacts directly.
+
+Expected:
+
+```text
+Content Job passage_id
+=
+Passage passage_id
+=
+Assessment passage_id
+=
+Package passage_id
+```
+
+Likewise verify all common identifiers and metadata.
+
+Any unexplained mismatch is a BLOCKER or MAJOR defect depending on impact.
+
+---
+
+# 11. Passage Preservation
+
+The learner-facing passage inside the Production Package must match the exact approved Stage 03 passage.
+
+QA must independently compare:
+
+```text
+approved Stage 03 passage
+vs
+packaged passage
+```
+
+The package must not alter:
+
+- words;
+- punctuation;
+- capitalization where content-significant;
+- contractions;
+- sentence order;
+- title;
+- learner-facing structure.
+
+Unauthorized differences prevent PASS.
+
+---
+
+# 12. No Silent Passage Cleanup
+
+Packaging must not have performed:
+
+- grammar correction;
+- spelling correction;
+- punctuation normalization;
+- title normalization;
+- wording cleanup;
+- automatic shortening;
+- automatic expansion.
+
+If the approved passage needs correction, Stage 03 must reopen.
+
+---
+
+# 13. Word-Count Preservation
+
+Where exact word count applies, independently verify that the packaged learner-facing passage still satisfies the approved requirement.
+
+For Band A where applicable:
+
+```text
+exactly 100 words
+```
+
+Packaging must not alter the count.
+
+---
+
+# 14. Assessment Preservation
+
+Compare the packaged assessment against the approved Stage 04 assessment.
+
+Verify exact preservation of:
+
+- question wording;
+- item IDs;
+- item order where order is meaningful;
+- expected answers;
+- acceptable alternatives;
+- passage-evidence mapping;
+- learner-evidence mapping;
+- response type;
+- scoring logic.
+
+Unauthorized change prevents PASS.
+
+---
+
+# 15. Scoring Preservation
+
+QA must specifically verify that package transformation has not changed:
+
+```text
+what counts as correct
+what counts as partially correct
+what counts as incorrect
+```
+
+A seemingly small schema conversion that alters scoring semantics is a MAJOR defect.
+
+---
+
+# 16. Assessment-to-Passage Pairing
+
+For every assessment item verify that it still belongs to the exact packaged passage.
+
+The package must not accidentally pair:
+
+```text
+Passage 034
+with
+Assessment 035
+```
+
+or equivalent mismatches.
+
+---
+
+# 17. Content Job Metadata Preservation
+
+Verify that internal curriculum metadata remains faithful to the approved Content Job.
+
+This includes where packaged:
+
+- Reading Stage;
+- P-level;
+- knowledge strand;
+- comprehension target;
+- delivery position;
+- learner-evidence references.
+
+Stage 05 may not reinterpret these values.
+
+---
+
+# 18. Delivery Integrity
+
+Verify the exact delivery coordinate.
+
+For World 1 Band A, where applicable:
+
+```text
+delivery_session =
+(P_number - 1) × 15 + RS_number
+```
+
+Independently recalculate rather than trusting packaged values.
+
+Incorrect delivery mapping is a MAJOR defect.
+
+---
+
+# 19. Runtime Schema Compliance
+
+Validate the package against the certified application/runtime contract.
+
+Verify:
+
+- required fields;
+- field names;
+- data types;
+- required arrays;
+- required objects;
+- allowed enumerations;
+- optional/mandatory status;
+- versioning fields;
+- runtime flags.
+
+Schema validity alone is not sufficient for PASS, but schema failure prevents PASS.
+
+---
+
+# 20. Semantic Schema Compliance
+
+A structurally valid value may still be semantically wrong.
+
+Example:
+
+```json
+"reading_stage": "RS04"
+```
+
+is structurally valid but incorrect if the source is RS05.
+
+QA must verify meaning, not merely type correctness.
+
+---
+
+# 21. Runtime Metadata
+
+Review all Stage 05-added metadata.
+
+Examples may include:
+
+- schema version;
+- content version;
+- runtime configuration;
+- feature flags;
+- TTS settings;
+- response mode;
+- telemetry identifiers.
+
+Verify that metadata:
+
+- is permitted;
+- is internally consistent;
+- does not alter curriculum meaning;
+- does not conflict with the application contract.
+
+---
+
+# 22. No Unauthorized Content Creation
+
+Stage 05 must not introduce new learner-facing material.
+
+Search for content not present in approved Stage 03 or Stage 04 artifacts, such as:
+
+- new explanations;
+- new hints;
+- new instructions;
+- new questions;
+- new feedback text;
+- rewritten title;
+- additional learner-facing facts.
+
+If found, determine whether it is explicitly permitted runtime content.
+
+Otherwise classify as a defect.
+
+---
+
+# 23. Learner-Facing / Internal Separation
+
+The package must maintain a clear boundary between what the learner may see and what remains internal.
+
+Internal fields may include:
+
+```text
+RS
+P-level
+learner evidence
+expected answer
+scoring rule
+QA provenance
+source path
+artifact hash
+internal telemetry labels
+```
+
+Verify that the runtime structure does not accidentally expose internal fields to learner-facing presentation.
+
+---
+
+# 24. Answer-Key Security
+
+Where questions and answer keys coexist in the package, verify structural separation sufficient to prevent accidental pre-response display.
+
+The package must support runtime behaviour where learners cannot access:
+
+- expected answers;
+- scoring keys;
+- acceptable alternatives;
+- hidden evidence mappings;
+
+before appropriate submission/scoring.
+
+---
+
+# 25. Source Provenance
+
+The Production Package must clearly identify its approved source artifacts.
+
+At minimum verify references to:
+
+```text
+approved Content Job
+approved Passage
+approved Assessment
+```
+
+Where available, provenance should include:
+
+- path;
+- version;
+- hash;
+- certificate reference.
+
+---
+
+# 26. Provenance Accuracy
+
+Do not merely verify that provenance fields are populated.
+
+Confirm that they actually correspond to the source artifacts used.
+
+Incorrect provenance undermines traceability and prevents trustworthy release management.
+
+---
+
+# 27. QA Provenance
+
+Verify that package metadata correctly records the approval states of upstream artifacts.
+
+Example:
+
+```text
+Stage02 = PASS
+Stage03 = PASS
+Stage04 = PASS
+```
+
+QA status must not be fabricated or inherited from an unrelated version.
+
+---
+
+# 28. WIP Dependency Review
+
+Actively search the complete Production Package for:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip
+```
+
+No production-authoritative source, reference or runtime dependency may point to WIP.
+
+Any such dependency prevents PASS.
+
+---
+
+# 29. Runtime Self-Containment
+
+Determine whether the package contains or validly references everything required for application delivery.
+
+The runtime must not unexpectedly depend on:
+
+- Stage 01 Knowledge Map planning files;
+- Stage 02 WIP artifacts;
+- QA working notes;
+- creator reasoning;
+- missing local files.
+
+Any required dependency must be explicit and approved.
+
+---
+
+# 30. Character / Encoding Integrity
+
+Independently inspect learner-facing content for packaging corruption.
+
+Look for:
+
+- broken apostrophes;
+- malformed quotation marks;
+- encoding artifacts;
+- damaged Unicode;
+- escaped characters displayed literally;
+- altered line breaks;
+- accidental backslashes;
+- truncated text.
+
+Any corruption affecting learner experience prevents PASS.
+
+---
+
+# 31. Data Integrity
+
+Where JSON is used, verify:
+
+- valid JSON;
+- correct nesting;
+- correct arrays;
+- correct data types;
+- no duplicate keys where invalid;
+- no truncation;
+- no accidentally stringified objects;
+- no omitted required values.
+
+---
+
+# 32. Ordering Integrity
+
+Verify required ordering such as:
+
+- learner reads passage before assessment;
+- question ordering;
+- assessment item sequence;
+- delivery sequence;
+- any runtime steps specified by the application.
+
+Packaging must not inadvertently rearrange instructional flow.
+
+---
+
+# 33. Version Integrity
+
+Verify:
+
+- package version exists where required;
+- source artifact versions are correct;
+- package versioning follows the approved policy;
+- no older source version is silently mixed with newer sources.
+
+Mixed-version packages should not pass.
+
+---
+
+# 34. Upstream Change Detection
+
+Determine whether any source artifact changed after this Production Package was assembled.
+
+If the currently approved:
+
+```text
+Content Job
+Passage
+or
+Assessment
+```
+
+differs from the version packaged, the package is stale.
+
+Return:
+
+```text
+FAIL_REWORK
+```
+
+or `BLOCKED` depending on cause.
+
+Stage 05 must rebuild from current approved inputs.
+
+---
+
+# 35. Cross-Artifact Consistency
+
+Review the package as one integrated unit.
+
+Ask:
+
+- Does passage metadata agree with assessment metadata?
+- Does the assessment still make sense for the packaged passage?
+- Does RS/P metadata agree everywhere?
+- Are learner-evidence references consistent?
+- Are delivery identifiers coherent?
+- Does runtime configuration match assessment response type?
+
+Inconsistency prevents PASS.
+
+---
+
+# 36. Assessment Runtime Compatibility
+
+Verify that runtime metadata supports the assessment as approved.
+
+Examples:
+
+If assessment requires:
+
+```text
+short text response
+```
+
+the package must not configure:
+
+```text
+multiple choice
+```
+
+If oral response is required, relevant runtime settings must not contradict it.
+
+---
+
+# 37. Telemetry Mapping Integrity
+
+Where runtime telemetry identifiers are included, verify that they correctly map to:
+
+- Passage ID;
+- RS;
+- P-level;
+- Delivery Session;
+- assessment item IDs.
+
+Telemetry mapping must not silently attribute learner performance to the wrong coordinate.
+
+---
+
+# 38. No Curriculum Transformation
+
+QA must confirm Stage 05 remained an integration stage.
+
+If packaging has changed:
+
+- reading target;
+- P-level;
+- comprehension target;
+- assessment behaviour;
+- learner-facing meaning;
+
+this is an unauthorized transformation.
+
+---
+
+# 39. Full-Fledged Review Requirement
+
+Stage 05 QA is not merely:
+
+```text
+JSON validation
++
+path checking
+```
+
+Claude must independently review the complete package for semantic and operational integrity.
+
+Actively search for:
+
+- subtle mismatches;
+- stale upstream references;
+- misplaced metadata;
+- packaging transformations;
+- scoring changes;
+- runtime inconsistencies;
+- deployment risks not explicitly listed.
+
+The listed checks are minimum requirements.
+
+---
+
+# 40. Deployment Readiness Review
+
+After detailed verification, ask:
+
+> If this exact package were handed to the SpeedReader application without further content modification, is it safe and complete enough to deploy to staging?
+
+This includes:
+
+- content integrity;
+- assessment integrity;
+- runtime integrity;
+- provenance;
+- internal/learner separation;
+- configuration completeness.
+
+If material uncertainty remains:
+
+```text
+DO NOT PASS
+```
+
+---
+
+# 41. Upstream Defect Identification
+
+Stage 05 QA may discover defects in approved upstream artifacts.
+
+Examples:
+
+```text
+Passage metadata mismatch
+Assessment references wrong evidence
+Content Job identity inconsistency
+```
+
+These must be identified as:
+
+```text
+UPSTREAM_DEFECT: STAGEXX
+```
+
+Stage 05 must not patch them.
+
+The appropriate upstream stage must reopen and be re-certified.
+
+---
+
+# 42. Runtime Specification Defect
+
+If QA finds that the Production Package cannot be correctly judged because the runtime specification is:
+
+- missing;
+- contradictory;
+- incomplete;
+- ambiguous;
+
+return:
+
+```text
+BLOCKED_BY_RUNTIME_SPEC
+```
+
+Do not approve based on assumptions.
+
+---
+
+# 43. Defect Severity
+
+Every finding must be classified.
+
+## BLOCKER
+
+A defect preventing trustworthy deployment or review.
+
+Examples:
+
+- uncertified upstream source;
+- WIP artifact used as source;
+- wrong passage/assessment pairing;
+- missing runtime specification;
+- fundamentally invalid package structure;
+- conflicting authoritative requirements.
+
+Any unresolved BLOCKER prevents PASS.
+
+---
+
+## MAJOR
+
+A substantive production defect.
+
+Examples:
+
+- approved passage altered;
+- assessment altered;
+- scoring semantics changed;
+- wrong RS/P;
+- wrong delivery session;
+- answer key exposed incorrectly;
+- package contains stale upstream artifact;
+- material runtime incompatibility;
+- provenance materially wrong.
+
+Any unresolved MAJOR prevents PASS.
+
+---
+
+## MINOR
+
+A localized defect not fundamentally affecting content meaning or runtime safety, but still requiring correction under the current pipeline standard.
+
+Examples:
+
+- non-critical metadata clarity;
+- optional provenance detail missing where not required;
+- localized formatting issue without semantic impact.
+
+---
+
+## OBSERVATION
+
+A non-blocking recommendation for future improvement.
+
+Do not use `OBSERVATION` to downgrade a real defect.
+
+---
+
+# 44. Finding Format
+
+Each finding should include:
+
+```text
+Finding ID
+Severity
+Package ID
+Affected field/component
+Governing requirement
+Observed defect
+Why it matters
+Origin
+Freeze impact
+Acceptance criteria
+```
+
+Example:
+
+```text
+PKG-QA-009
+
+Severity:
+MAJOR
+
+Package:
+PACKAGE-W1-BA-034
+
+Affected:
+learner_content.passage_text
+
+Requirement:
+Packaged passage must exactly preserve the Stage 03 approved passage.
+
+Finding:
+The packaged passage contains one punctuation and wording change
+not present in the approved Stage 03 artifact.
+
+Why it matters:
+Stage 05 has modified independently certified learner-facing content.
+
+Origin:
+Stage 05
+
+Freeze Impact:
+YES
+
+Acceptance Criteria:
+Rebuild the package using the exact approved Stage 03 passage without
+any normalization, rewriting or cleanup.
+```
+
+QA describes the required state.
+
+QA does not repair the package itself.
+
+---
+
+# 45. QA Report Structure
+
+Stage 05 QA should produce:
+
+## Artifact Identification
+
+- Package ID;
+- Passage ID;
+- Assessment ID;
+- WIP source path;
+- upstream approved artifact paths;
+- package version/hash where available.
+
+## Executive Verdict
+
+```text
+PASS
+FAIL_REWORK
+BLOCKED
+```
+
+## Review Coverage
+
+Confirm review of:
+
+- all upstream sources;
+- complete learner content;
+- complete assessment;
+- runtime/schema;
+- provenance;
+- path integrity;
+- package-level integration.
+
+## Strengths
+
+Important qualities worth preserving.
+
+## Findings
+
+Grouped by severity.
+
+## Upstream Defects
+
+List separately.
+
+## Runtime Specification Defects
+
+List separately where applicable.
+
+## Acceptance Criteria
+
+What must become true before re-review.
+
+## Deployment Authorization
+
+Explicitly state:
+
+```text
+AUTHORIZED FOR DOWNSTREAM DEPLOYMENT/INTEGRATION
+```
+
+or:
+
+```text
+NOT AUTHORIZED
+```
+
+---
+
+# 46. PASS Criteria
+
+PASS requires all of the following:
+
+- all upstream sources independently QA-approved;
+- no WIP artifact used as authoritative source;
+- IDs and coordinate metadata consistent;
+- passage preserved exactly;
+- assessment preserved exactly;
+- scoring semantics preserved;
+- Content Job metadata preserved correctly;
+- delivery mapping correct;
+- runtime schema passes;
+- runtime metadata valid;
+- learner/internal data correctly separated;
+- answer-key separation valid;
+- source provenance accurate;
+- QA provenance accurate;
+- zero WIP dependencies;
+- encoding intact;
+- data structure valid;
+- word-count integrity preserved;
+- package versioning valid;
+- no stale source artifacts;
+- whole-package integration coherent;
+- package is staging/deployment ready;
+- zero unresolved BLOCKER findings;
+- zero unresolved MAJOR findings.
+
+For the current pipeline:
+
+```text
+NO CONDITIONAL PASS
+```
+
+---
+
+# 47. FAIL_REWORK
+
+Use when all defects can be corrected entirely within Stage 05 packaging without modifying approved upstream artifacts.
+
+The package remains in:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip
+```
+
+Required flow:
+
+```text
+Stage 05 QA findings
+↓
+Stage 05 ChatGPT Work
+↓
+Packaging corrections
+↓
+Mechanical self-validation
+↓
+Semantic/integration self-validation
+↓
+New WIP package version
+↓
+Stage 05 QA full independent re-review
+```
+
+Nothing is promoted to `approved`.
+
+---
+
+# 48. BLOCKED
+
+Use when resolution requires:
+
+- reopening an upstream stage;
+- correcting an approved source artifact;
+- resolving a runtime specification conflict;
+- obtaining a missing authoritative dependency.
+
+The Stage 05 package remains in WIP.
+
+No deployment/integration may begin.
+
+---
+
+# 49. Re-Review Rule
+
+A revised package is a new QA artifact.
+
+The reviewer must re-check:
+
+- all previous findings;
+- acceptance criteria;
+- source versions;
+- passage preservation;
+- assessment preservation;
+- schema;
+- runtime metadata;
+- provenance;
+- absence of WIP dependencies;
+- integration;
+- regression risk.
+
+Do not approve merely because previously reported fields changed.
+
+---
+
+# 50. Promotion on PASS
+
+When and only when QA returns:
+
+```text
+PASS
+```
+
+the exact reviewed package must move from:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip\stage05\production-packages\...
+```
+
+to:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved\stage05\production-packages\...
+```
+
+No modification may occur during promotion.
+
+---
+
+# 51. Exact-Artifact Rule
+
+QA approval applies only to the exact Production Package reviewed.
+
+Any modification after PASS invalidates certification for the changed artifact.
+
+This includes changes to:
+
+- passage;
+- assessment;
+- scoring;
+- runtime metadata;
+- provenance;
+- IDs;
+- package version;
+- source references.
+
+A modified package must return to WIP and undergo QA again.
+
+---
+
+# 52. QA Traceability
+
+The QA report should remain associated with the approved package.
+
+Record at minimum:
+
+```text
+Package ID
+QA verdict
+QA specification version
+review timestamp
+WIP source path
+approved destination path
+source artifact versions
+finding counts
+package hash where available
+```
+
+---
+
+# 53. Approved Artifact Authority
+
+After PASS:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved\stage05\production-packages
+```
+
+becomes the only authoritative Stage 05 output location.
+
+A corresponding WIP package must never be used for deployment.
+
+---
+
+# 54. Deployment Boundary
+
+Stage 05 QA authorizes the package for the downstream deployment/integration workflow.
+
+It does not itself certify:
+
+- Supabase publication;
+- application rendering;
+- TTS behaviour;
+- browser/device behaviour;
+- runtime telemetry;
+- production deployment.
+
+Those require downstream integration/deployment validation.
+
+Stage 05 QA certifies **the content package**, not the live system.
+
+---
+
+# 55. Core QA Principle
+
+The reviewer is not asking:
+
+> Does this JSON look valid?
+
+The correct question is:
+
+> Is this exact package a faithful, traceable, runtime-valid integration of only independently approved SpeedReader content, with no content transformation, stale dependency, WIP leakage, identity mismatch or assessment/scoring corruption?
+
+If that cannot be demonstrated:
+
+```text
+DO NOT PASS
+```
+
+---
+
+# 56. Stage 05 QA Success Condition
+
+Stage 05 QA is complete when:
+
+> The complete WIP Production Package has been independently compared against its exact approved Content Job, Passage and Assessment; source certification, artifact identity, learner-facing content preservation, assessment/scoring preservation, delivery mapping, runtime schema, metadata, provenance, WIP isolation and integration integrity have all been verified; every defect has been classified with explicit acceptance criteria; and an independent certification decision has been issued.
+
+If the decision is `PASS`, the exact reviewed Production Package is moved from:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\wip
+```
+
+to:
+
+```text
+D:\Sridhar\Projects\SpeedReader\pipeline\approved
+```
+
+Only that approved package may enter the downstream deployment/integration pipeline.
