@@ -390,3 +390,8 @@ export function browserSpeech(): Pick<NarratorOptions, "synth" | "createUtteranc
     touchDevice: "ontouchstart" in window || (navigator.maxTouchPoints || 0) > 0
   };
 }
+
+/** Capability check for device text-to-speech; the one place outside the UI that may name the API (FR-037). */
+export function hasSpeechSynthesis(win: Record<string, unknown>): boolean {
+  return Boolean(win.speechSynthesis);
+}
