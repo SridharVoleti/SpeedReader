@@ -1,4 +1,8 @@
-import { COMPLEXITY_PROFILE, passageSpecFor } from "../../../../lib/sr/passage-progression";
+import { passageSpecFor, setActiveProfile } from "../../../../lib/sr/passage-progression";
+import { FIXTURE_PROFILE } from "./profile";
+
+setActiveProfile(FIXTURE_PROFILE);
+const COMPLEXITY_PROFILE = FIXTURE_PROFILE.complexity;
 import type { RoleId } from "../../../../lib/sr/pipeline/roles";
 
 export const prov = (role: RoleId, inputs: { role: RoleId; hash: string }[] = []) => ({ role, inputs, createdAt: "2026-10-08T00:00:00Z", creator: "creator-agent" });

@@ -208,3 +208,10 @@ independent QA certification (AC-C10) do not exist yet. See
 
 Open: sync quality on real Edge/Neerja depends on the voice sending word-boundary events; confirm on a device.
 Unit tests: `narrator`, `read-along-voice`, `fr-037-reference-delivery`; UI: `read-aloud.spec.ts`.
+
+
+## SR review blockers (GitHub issues #6-#15)
+
+| Issue | Title | Status | Notes |
+|---|---|---|---|
+| #6 / SR-001 | Placeholder World 1 ladder + complexity profile removed | Implemented, awaiting independent QA | `lib/sr/passage-progression.ts` now loads a hash-sealed, QA-`PASS` profile from `pipeline/approved/world1-passage-profile.json`, validates full 1..1500 coverage (contiguous, non-decreasing), and **fails closed** (`ProfileUnavailableError`; role 1 QA reports `APPROVED_PROFILE_UNAVAILABLE`). No approved profile exists yet, so no values are shipped; tests use `tests/unit/sr/helpers/profile.ts` (fixture, not canonical). **Open:** the approved Knowledge Map must be produced/QA'd and its profile file placed in `pipeline/approved/`. |

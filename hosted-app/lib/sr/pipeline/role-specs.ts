@@ -1,7 +1,7 @@
 // Per-role owned-artifact contracts: the exact payload fields a role may produce (completeness + bound)
 // and the role-specific blocker checks its independent QA runs. A role spec is added with its tests.
 
-import { type Complexity, passageSpecFor, validateSpecDifficulty } from "../passage-progression";
+import { type Complexity, ProfileUnavailableError, passageSpecFor, validateSpecDifficulty } from "../passage-progression";
 import { WORLD1_PASSAGE_COUNT } from "../../v2/catalog";
 import type { RoleId } from "./roles";
 
@@ -23,7 +23,12 @@ const role1: RoleSpec = {
     const out: Finding[] = [];
     const seq = p.sequence as number;
     if (!Number.isInteger(seq) || seq < 1 || seq > WORLD1_PASSAGE_COUNT) return [["SEQUENCE_IN_RANGE", `sequence=${String(p.sequence)}`]];
-    const spec = passageSpecFor(seq);
+    let spec;
+    try { spec = passageSpecFor(seq); }
+    catch (e) {
+      if (e instanceof ProfileUnavailableError) return [["APPROVED_PROFILE_UNAVAILABLE", e.message]];
+      throw e;
+    }
     if (p.targetWords !== spec.targetWords) out.push(["LENGTH_LADDER", `targetWords=${String(p.targetWords)} expected ${spec.targetWords}`]);
     for (const d of validateSpecDifficulty({ ...spec, complexity: p.complexity as Complexity })) out.push(["CONSTANT_DIFFICULTY", d]);
     return out;
