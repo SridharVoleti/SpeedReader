@@ -38,3 +38,5 @@ __pycache__/
 *.egg-info/
 dist/
 .venv/
+.data/
+.sr-e2e/

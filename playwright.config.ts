@@ -1,15 +1,25 @@
 import { defineConfig } from "@playwright/test";
+import { resolve } from "node:path";
+
+// Real approved SR package set, seeded by hosted-app/tests/ui/sr-global-setup.ts through the real pipeline.
+const SR_E2E = resolve(__dirname, ".sr-e2e");
 
 export default defineConfig({
   testDir: ".",
   testMatch: ["container/tests/**/*.spec.ts", "hosted-app/tests/ui/**/*.spec.ts"],
   fullyParallel: true,
+  globalSetup: "./hosted-app/tests/ui/sr-global-setup.ts",
   use: {
     baseURL: "http://127.0.0.1:3001",
     trace: "on-first-retry"
   },
   webServer: {
     command: "npm run start -- -p 3001",
+    env: {
+      SR_APPROVED_ROOT: resolve(SR_E2E, "approved"),
+      SR_WIP_ROOT: resolve(SR_E2E, "wip"),
+      SR_DATA_DIR: resolve(SR_E2E, "data")
+    },
     url: "http://127.0.0.1:3001",
     reuseExistingServer: false,
     timeout: 120_000

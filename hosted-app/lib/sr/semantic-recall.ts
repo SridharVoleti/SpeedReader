@@ -8,7 +8,12 @@
 
 export type Explicitness = "EXPLICIT" | "IMPLICIT" | "NOT_IN_PASSAGE";
 /** Acceptable alternates per slot (each alternate may be multi-word). Predicate is mandatory. */
-export type Proposition = { subject?: readonly string[]; predicate: readonly string[]; object?: readonly string[] };
+export type Proposition = {
+  subject?: readonly string[]; predicate: readonly string[]; object?: readonly string[];
+  /** Optional content words of the proposition: if at least half appear in one clause but the slots do not match, the
+   *  clause is routed to review (UNRESOLVED_SEMANTIC) instead of being scored as an omission. Never grants credit. */
+  keyTerms?: readonly string[];
+};
 export type Fact = {
   /** Immutable across map versions. */
   factId: string;
@@ -39,12 +44,18 @@ const norm = (s: string): string =>
   s.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
 
 const has = (clause: string, alt: string): boolean => ` ${clause} `.includes(` ${norm(alt)} `);
-const firstHit = (clause: string, alts: readonly string[] | undefined): string | null =>
-  (alts ?? []).find((a) => has(clause, a)) ?? null;
+/** An alternate that itself spans several clauses ("a pencil, a notebook, and a packet") can only match at sentence level. */
+const MULTI_CLAUSE = /,|\b(?:and|but|then|because)\b/i;
+const hitIn = (clause: string, sentence: string, alt: string): string | null =>
+  has(clause, alt) ? clause : MULTI_CLAUSE.test(alt) && has(sentence, alt) ? sentence : null;
+const firstHit = (clause: string, sentence: string, alts: readonly string[] | undefined): { alt: string; scope: string } | null => {
+  for (const alt of alts ?? []) { const scope = hitIn(clause, sentence, alt); if (scope) return { alt, scope }; }
+  return null;
+};
 
-/** Negation is local: a negator within 3 words before the matched predicate alternate, in the same clause. */
-function negatedAround(clause: string, predicateAlt: string): boolean {
-  const words = clause.split(" ");
+/** Negation is local: a negator within 3 words before the matched predicate alternate, in the scope where it matched. */
+function negatedAround(scope: string, predicateAlt: string): boolean {
+  const words = scope.split(" ");
   const p = norm(predicateAlt).split(" ");
   for (let i = 0; i + p.length <= words.length; i++) {
     if (p.every((w, j) => words[i + j] === w)) return words.slice(Math.max(0, i - 3), i).some((w) => NEGATIONS.has(w));
@@ -55,15 +66,20 @@ function negatedAround(clause: string, predicateAlt: string): boolean {
 type Match = { complete: boolean; partial: boolean; matched: string[]; negated: boolean };
 
 function matchProposition(clause: string, sentence: string, prop: Proposition): Match {
-  const pred = firstHit(clause, prop.predicate);
-  const obj = prop.object ? firstHit(clause, prop.object) : "";
-  const subj = prop.subject ? firstHit(sentence, prop.subject) : "";
-  const matched = [pred && `predicate:${pred}`, prop.object && obj && `object:${obj}`, prop.subject && subj && `subject:${subj}`].filter(Boolean) as string[];
+  const pred = firstHit(clause, sentence, prop.predicate);
+  const obj = prop.object ? firstHit(clause, sentence, prop.object) : null;
+  const subj = prop.subject ? firstHit(sentence, sentence, prop.subject) : null;
+  const matched = [pred && `predicate:${pred.alt}`, prop.object && obj && `object:${obj.alt}`, prop.subject && subj && `subject:${subj.alt}`].filter(Boolean) as string[];
   const complete = !!pred && (!prop.object || !!obj);
   // subject is verified at sentence level (pronoun-led second clauses are normal speech); a named wrong subject is not matched
-  const subjectOk = !prop.subject || !!subj || !/\b(he|she|they|it|him|her)\b/.test(` ${sentence} `) === false;
-  const partial = !complete && matched.length > 0;
-  return { complete: complete && subjectOk, partial: partial || (complete && !subjectOk), matched, negated: !!pred && negatedAround(clause, pred) };
+  const subjectOk = !prop.subject || !!subj || /\b(?:he|she|they|it|him|her)\b/.test(sentence);
+  let keyTermPartial = false;
+  if (!complete && matched.length === 0 && prop.keyTerms?.length) {
+    const hits = prop.keyTerms.filter((k) => has(clause, k));
+    if (hits.length >= Math.ceil(prop.keyTerms.length / 2)) { keyTermPartial = true; matched.push(`keyTerms:${hits.length}/${prop.keyTerms.length}`); }
+  }
+  const partial = (!complete && matched.length > 0) || keyTermPartial;
+  return { complete: complete && subjectOk, partial: partial || (complete && !subjectOk), matched, negated: !!pred && negatedAround(pred.scope, pred.alt) };
 }
 
 function splitUnits(text: string): { sentence: string; clauses: string[] }[] {
