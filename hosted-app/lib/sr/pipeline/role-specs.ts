@@ -4,6 +4,7 @@
 import { type Complexity, ProfileUnavailableError, passageSpecFor, validateSpecDifficulty } from "../passage-progression";
 import { WORLD1_PASSAGE_COUNT } from "../../v2/catalog";
 import type { RoleId } from "./roles";
+import { getOptionJudge, getPropositionJudge, passageSentences } from "./verifiers";
 
 export type Payload = Record<string, unknown>;
 export type Upstream = Partial<Record<RoleId, Payload>>;
@@ -53,7 +54,31 @@ const role2: RoleSpec = {
   }
 };
 
-type Item = { itemId: string; options: string[]; answerIndex: number; primary: boolean };
+type Item = { itemId: string; stem: string; options: string[]; answerIndex: number; primary: boolean; evidence?: { quote?: string } };
+
+
+/** Independent answer verification: explicit passage evidence, exactly one passage-supported option, distractors false. */
+function verifyAnswers(items: Item[], passage: string, havePassage: boolean, prior: Finding[]): Finding[] {
+  const out: Finding[] = [];
+  const structurallyBad = new Set(prior.filter((f) => f[0] === "ONE_DEFENSIBLE_ANSWER").map((f) => f[1].split(":")[0]));
+  const judge = getOptionJudge();
+  for (const i of items) {
+    if (structurallyBad.has(`item ${i.itemId}`)) continue;
+    if (!havePassage) { out.push(["PASSAGE_EVIDENCE_UNAVAILABLE", `item ${i.itemId}: approved passage text is required to verify the answer`]); continue; }
+    const quote = i.evidence?.quote?.trim();
+    if (!quote) out.push(["ANSWER_EVIDENCE_PRESENT", `item ${i.itemId}: no explicit passage evidence cited for the correct answer`]);
+    else if (!passage.includes(quote)) out.push(["ANSWER_EVIDENCE_IN_PASSAGE", `item ${i.itemId}: cited evidence "${quote}" is not in the approved passage`]);
+    if (!judge) { out.push(["INDEPENDENT_VERIFIER_MISSING", `item ${i.itemId}: no independent option judge registered; answer uniqueness cannot be verified`]); continue; }
+    const j = judge(passage, { stem: i.stem, options: i.options });
+    if (j.verdicts.length !== i.options.length) { out.push(["ONE_DEFENSIBLE_ANSWER", `item ${i.itemId}: verifier returned ${j.verdicts.length} verdicts for ${i.options.length} options`]); continue; }
+    const supported = j.verdicts.map((v, n) => (v === "SUPPORTED" ? n : -1)).filter((n) => n >= 0);
+    const cite = j.evidence.join(" | ");
+    if (supported.length > 1) out.push(["ONE_DEFENSIBLE_ANSWER", `item ${i.itemId}: options ${supported.map((n) => `#${n} "${i.options[n]}"`).join(" and ")} are both passage-supported. Evidence: ${cite}`]);
+    else if (supported.length === 0) out.push(["ANSWER_SUPPORTED_BY_PASSAGE", `item ${i.itemId}: no option is passage-supported. Evidence: ${cite}`]);
+    else if (supported[0] !== i.answerIndex) out.push(["ANSWER_CORRECT", `item ${i.itemId}: marked #${i.answerIndex} "${i.options[i.answerIndex]}" but passage supports #${supported[0]} "${i.options[supported[0]]}". Evidence: ${cite}`]);
+  }
+  return out;
+}
 
 const role3: RoleSpec = {
   fields: ["passageId", "items"],
@@ -70,6 +95,7 @@ const role3: RoleSpec = {
       if (!Number.isInteger(i.answerIndex) || i.answerIndex < 0 || i.answerIndex >= i.options.length || !distinct)
         out.push(["ONE_DEFENSIBLE_ANSWER", `item ${i.itemId}: answerIndex=${i.answerIndex} options=${JSON.stringify(i.options)}`]);
     }
+    out.push(...verifyAnswers(items, String(up[2]?.text ?? ""), !!up[2], out));
     return out;
   }
 };
@@ -79,7 +105,24 @@ const idBlocker = (p: Payload, up: Upstream): Finding[] => {
   return ref && p.passageId !== ref.passageId ? [["PASSAGE_ID_MATCH", `got ${String(p.passageId)} expected ${String(ref.passageId)}`]] : [];
 };
 
-type Unit = { muId: string; text: string; factIds: string[] };
+/** `text` is the meaning-unit PROPOSITION (a faithful paraphrase is allowed); `evidence` is the canonical passage reference. */
+type Evidence = { sentences?: number[]; span?: string };
+type Unit = { muId: string; text: string; factIds: string[]; evidence?: Evidence };
+
+function resolveEvidence(ev: Evidence | undefined, passage: string): { text: string } | { error: string } {
+  if (!ev || (!ev.sentences?.length && !ev.span)) return { error: "no passage evidence reference (sentences[] or span)" };
+  const sents = passageSentences(passage);
+  const parts: string[] = [];
+  for (const n of ev.sentences ?? []) {
+    if (!Number.isInteger(n) || n < 1 || n > sents.length) return { error: `sentence ${String(n)} does not exist (passage has ${sents.length})` };
+    parts.push(sents[n - 1]);
+  }
+  if (ev.span !== undefined) {
+    if (!ev.span || !passage.includes(ev.span)) return { error: `source span "${ev.span}" not found in passage` };
+    parts.push(ev.span);
+  }
+  return { text: parts.join(" ") };
+}
 
 const role4: RoleSpec = {
   fields: ["passageId", "units"],
@@ -92,7 +135,13 @@ const role4: RoleSpec = {
     const passage = String(up[2]?.text ?? "");
     for (const u of units) {
       if (!u.factIds?.length) out.push(["MU_HAS_FACT", `unit ${u.muId} has no fact id`]);
-      if (up[2] && !passage.includes(u.text)) out.push(["MU_TEXT_IN_PASSAGE", `unit ${u.muId} text not found in approved passage: "${u.text}"`]);
+      if (new Set(u.factIds ?? []).size !== (u.factIds ?? []).length) out.push(["MU_FACT_ID_UNIQUE", `unit ${u.muId} repeats a fact id`]);
+      if (!up[2]) { out.push(["PASSAGE_EVIDENCE_UNAVAILABLE", `unit ${u.muId}: approved passage text is required to verify evidence`]); continue; }
+      const ev = resolveEvidence(u.evidence, passage);
+      if ("error" in ev) { out.push(["MU_EVIDENCE_REF", `unit ${u.muId}: ${ev.error}`]); continue; }
+      const judge = getPropositionJudge();
+      if (!judge) { out.push(["INDEPENDENT_VERIFIER_MISSING", `unit ${u.muId}: no proposition judge registered; faithfulness cannot be verified`]); continue; }
+      if (judge(ev.text, u.text) !== "ENTAILED") out.push(["MU_PROPOSITION_SUPPORTED", `unit ${u.muId}: proposition "${u.text}" is not supported by cited evidence "${ev.text}"`]);
     }
     return out;
   }

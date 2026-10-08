@@ -32,8 +32,8 @@ export const PACKAGE_SCHEMA = {
         items: {
           type: "array", minItems: 4, maxItems: 4,
           items: {
-            type: "object", additionalProperties: false, required: ["itemId", "stem", "options", "answerIndex", "primary"],
-            properties: { itemId: str, stem: str, options: { type: "array", minItems: 2, items: str }, answerIndex: { type: "integer", minimum: 0 }, primary: { type: "boolean" } }
+            type: "object", additionalProperties: false, required: ["itemId", "stem", "options", "answerIndex", "primary", "evidence"],
+            properties: { itemId: str, stem: str, options: { type: "array", minItems: 2, items: str }, answerIndex: { type: "integer", minimum: 0 }, primary: { type: "boolean" }, evidence: { type: "object", additionalProperties: false, required: ["quote"], properties: { quote: str } } }
           }
         }
       }
@@ -42,7 +42,7 @@ export const PACKAGE_SCHEMA = {
       type: "object", additionalProperties: false, required: ["passageId", "units"],
       properties: {
         passageId: str,
-        units: { type: "array", minItems: 1, items: { type: "object", additionalProperties: false, required: ["muId", "text", "factIds"], properties: { muId: str, text: str, factIds: { type: "array", minItems: 1, items: str } } } }
+        units: { type: "array", minItems: 1, items: { type: "object", additionalProperties: false, required: ["muId", "text", "factIds", "evidence"], properties: { muId: str, text: str, factIds: { type: "array", minItems: 1, items: str }, evidence: { type: "object", additionalProperties: false, minProperties: 1, properties: { sentences: { type: "array", minItems: 1, items: { type: "integer", minimum: 1 } }, span: str } } } } }
       }
     },
     bpc: {

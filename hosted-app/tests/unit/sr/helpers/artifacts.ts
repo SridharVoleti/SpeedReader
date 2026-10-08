@@ -1,7 +1,18 @@
 import { passageSpecFor, setActiveProfile } from "../../../../lib/sr/passage-progression";
 import { FIXTURE_PROFILE } from "./profile";
+import { setOptionJudge, setPropositionJudge } from "../../../../lib/sr/pipeline/verifiers";
+
+const ITEMS_KEY: Record<string, number> = { "What happened first?": 0, "Who acted?": 1, "Why?": 2, "What next?": 0 };
 
 setActiveProfile(FIXTURE_PROFILE);
+
+// Fixture judges stand in for the independent reviewer: option judge knows the fixture key (never given the creator's answerIndex);
+// proposition judge entails everything except text marked "invented".
+setOptionJudge((_passage, item) => {
+  const key = ITEMS_KEY[item.stem];
+  return { verdicts: item.options.map((_o, n) => (key === undefined ? "UNSUPPORTED" : n === key ? "SUPPORTED" : "CONTRADICTED")), evidence: ["fixture judge"] };
+});
+setPropositionJudge((_evidence, proposition) => (/invented/.test(proposition) ? "UNSUPPORTED" : "ENTAILED"));
 const COMPLEXITY_PROFILE = FIXTURE_PROFILE.complexity;
 import type { RoleId } from "../../../../lib/sr/pipeline/roles";
 
@@ -26,10 +37,10 @@ export const role2Payload = () => ({ passageId: PID, text: words(80), wordCount:
 export const role2 = (p: Record<string, unknown> = role2Payload()) => envelope(2, "PASSAGE_TEXT", p, [H(1)]);
 
 export const items4 = () => [
-  { itemId: "I1", stem: "What happened first?", options: ["a", "b", "c"], answerIndex: 0, primary: true },
-  { itemId: "I2", stem: "Who acted?", options: ["a", "b", "c"], answerIndex: 1, primary: false },
-  { itemId: "I3", stem: "Why?", options: ["a", "b", "c"], answerIndex: 2, primary: false },
-  { itemId: "I4", stem: "What next?", options: ["a", "b", "c"], answerIndex: 0, primary: false }
+  { itemId: "I1", stem: "What happened first?", options: ["a", "b", "c"], answerIndex: 0, primary: true, evidence: { quote: "w0 w1" } },
+  { itemId: "I2", stem: "Who acted?", options: ["a", "b", "c"], answerIndex: 1, primary: false, evidence: { quote: "w5 w6" } },
+  { itemId: "I3", stem: "Why?", options: ["a", "b", "c"], answerIndex: 2, primary: false, evidence: { quote: "w20 w21" } },
+  { itemId: "I4", stem: "What next?", options: ["a", "b", "c"], answerIndex: 0, primary: false, evidence: { quote: "w30 w31" } }
 ];
 export const role3Payload = () => ({ passageId: PID, items: items4() });
 export const role3 = (p: Record<string, unknown> = role3Payload()) => envelope(3, "ASSESSMENT", p, [H(1), H(2)]);
@@ -37,9 +48,9 @@ export const role3 = (p: Record<string, unknown> = role3Payload()) => envelope(3
 export const role4Payload = () => ({
   passageId: PID,
   units: [
-    { muId: "MU1", text: "w0 w1 w2", factIds: ["F1"] },
-    { muId: "MU2", text: "w10 w11", factIds: ["F2"] },
-    { muId: "MU3", text: "w40 w41 w42", factIds: ["F3"] }
+    { muId: "MU1", text: "w0 w1 w2", factIds: ["F1"], evidence: { span: "w0 w1 w2" } },
+    { muId: "MU2", text: "A faithful paraphrase of w10 w11", factIds: ["F2"], evidence: { span: "w10 w11" } },
+    { muId: "MU3", text: "w40 w41 w42", factIds: ["F3"], evidence: { sentences: [1] } }
   ]
 });
 export const role4 = (p: Record<string, unknown> = role4Payload()) => envelope(4, "MEANING_UNITS", p, [H(2)]);
