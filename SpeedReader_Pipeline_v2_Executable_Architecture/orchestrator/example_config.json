@@ -1,0 +1,11 @@
+{
+  "execution_mode": "MANUAL_PACKET",
+  "database_path": "pipeline/state/speedreader.db",
+  "wip_root": "pipeline/wip",
+  "approved_root": "pipeline/approved",
+  "jobs_root": "pipeline/jobs",
+  "max_creator_attempts": 3,
+  "same_blocker_early_escalation_count": 2,
+  "canonical_manifest": "canonical/canonical_manifest.json",
+  "model_runner": null
+}

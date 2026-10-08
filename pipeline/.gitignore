@@ -1,0 +1,7 @@
+# Pipeline v2 runtime data is local state, never committed: SQLite db, WIP/approved artifacts, job packets, imported results.
+state/
+wip/
+approved/
+jobs/
+results/
+demo/

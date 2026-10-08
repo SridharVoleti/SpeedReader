@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "job_id",
+    "production_unit_id",
+    "role_id",
+    "job_type",
+    "attempt_no",
+    "canonical_package_id",
+    "canonical_package_hash",
+    "applicable_acceptance_criteria_ids",
+    "approved_upstream_artifacts",
+    "machine_check_evidence"
+  ],
+  "properties": {
+    "job_id": {
+      "type": [
+        "integer",
+        "string"
+      ]
+    },
+    "production_unit_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role_id": {
+      "type": "string",
+      "enum": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6S"
+      ]
+    },
+    "job_type": {
+      "type": "string",
+      "enum": [
+        "CREATOR",
+        "QA"
+      ]
+    },
+    "attempt_no": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "canonical_package_id": {
+      "type": "string"
+    },
+    "canonical_package_hash": {
+      "type": "string"
+    },
+    "applicable_acceptance_criteria_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approved_upstream_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "candidate_artifact": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "machine_check_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "open_defect_context": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

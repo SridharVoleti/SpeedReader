@@ -1,0 +1,44 @@
+{
+  "canonical_package_id": "SPEEDREADER-W1-BANDA-CANONICAL",
+  "status": "INCOMPLETE_FAIL_CLOSED",
+  "note": "Acceptance criteria are present. Add the independently approved knowledge-map/registry and every normative matrix/schema/tokenizer artifact before production.",
+  "artifacts": [
+    {
+      "path": "canonical/SpeedReader World 1 Band A \u2014 Final Knowledge Map Acceptance Criteria.md",
+      "type": "ACCEPTANCE_CRITERIA",
+      "sha256": "32bfd12c76655ed70d31e751bee3d5e4b73ce7755ab391192531ace3a1a2f35e",
+      "normative": true,
+      "present": true
+    },
+    {
+      "path": "canonical/registry.csv",
+      "type": "REGISTRY",
+      "normative": true,
+      "present": false
+    },
+    {
+      "path": "canonical/knowledge_map_package.json",
+      "type": "KNOWLEDGE_MAP_PACKAGE",
+      "normative": true,
+      "present": false
+    },
+    {
+      "path": "canonical/count100_spec.json",
+      "type": "TOKENIZER_SPEC",
+      "normative": true,
+      "present": false
+    },
+    {
+      "path": "canonical/final_package.schema.json",
+      "type": "FINAL_SCHEMA",
+      "normative": true,
+      "present": false
+    },
+    {
+      "path": "canonical/outcome_state_machine.json",
+      "type": "OUTCOME_RULES",
+      "normative": true,
+      "present": false
+    }
+  ]
+}

@@ -9,6 +9,8 @@
     "lint": "next lint",
     "test:backend": "python -m pytest hosted-app/backend/tests",
     "test:unit": "vitest run",
+    "test:pipeline-v2": "vitest run hosted-app/tests/unit/sr/pipeline-v2",
+    "pipeline": "node tools/pipeline/pipeline.mjs",
     "test:ui": "playwright test",
     "qa:sr": "node tools/sr-qa-run.mjs"
   },

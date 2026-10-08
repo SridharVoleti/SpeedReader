@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "job_id",
+    "production_unit_id",
+    "role_id",
+    "job_type",
+    "state",
+    "checks_run",
+    "blocking_defects",
+    "nonblocking_observations"
+  ],
+  "properties": {
+    "job_id": {
+      "type": [
+        "integer",
+        "string"
+      ]
+    },
+    "production_unit_id": {
+      "type": "string"
+    },
+    "role_id": {
+      "type": "string"
+    },
+    "job_type": {
+      "type": "string",
+      "enum": [
+        "CREATOR",
+        "QA"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "READY_FOR_INDEPENDENT_QA",
+        "BLOCKED_UPSTREAM",
+        "BLOCKED_CANONICAL",
+        "ESCALATED",
+        "QA_PASS",
+        "QA_FAIL",
+        "QA_BLOCKED_NOT_EXECUTED"
+      ]
+    },
+    "artifact": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "candidate_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "checks_run": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "blocking_defects": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "nonblocking_observations": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
