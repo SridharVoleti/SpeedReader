@@ -29,7 +29,7 @@ describe("SR-038 upstream fidelity: the package is exactly the approved artifact
   });
   it("altered scoring, attempt contract, BPC and meaning units all fail", () => {
     for (const [section, role, mutate] of [
-      ["scoring", 6, (p: Record<string, any>) => { p.scoring.passThreshold = 10; }],
+      ["scoring", 6, (p: Record<string, any>) => { p.scoring.primaryItemId = "I2"; }],
       ["attemptContract", 7, (p: Record<string, any>) => { p.attemptContract.outcomes[1].nextAction = "STOP"; }],
       ["bpc", 5, (p: Record<string, any>) => { p.bpc.text = "different"; }],
       ["meaningUnits", 4, (p: Record<string, any>) => { p.meaningUnits.units.pop(); }]

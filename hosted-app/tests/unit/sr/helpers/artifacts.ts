@@ -59,7 +59,7 @@ export const role5Payload = () => ({ passageId: PID, text: "A model retelling th
 export const role5 = (p: Record<string, unknown> = role5Payload()) => envelope(5, "BPC", p, [H(2), H(4)]);
 
 export const role6Payload = () => ({
-  passageId: PID, passThreshold: 60, primaryItemId: "I1",
+  passageId: PID, ruleId: "P10_FIRST_ATTEMPT_3_OF_4_PRIMARY", primaryItemId: "I1",
   itemPoints: { I1: 25, I2: 25, I3: 25, I4: 25 }
 });
 export const role6 = (p: Record<string, unknown> = role6Payload()) => envelope(6, "SCORING_CONTRACT", p, [H(3), H(4)]);

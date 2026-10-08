@@ -50,8 +50,8 @@ export const PACKAGE_SCHEMA = {
       properties: { passageId: str, text: str, factIds: { type: "array", items: str } }
     },
     scoring: {
-      type: "object", additionalProperties: false, required: ["passageId", "passThreshold", "primaryItemId", "itemPoints"],
-      properties: { passageId: str, passThreshold: { type: "number", minimum: 0, maximum: 100 }, primaryItemId: str, itemPoints: { type: "object", additionalProperties: { type: "number", minimum: 0 } } }
+      type: "object", additionalProperties: false, required: ["passageId", "ruleId", "primaryItemId", "itemPoints"],
+      properties: { passageId: str, ruleId: { enum: ["P10_FIRST_ATTEMPT_3_OF_4_PRIMARY"] }, primaryItemId: str, itemPoints: { type: "object", additionalProperties: { type: "number", minimum: 0 } } }
     },
     attemptContract: {
       type: "object", additionalProperties: false, required: ["passageId", "outcomes"],

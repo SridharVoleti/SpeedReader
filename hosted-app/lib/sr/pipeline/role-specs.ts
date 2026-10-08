@@ -4,6 +4,7 @@
 import { type Complexity, ProfileUnavailableError, passageSpecFor, validateSpecDifficulty } from "../passage-progression";
 import { WORLD1_PASSAGE_COUNT } from "../../v2/catalog";
 import type { RoleId } from "./roles";
+import { SCORING_RULES } from "../p10-scoring";
 import { getOptionJudge, getPropositionJudge, passageSentences } from "./verifiers";
 
 export type Payload = Record<string, unknown>;
@@ -163,7 +164,7 @@ const role5: RoleSpec = {
 };
 
 const role6: RoleSpec = {
-  fields: ["passageId", "passThreshold", "primaryItemId", "itemPoints"],
+  fields: ["passageId", "ruleId", "primaryItemId", "itemPoints"],
   blockers(p, up) {
     const out: Finding[] = [...idBlocker(p, up)];
     const points = (p.itemPoints as Record<string, number>) ?? {};
@@ -175,8 +176,9 @@ const role6: RoleSpec = {
     const primaries = approvedItems.filter((i) => i.primary);
     if (up[3] && primaries.length !== 1) out.push(["PRIMARY_ITEM_MATCH", `approved assessment has ${primaries.length} primary items; cannot bind contract`, 3]);
     else if (up[3] && p.primaryItemId !== primaries[0].itemId) out.push(["PRIMARY_ITEM_MATCH", `contract primary ${String(p.primaryItemId)} vs assessment primary ${primaries[0].itemId}`]);
-    const t = p.passThreshold as number;
-    if (!Number.isFinite(t) || t < 0 || t > 100) out.push(["THRESHOLD_RANGE", `passThreshold=${String(t)}`]);
+    const rule = SCORING_RULES[String(p.ruleId)];
+    if (!rule) out.push(["SCORING_RULE_APPROVED", `ruleId=${String(p.ruleId)} is not a registered canonical rule (${Object.keys(SCORING_RULES).join(", ")}); thresholds are never invented`]);
+    else if (up[3] && approvedItems.length !== rule.itemCount) out.push(["RULE_ITEM_COUNT", `rule ${rule.id} needs ${rule.itemCount} items, approved assessment has ${approvedItems.length}`, 3]);
     return out;
   }
 };

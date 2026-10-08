@@ -15,6 +15,14 @@ describe("SR-025 Role 6 QA: Scoring Contract", () => {
     expect(r.blockers[0]).toMatchObject({ violated_rule: "POINTS_TOTAL_100", owner_role: 6 });
   });
   it("primary item must be the one Role 3 designated", () => expect(rules({ ...role6Payload(), primaryItemId: "I2" })).toContain("PRIMARY_ITEM_MATCH"));
-  it("threshold must be within 0..100", () => expect(rules({ ...role6Payload(), passThreshold: 140 })).toContain("THRESHOLD_RANGE"));
+  it("only a registered canonical rule may be referenced; invented thresholds are rejected", () => {
+    expect(rules({ ...role6Payload(), ruleId: "THRESHOLD_60" })).toContain("SCORING_RULE_APPROVED");
+    expect(runQa(6, role6({ ...role6Payload(), passThreshold: 60 }), approved(3, 4), { 3: UPSTREAM[3], 4: UPSTREAM[4] }).blockers.map((b) => b.evidence).join()).toMatch(/unexpected field passThreshold/);
+  });
+  it("rule item count must match the approved assessment, routed to Role 3", () => {
+    const three = { ...UPSTREAM[3], items: (UPSTREAM[3].items as unknown[]).slice(0, 3) };
+    const r = runQa(6, role6(), approved(3, 4), { 3: three, 4: UPSTREAM[4] });
+    expect(r.blockers.find((b) => b.violated_rule === "RULE_ITEM_COUNT")).toMatchObject({ owner_role: 3 });
+  });
   it("passage id must match", () => expect(rules({ ...role6Payload(), passageId: "W1-0001" })).toContain("PASSAGE_ID_MATCH"));
 });
