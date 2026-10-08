@@ -1,0 +1,16 @@
+{
+  "commitReviewed": "5ec17bc7d02e27f250ea2933f73f1ff1061dd0a1",
+  "note": "Maps each independent-review blocker to the negative/integration regression tests that must exist. Evidence only - not certification.",
+  "blockers": [
+    { "issue": 6, "sr": ["SR-001"], "tests": ["hosted-app/tests/unit/sr/sr-001b-approved-profile.test.ts"] },
+    { "issue": 7, "sr": ["SR-044"], "tests": ["hosted-app/tests/unit/sr/sr-044-semantic-recall.test.ts"] },
+    { "issue": 8, "sr": ["SR-017"], "tests": ["hosted-app/tests/unit/sr/sr-019-role3-qa.test.ts"] },
+    { "issue": 9, "sr": ["SR-019"], "tests": ["hosted-app/tests/unit/sr/sr-021-role4-qa.test.ts"] },
+    { "issue": 10, "sr": ["SR-022", "SR-046"], "tests": ["hosted-app/tests/unit/sr/sr-025-role6-qa.test.ts", "hosted-app/tests/unit/sr/sr-046-p10-primary.test.ts"] },
+    { "issue": 11, "sr": ["SR-042"], "tests": ["hosted-app/tests/unit/sr/sr-042-wip-approved-separation.test.ts"] },
+    { "issue": 12, "sr": ["SR-036", "SR-039"], "tests": ["hosted-app/tests/unit/sr/sr-036b-schema-negative-matrix.test.ts"] },
+    { "issue": 13, "sr": ["SR-041"], "tests": ["hosted-app/tests/unit/sr/sr-041b-publish-integration.test.ts"] },
+    { "issue": 14, "sr": ["SR-008", "SR-009", "SR-011", "SR-044"], "tests": ["hosted-app/tests/unit/sr/sr-014-live-journey.test.ts", "hosted-app/tests/ui/sr-explain.spec.ts"] },
+    { "issue": 15, "sr": ["SR-001..048"], "tests": ["hosted-app/tests/unit/sr/sr-qa-evidence.test.ts"] }
+  ]
+}
