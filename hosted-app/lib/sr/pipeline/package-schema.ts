@@ -1,10 +1,9 @@
 // SR-036 - Canonical final-package JSON Schema, validated with a real validator (ajv), not hand-rolled checks.
 
 import Ajv from "ajv";
-import { createRequire } from "node:module";
+import ajvPackage from "ajv/package.json";
 
-const require = createRequire(import.meta.url);
-export const SCHEMA_VALIDATOR = { name: "ajv", version: (require("ajv/package.json") as { version: string }).version };
+export const SCHEMA_VALIDATOR = { name: "ajv", version: (ajvPackage as { version: string }).version };
 
 const str = { type: "string", minLength: 1 } as const;
 const passageId = { type: "string", pattern: "^W1-\[0-9]{4}$" } as const;

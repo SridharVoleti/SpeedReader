@@ -17,6 +17,7 @@ const manifest: AppManifest = {
     "certification-demo": () => import("./ui/certification-demo/page"),
     "frozen-v2-demo": () => import("./ui/frozen-v2-demo/page"),
     "evidence-demo": () => import("./ui/evidence-demo/page"),
+    "explain": () => import("./ui/explain/page"),
     "item-types-demo": () => import("./ui/item-types-demo/page"),
     "meaningful-chunking-demo": () => import("./ui/meaningful-chunking-demo/page"),
     "personal-reading-model-demo": () => import("./ui/personal-reading-model-demo/page"),
