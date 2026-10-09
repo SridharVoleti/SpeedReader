@@ -124,7 +124,7 @@ describe("report", () => {
 
 describe("CLI", () => {
   it("without credentials it reports BLOCKED_EXTERNAL and exits non-zero (never a pass)", () => {
-    const clean = { PATH: process.env.PATH ?? "", SystemRoot: process.env.SystemRoot ?? "" } as NodeJS.ProcessEnv;
+    const clean = { PATH: process.env.PATH ?? "", SystemRoot: process.env.SystemRoot ?? "" } as unknown as NodeJS.ProcessEnv;
     const r = spawnSync(process.execPath, ["tools/hosted-supabase-verify.mjs"], { env: clean, encoding: "utf8" });
     expect(r.status).toBe(2);
     expect(r.stdout + r.stderr).toMatch(/BLOCKED_EXTERNAL/);
