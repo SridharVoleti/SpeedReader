@@ -1,0 +1,899 @@
+$ npx vitest run
+# commit e4faed51995446c067394f58fbabdd1dd674f6e3 dirty=false node v20.11.1
+# exit 1
+
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mD:/Sridhar/Projects/SpeedReader[39m
+
+ [32m✓[39m hosted-app/tests/unit/v2/app-ready-lifecycle.test.ts [2m([22m[2m25 tests[22m[2m)[22m[90m 44[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-oral-telemetry.test.ts [2m([22m[2m22 tests[22m[2m)[22m[90m 66[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-kmp10-readiness.test.ts [2m([22m[2m54 tests[22m[2m)[22m[90m 110[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-045-evidence-recency.test.ts [2m([22m[2m25 tests[22m[2m)[22m[90m 229[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/pipeline-v2/role8.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 1918[2mms[22m[39m
+   [33m[2m✓[22m[39m Role 8 validation - mandatory checks[2m > [22mversion/hash lock: lock hash, package version and canonical hash must all match [33m445[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-api-learner-service.test.ts [2m([22m[2m34 tests[22m[2m)[22m[33m 1707[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-retention-check.test.ts [2m([22m[2m15 tests[22m[2m)[22m[90m 78[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-cal-analytics.test.ts [2m([22m[2m25 tests[22m[2m)[22m[33m 1196[2mms[22m[39m
+   [33m[2m✓[22m[39m the ops endpoint exposes the report only to internal callers and captures the client class[2m > [22mis gated by the internal key and built from stored learners [33m1143[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-data-supabase-adapters.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 1474[2mms[22m[39m
+   [33m[2m✓[22m[39m durable sessions and assessment progress: file[2m > [22massessment progress survives across instances and finalizes once [33m368[2mms[22m[39m
+   [33m[2m✓[22m[39m the whole v3 journey runs through the Supabase adapters (fake PostgREST)[2m > [22massessment -> story -> Level Up evidence is written via the transactional function [33m301[2mms[22m[39m
+ [31m❯[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts [2m([22m[2m21 tests[22m[2m | [22m[31m21 failed[39m[2m)[22m[33m 3511[2mms[22m[39m
+[31m   [31m×[31m own-role QA failure, retry limit and escalation[2m > [22ma QA FAIL traverses QA_FAILED, preserves the failed attempt and schedules attempt 2 with the defect as context[90m 258[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m own-role QA failure, retry limit and escalation[2m > [22mafter a correction passes, the defect closes and the new version is approved[90m 261[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m own-role QA failure, retry limit and escalation[2m > [22mthree failed creator attempts (attempt 1 initial, 2 correction, 3 final) escalate to human review; no 4th job exists[90m 220[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m own-role QA failure, retry limit and escalation[2m > [22msubstantially the same blocker twice in a row escalates early (after the 2nd failure)[90m 110[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m own-role QA failure, retry limit and escalation[2m > [22mdifferent blockers on consecutive failures do not trigger early escalation[90m 111[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m own-role QA failure, retry limit and escalation[2m > [22ma human can resolve an escalation: the chain resets and a fresh attempt 1 job is created[90m 167[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m own-role QA failure, retry limit and escalation[2m > [22ma QA FAIL must carry at least one complete BLOCKER defect[90m 153[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m own-role QA failure, retry limit and escalation[2m > [22mnon-blocking observations never force rework[90m 121[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22mRole 6 QA reports a Role 4 defect: owner identified, Role 6 BLOCKED_UPSTREAM, Role 4 correction job created, nothing repaired by QA[90m 160[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22mthe Role 4 correction packet carries the defect context; after fresh independent QA and approval only true descendants are invalidated[90m 214[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22mwhen everything downstream was already approved, the whole descendant chain 5,6,7,8 is invalidated and 3 is kept[90m 203[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22ma correction that reproduces the identical artifact hash invalidates nothing[90m 148[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22ma Role 3 defect found in Role 6 QA is routed to Role 3, not to Role 4 or Role 5[90m 175[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22ma Role 2 source defect found at Role 4 QA cascades: the approved Role 3 (relied on old Role 2) is invalidated, an exported Role 3 job goes stale[90m 157[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22man approved Role 3 is invalidated when Role 2 is re-approved with a different hash[90m 125[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22ma Role 4 creator that finds the cause in Role 2 reports BLOCKED_UPSTREAM; the creator's attempt is not consumed[90m 96[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22mowners must be this role or an upstream role; a downstream or unrelated owner is rejected[90m 102[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22mCANONICAL_OWNER (or the code-owned Role 1) escalates to human review instead of creating an LLM correction job[90m 244[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22mthe same upstream blocker reported again after the correction escalates the owner (not an endless loop)[90m 117[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m upstream touchback[2m > [22mthe owner's retry budget bounds repeated touchbacks (third reopen escalates)[90m 111[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m audit trail[2m > [22mevery transition and import is recorded in append-only history[90m 247[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+ [32m✓[39m hosted-app/tests/unit/sr/pipeline-v2/role7.test.ts [2m([22m[2m25 tests[22m[2m)[22m[33m 3812[2mms[22m[39m
+   [33m[2m✓[22m[39m Role 7 - outcome machine parsed from the canonical transition matrix[2m > [22mdetects mirror drift between the spec matrix and the Attempt Outcome Model CSV [33m341[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-data-attempt-and-decisions.test.ts [2m([22m[2m17 tests[22m[2m)[22m[90m 72[2mms[22m[39m
+ [31m❯[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts [2m([22m[2m34 tests[22m[2m | [22m[31m34 failed[39m[2m)[22m[33m 5228[2mms[22m[39m
+[31m   [31m×[31m registration and queue eligibility[2m > [22mregistering a passage creates all eight work items; only Role 1 can start[33m 363[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m registration and queue eligibility[2m > [22mregistering is idempotent and rejects unknown passages (no guessing)[90m 212[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m registration and queue eligibility[2m > [22mdeterministic Role 1 runs on resume and promotes through a machine certificate; Role 2 becomes READY with a creator job[90m 154[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m registration and queue eligibility[2m > [22mdownstream roles become eligible only from APPROVED upstream (R3 needs R1+R2, R5 needs R2+R4, R6 needs R3+R4, R7 needs R6, R8 needs R1-R7)[90m 138[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m registration and queue eligibility[2m > [22mnext picks READY semantic jobs in delivery order; there is never a QA job without a candidate[90m 148[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22ma creator result lands in WIP only; nothing is approved and downstream stays PENDING/READY-blocked[90m 120[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22monly an independent QA PASS with the exact candidate hash promotes the artifact to APPROVED[90m 137[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22mQA PASS naming a different candidate hash is rejected and promotes nothing[90m 107[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22mif the WIP bytes change after the creator import, QA cannot approve them[90m 235[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22mself-approval is prevented: the creator's own context cannot QA, a creator cannot return PASS, a QA job cannot return creator output[90m 132[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22mQA is read-only: a QA result that carries an artifact is rejected[33m 405[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22mQA_PASS may not carry blocking defects[90m 134[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22ma QA PASS is refused while an open blocker exists against that candidate[90m 107[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22mresults are single-use: replaying an imported job is rejected[90m 101[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22ma result must match the job envelope (job id, passage, role) and validate against agent_result.schema.json[90m 122[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m WIP isolation and QA-gated approval[2m > [22man unexported job cannot be imported[90m 253[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m Cowork job packets[2m > [22ma creator packet validates against job_packet.schema.json and the prompt is self-contained[90m 164[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m Cowork job packets[2m > [22mthe common contract is injected, not duplicated: role contract files do not repeat it[90m 110[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m Cowork job packets[2m > [22mthe packet for a role never contains unapproved WIP[90m 102[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m Cowork job packets[2m > [22mthe independent QA packet is generated automatically on creator import and carries NO creator reasoning[90m 106[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m Cowork job packets[2m > [22mRole 2 QA packets carry the COUNT-100 machine evidence computed by code[90m 136[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m Cowork job packets[2m > [22macknowledged canonical gaps travel in the packet as authority caveats[90m 149[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m stale inputs and reopened upstream[2m > [22mimport itself rejects a job whose pinned inputs changed even if reconcile has not run yet[90m 133[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m stale inputs and reopened upstream[2m > [22mwhile an upstream role is reopened for correction, downstream roles do not start new work from its old approval[90m 96[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m Role 2 machine check (COUNT-100) gates the QA hand-off[2m > [22ma 99-token body is MACHINE_REJECTED: no QA job, the attempt is spent, a correction job carries the machine defect[90m 98[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m Role 2 machine check (COUNT-100) gates the QA hand-off[2m > [22m101 tokens and hidden characters are rejected too; the LLM never decides the count[90m 90[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m Role 2 machine check (COUNT-100) gates the QA hand-off[2m > [22ma passage the tokenizer counts as exactly 100 proceeds to independent QA[90m 99[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m restart and resume[2m > [22mstate, jobs and candidates survive closing and reopening the database mid-flow[90m 253[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m restart and resume[2m > [22mresume recovers interrupted file operations and does not duplicate work[90m 132[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m restart and resume[2m > [22mretry re-issues a lost exported job without spending an attempt and invalidates the old packet[90m 165[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m restart and resume[2m > [22mQA_BLOCKED_NOT_EXECUTED re-issues a fresh QA job and changes neither the verdict nor the attempt count[90m 108[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m canonical authority[2m > [22ma role whose canonical definition is missing fails closed as BLOCKED_CANONICAL_INPUT and names exactly what is missing[90m 130[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m canonical authority[2m > [22macknowledging a gap (human decision, config) lets the blocked role start on the next resume, with a caveat[90m 187[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+[31m   [31m×[31m canonical authority[2m > [22ma production engine (requireFrozenCanonical) refuses an uncertified canonical freeze[90m 94[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m     → Cannot read properties of undefined (reading 'cleanup')[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-042-wip-approved-separation.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 887[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/read-along-voice.test.ts [2m([22m[2m14 tests[22m[2m)[22m[90m 105[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-p10-capture.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 461[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-api-v3-routes.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 5311[2mms[22m[39m
+   [33m[2m✓[22m[39m v3 transport: content-backed learner journey with server-side scoring[2m > [22massessment -> first story -> feedback -> BPC -> progress, with no answer keys ever sent to the browser [33m810[2mms[22m[39m
+   [33m[2m✓[22m[39m v3 transport: content-backed learner journey with server-side scoring[2m > [22mscoring is the server's job: the client cannot post scores, and the direct-score assessment route is closed [33m619[2mms[22m[39m
+   [33m[2m✓[22m[39m v3 transport: content-backed learner journey with server-side scoring[2m > [22ma typed explanation is evaluated on the server; a bad answer is neutral feedback, never a block [33m586[2mms[22m[39m
+   [33m[2m✓[22m[39m v3 transport: content-backed learner journey with server-side scoring[2m > [22mtechnically failed speech is a retry, not a failure (APP-NFR-008) [33m824[2mms[22m[39m
+   [33m[2m✓[22m[39m v3 transport: content-backed learner journey with server-side scoring[2m > [22man off-sequence story is refused; a replay of a committed attempt is answered from the ledger [33m521[2mms[22m[39m
+   [33m[2m✓[22m[39m v3 transport: content-backed learner journey with server-side scoring[2m > [22mwhile holding, a familiar story is offered at the current WPM and completing it moves nothing [33m1090[2mms[22m[39m
+   [33m[2m✓[22m[39m client clocks are never trusted[2m > [22ma learner whose device clock is hours ahead still completes a story normally [33m535[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-report-parent.test.ts [2m([22m[2m11 tests[22m[2m)[22m[90m 92[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/narrator.test.ts [2m([22m[2m12 tests[22m[2m)[22m[90m 121[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-assessment-content.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1118[2mms[22m[39m
+   [33m[2m✓[22m[39m a new learner completes the mandatory assessment through the production provider interface[2m > [22massessment/start -> passages -> answers -> finalize; keys stay server-side; content version is recorded [33m743[2mms[22m[39m
+ [31m❯[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts [2m([22m[2m10 tests[22m[2m | [22m[31m9 failed[39m[2m)[22m[90m 146[2mms[22m[39m
+[31m   [31m×[31m SQLite state store[2m > [22mcreates the database file, parent directories and the full schema[90m 31[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m   [31m×[31m SQLite state store[2m > [22mpersists across close/reopen (restart safety)[90m 7[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m   [31m×[31m SQLite state store[2m > [22mre-opening an existing database is idempotent (no duplicate migration)[90m 25[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m   [31m×[31m SQLite state store[2m > [22mrefuses a database written by a newer schema version[90m 10[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m   [31m×[31m SQLite state store[2m > [22mtransactions commit atomically and roll back completely on error[90m 6[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m   [31m×[31m SQLite state store[2m > [22mnested transactions roll back only the inner scope[90m 8[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m   [31m×[31m SQLite state store[2m > [22menforces foreign keys and the explicit pipeline-state vocabulary[90m 9[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m   [31m×[31m SQLite state store[2m > [22mhistory is append-only: events, state_history and QA certificates cannot be edited or deleted[90m 7[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m   [31m×[31m SQLite state store[2m > [22man artifact's content hash and path are immutable once recorded[90m 6[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-km-delivery-order.test.ts [2m([22m[2m18 tests[22m[2m)[22m[33m 1756[2mms[22m[39m
+   [33m[2m✓[22m[39m registry coordinate stored with each attempt (APP-DATA-002)[2m > [22mflows onto the stored attempt for approved content only [33m1602[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-plat-session-envelope.test.ts [2m([22m[2m18 tests[22m[2m)[22m[90m 43[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-nfr-diagnostics-and-auth.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 581[2mms[22m[39m
+   [33m[2m✓[22m[39m APP-API-001 entitlement context from the verified launch grant[2m > [22mthe bootstrap response carries the entitlement context [33m333[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/pipeline-v2/count100.test.ts [2m([22m[2m42 tests[22m[2m)[22m[90m 72[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-assessment-elapsed.test.ts [2m([22m[2m11 tests[22m[2m)[22m[90m 152[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-data-learner-repository.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 414[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/pipeline-v2/canonical.test.ts [2m([22m[2m18 tests[22m[2m)[22m[33m 4963[2mms[22m[39m
+   [33m[2m✓[22m[39m registry (15 x 10 matrix, row contracts)[2m > [22ma registry with the wrong row count is rejected [33m306[2mms[22m[39m
+   [33m[2m✓[22m[39m the real v0.56 candidate package (integration; skipped when absent)[2m > [22mverifies its own lock, has 150 valid rows, and is reported as an UNCERTIFIED candidate [33m2279[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-047-attempt-record.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 88[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-041b-publish-integration.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 4708[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-041 publishPackage: persisted inputs, durable promotion, real consumer[2m > [22mpublishes a clean package: all checks pass, file lands in approved root, runtime loads it [33m547[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-041 publishPackage: persisted inputs, durable promotion, real consumer[2m > [22mbinds package sections to the approved source artifacts: a tampered section is rejected [33m417[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-041 publishPackage: persisted inputs, durable promotion, real consumer[2m > [22mdetects an approved upstream artifact tampered on disk after approval [33m577[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-041 publishPackage: persisted inputs, durable promotion, real consumer[2m > [22mversion drift fails closed [33m574[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-041 publishPackage: persisted inputs, durable promotion, real consumer[2m > [22ma package that passes the mandatory checks but cannot be consumed by the runtime is not published [33m348[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-041 publishPackage: persisted inputs, durable promotion, real consumer[2m > [22ma second publish of the same package is refused (immutable approved artifact) [33m651[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-041 publishPackage: persisted inputs, durable promotion, real consumer[2m > [22monly a QA actor can publish [33m553[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-041 publishPackage: persisted inputs, durable promotion, real consumer[2m > [22mthe runtime loader refuses WIP, unknown and tampered packages [33m485[2mms[22m[39m
+ [31m❯[39m hosted-app/tests/unit/sr/pipeline-v2/cli.test.ts [2m([22m[2m7 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 2144[2mms[22m[39m
+[31m   [31m×[31m pipeline CLI[2m > [22mfull manual Cowork loop: register -> next -> export-job -> import-result (creator) -> READY_FOR_INDEPENDENT_QA -> QA import -> approved[33m 315[2mms[22m[31m[39m
+[31m     → expected '' to contain 'registered W1-0001'[39m
+[31m   [31m×[31m pipeline CLI[2m > [22mstatus, passage, defects and jobs report state; resume is safe to repeat[33m 389[2mms[22m[31m[39m
+[31m     → expected '' to match /units: 1/[39m
+[31m   [31m×[31m pipeline CLI[2m > [22mvalidate reports which roles are missing, then runs the Role 8 machine checks[33m 348[2mms[22m[31m[39m
+[31m     → expected 2 to be 1 // Object.is equality[39m
+[31m   [31m×[31m pipeline CLI[2m > [22mretry re-issues a lost exported job[33m 619[2mms[22m[31m[39m
+[31m     → expected 2 to be +0 // Object.is equality[39m
+   [33m[2m✓[22m[39m pipeline CLI[2m > [22ma production invocation refuses an uncertified canonical package [33m314[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/item-types.test.ts [2m([22m[2m13 tests[22m[2m)[22m[90m 27[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-048-evidence-separation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 33[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-008-initial-assessment.test.ts [2m([22m[2m12 tests[22m[2m)[22m[90m 44[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-023-spoken-expression.test.ts [2m([22m[2m11 tests[22m[2m)[22m[90m 42[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-037-reference-delivery.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 257[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-api-v3-retention.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 11031[2mms[22m[39m
+   [33m[2m✓[22m[39m spaced memory checks over HTTP[2m > [22mwith the production schedule nothing is due right after reading a story [33m1349[2mms[22m[39m
+   [33m[2m✓[22m[39m spaced memory checks over HTTP[2m > [22mwhen due, only the questions are sent - never the story text - and the check is answered from memory [33m1252[2mms[22m[39m
+   [33m[2m✓[22m[39m spaced memory checks over HTTP[2m > [22ma good memory is celebrated and counted; the refresher arrives only after answering [33m1245[2mms[22m[39m
+   [33m[2m✓[22m[39m spaced memory checks over HTTP[2m > [22ma faded memory is met with a normal-and-fine message plus a refresher, never a failure [33m1432[2mms[22m[39m
+   [33m[2m✓[22m[39m spaced memory checks over HTTP[2m > [22mthe child progress summary exposes only the minimum retention counts - no thresholds, rates or labels [33m1607[2mms[22m[39m
+   [33m[2m✓[22m[39m spaced memory checks over HTTP[2m > [22mnever touches progression: speed, pointer and ledger are identical before and after, and the next story stays open [33m1526[2mms[22m[39m
+   [33m[2m✓[22m[39m spaced memory checks over HTTP[2m > [22mis idempotent, refuses a story that is not due, and validates the request [33m1242[2mms[22m[39m
+   [33m[2m✓[22m[39m spaced memory checks over HTTP[2m > [22mthe sync API does not change: a memory check reports nothing to Babysteps and is invisible to the ledger-based decision log [33m1358[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-014-live-journey.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 7294[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-009 / SR-008 session: speech, typed fallback, editable transcript[2m > [22munsupported browser starts in typed mode and still submits [33m665[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-009 / SR-008 session: speech, typed fallback, editable transcript[2m > [22mASR text is editable: raw and corrected are kept separately [33m449[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-009 / SR-008 session: speech, typed fallback, editable transcript[2m > [22mASR failure is never an automatic failure: falls back to typing and can still submit [33m579[2mms[22m[39m
+   [33m[2m✓[22m[39m SR-009 / SR-008 session: speech, typed fallback, editable transcript[2m > [22mempty submissions and double submissions are rejected [33m551[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22mthe learner view never leaks answer keys [33m396[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22mfirst attempt is recorded as independent evidence; correctness is revealed only in the response [33m707[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22ma later attempt is a supported retry: it cannot create comprehension readiness [33m601[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22mfirst attempt below the approved rule is NOT_YET and the primary item decides [33m540[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22mexplanation is scored semantically, never fails the learner, and weak answers get replay + optional retry without blocking [33m755[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22mlow-confidence ASR leaves unmatched ideas unresolved instead of marking them omitted [33m399[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22ma paraphrase that only partly matches is routed to review, not scored as an omission [33m345[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22ma struggled passage joins the revisit list without blocking anything [33m395[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22minvalid input is rejected with clear errors; unknown packages are 404 [33m454[2mms[22m[39m
+   [33m[2m✓[22m[39m learner view and attempt service on a real approved package[2m > [22mthe derived fact map is version-bound to the package [33m453[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-nfr-capabilities.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 34[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/attempt-ledger.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 28[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-attempt-provenance.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 307[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/ac-c08-observability.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 36[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-qa-v3-runner.test.ts [2m([22m[2m12 tests[22m[2m)[22m[90m 47[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-044-semantic-recall.test.ts [2m([22m[2m15 tests[22m[2m)[22m[90m 45[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-read-rsvp.test.ts [2m([22m[2m12 tests[22m[2m)[22m[90m 33[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-049-explainability.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 52[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/ac-c05-transaction-safety.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 53[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-019-role3-qa.test.ts [2m([22m[2m11 tests[22m[2m)[22m[90m 38[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/pipeline-v2/role1.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 2937[2mms[22m[39m
+   [33m[2m✓[22m[39m Role 1 against the real v0.56 candidate package (skipped when absent)[2m > [22mproduces a verified spec for RS01-P1 and an RS15-P10 readiness form [33m1520[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-033-book-time.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 29[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-persistence-config.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 138[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-046-threshold-lifecycle.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 27[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-035-news-reader-independence.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 50[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/mandatory-gates.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-036b-schema-negative-matrix.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 246[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-038-two-read-coaching.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 32[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-001b-approved-profile.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 218[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/certification-history.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-024-asr-uncertainty.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 26[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-content-provider.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 109[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/content-gate.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 41[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/outcome-separation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 27[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-021-weighting-lifecycle.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 32[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-api-v3-news-reader.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 11704[2mms[22m[39m
+   [33m[2m✓[22m[39m News Reader over HTTP (APP-API-007, APP-NR-001..010)[2m > [22mlists only completed stories and refuses an unread one (no spoilers of the canonical sequence) [33m2440[2mms[22m[39m
+   [33m[2m✓[22m[39m News Reader over HTTP (APP-API-007, APP-NR-001..010)[2m > [22mstart returns the reference delivery policy (145 WPM female TTS) and the canonical tokens for read-along [33m1638[2mms[22m[39m
+   [33m[2m✓[22m[39m News Reader over HTTP (APP-API-007, APP-NR-001..010)[2m > [22mtwo reads are stored separately, the second is framed as practice, and core state is untouched [33m1800[2mms[22m[39m
+   [33m[2m✓[22m[39m News Reader over HTTP (APP-API-007, APP-NR-001..010)[2m > [22ma replayed read is idempotent [33m1949[2mms[22m[39m
+   [33m[2m✓[22m[39m News Reader over HTTP (APP-API-007, APP-NR-001..010)[2m > [22mmissing microphone, failed capture or low confidence are technical: stored unscored and never block anything [33m2109[2mms[22m[39m
+   [33m[2m✓[22m[39m News Reader over HTTP (APP-API-007, APP-NR-001..010)[2m > [22mvalidates the request and the direct-submit route is closed (metrics are the server's job) [33m1763[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/comprehension-dominates-speed.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/zero-ai-dependency.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/wpm-ladder.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 34[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-018-familiar-practice.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/certification-gates.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-qa-evidence.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 52[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/evidence-schema.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/gold-corpus.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-nr-metrics.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 131[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/ac-c01-stale-rules.test.ts [2m([22m[2m14 tests[22m[2m)[22m[90m 103[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-044-readiness-forms.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 24[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/remediation-reassessment.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/constructs.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-022-question-alignment.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 25[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-041-terminal-gate.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 73[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/duration-band-measurement.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-036-shared-content-separate-state.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-020-hybrid-evidence.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 24[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-ui-book-goal.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 34[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-030-green-celebration.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/expanded-constructs.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [31m❯[39m hosted-app/tests/unit/sr/pipeline-v2/phase-a-demo.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 1432[2mms[22m[39m
+[31m   [31m×[31m Phase-A infrastructure demonstration[2m > [22mruns end to end on the synthetic canonical fixture[33m 311[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+[31m   [31m×[31m Phase-A infrastructure demonstration[2m > [22mruns on the real v0.56 candidate package rows and reports its freeze status[33m 1117[2mms[22m[31m[39m
+[31m     → No such built-in module: node:sqlite[39m
+ [32m✓[39m hosted-app/tests/unit/evidence-classes.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/evidence-driven-activity.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/no-grammar-penalty.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-017-new-prove-progress.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 26[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-031-below-75-positive.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 32[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/fatigue-stability-indicators.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-026-bpc-story-style.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 29[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-046-p10-primary.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 31[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/bottleneck-diagnosis.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-025-bpc-after-scoring.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-027-bpc-fidelity.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 29[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-007-ac53r.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 26[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-v3-content-and-sync.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 308[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/semantic-equivalence.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-db-evidence-projection.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 26352[2mms[22m[39m
+   [33m[2m✓[22m[39m committing an attempt writes the normalized evidence domains in the same transaction (#20)[2m > [22mstructured items and raw/confirmed spoken evidence are queryable; replay duplicates nothing [33m7960[2mms[22m[39m
+   [33m[2m✓[22m[39m committing an attempt writes the normalized evidence domains in the same transaction (#20)[2m > [22ma Level-Up and a HOLD are persisted as auditable decisions with input evidence ids and rule versions [33m4797[2mms[22m[39m
+   [33m[2m✓[22m[39m committing an attempt writes the normalized evidence domains in the same transaction (#20)[2m > [22mfamiliar practice and News Reader are projected into their own tables, never into attempts or decisions [33m4495[2mms[22m[39m
+   [33m[2m✓[22m[39m committing an attempt writes the normalized evidence domains in the same transaction (#20)[2m > [22ma failing evidence projection rolls the learner state back (no split-brain) [33m4175[2mms[22m[39m
+   [33m[2m✓[22m[39m committing an attempt writes the normalized evidence domains in the same transaction (#20)[2m > [22mthe content package consumed by an attempt is recoverable: identity is stored once per version, history never rewritten (#23) [33m4920[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-034-news-reader-parallel.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 25[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-infra-constraints.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 30[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-readiness-ruleset-diff.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 621[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/interpretability-safety.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-040-executable-evidence.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/negation-safety.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-032-levelup-celebration.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 24[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/learner-progress-persistence.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 26[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/book-level-certification.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-029-numeric-private.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 30[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-013-stage-gates.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 29[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-015-post-five.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 24[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-ledger-consistency.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 50[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-readiness-not-a-gate.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 145[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/question-contamination.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/meaningful-chunk-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/retained-comprehension.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/independent-confirmation.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sustainable-reading-rate.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-021-role4-qa.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 32[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-db-session-concurrency.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 21035[2mms[22m[39m
+   [33m[2m✓[22m[39m concurrent session starts: postgres (real SQL)[2m > [22mtwo simultaneous bootstraps from different devices: exactly one wins, one active session is persisted [33m6894[2mms[22m[39m
+   [33m[2m✓[22m[39m concurrent session starts: postgres (real SQL)[2m > [22mmany simultaneous starts never create more than one live session [33m4443[2mms[22m[39m
+   [33m[2m✓[22m[39m concurrent session starts: postgres (real SQL)[2m > [22mthe weekly maximum holds under concurrency, ordinals are unique and the 6th session is REVIEW [33m5598[2mms[22m[39m
+   [33m[2m✓[22m[39m concurrent session starts: postgres (real SQL)[2m > [22ma write based on stale session state is rejected instead of overwriting newer state [33m3776[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/frontier-search.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-031-dependency-invalidation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 26[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-042-levelups-not-readiness.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 31[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-019-support-invisible.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 32[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/rs-competency.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-038-upstream-fidelity.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 29[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/invalid-attempts.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/book-challenge.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-039-oral-gate-superseded.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 32[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/personal-reading-model.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/adaptive-speed.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/reading-timing.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 24[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-048-good-enough-to-ship.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 27[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/rate-states.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-015-role1-qa.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 28[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-030-defect-routing.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 33[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-040-p1500-not-sufficient.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/game-path-continuity.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-006-transition-precedence.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 155[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-037-referential-integrity.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 24[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/ac-c03-separate-state.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/reading-purpose-profiles.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-043-news-reader-no-world-block.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-005-staircase.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 266[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/unfamiliar-content-transfer.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-014-first-five.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-025-role6-qa.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 28[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/scoring-determinism.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 109[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/delayed-recall-evidence.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-028-permanent-features.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 24[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/section-checkpoint.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-014-role1-creator.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/certification-rate.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-039-version-hashes.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 29[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-009-personal-trajectory.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 27[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/independent-gates.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-006-pilot-threshold.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 21[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-033-final-input-manifest.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-001-consistent-difficulty.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 21[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-008-editable-transcript.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-005-inactivity-stale.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 21[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/chunking.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-db-rls.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 16717[2mms[22m[39m
+   [33m[2m✓[22m[39m RLS covers the full SpeedReader table set (#19)[2m > [22mevery sr_* table is in the expected set, and every one has row level security enabled [33m5755[2mms[22m[39m
+   [33m[2m✓[22m[39m RLS covers the full SpeedReader table set (#19)[2m > [22mspoken transcripts and readiness evidence are specifically protected [33m3677[2mms[22m[39m
+   [33m[2m✓[22m[39m RLS covers the full SpeedReader table set (#19)[2m > [22mno policy grants a client role direct access (server-mediated only) [33m3672[2mms[22m[39m
+   [33m[2m✓[22m[39m RLS covers the full SpeedReader table set (#19)[2m > [22mupgrade path: 0005 applies on a database already at 0004 holding learner data, and is re-runnable [33m3609[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/semantic-pacing.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-045-first-attempt-independence.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/page-goal-measurement.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-012-comprehension-only-gate.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 33[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-011-level-semantics.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-010-speed-ceiling.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/flexible-span-progression.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-032-authority-conflict.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/book-eta.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-041-150-not-mandatory.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-036-json-schema.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 40[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-003-catalog.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 29[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/no-meaningless-repetition.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-004-first-150.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-017-role2-qa.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 26[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-016-role2-creator.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/world1-framework.test.ts [2m([22m[2m2 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-013-green-threshold.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-007-calibration-report.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-002-revisit.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-001-worlds.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-027-role7-qa.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-034-strict-json.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-003-equivalence.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 12[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-043-free-explanation.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-029-role8-qa.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-018-role3-creator.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-010-no-blocking.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-028-role8-creator.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-035-duplicate-keys.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-023-role5-qa.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-004-bpc-support.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-009-browser-speech-apis.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-002-world-strategies.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-020-role4-creator.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-011-mimicry.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-022-role5-creator.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-047-separate-gates.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-024-role6-creator.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-026-role7-creator.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/sr-012-knowledge-map-authority.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-explain-route-gated.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 12[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/ac-c06-boundaries.test.ts [2m([22m[2m15 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/sr/pipeline-v2/csv.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/fr-016-no-decrement.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 10237[2mms[22m[39m
+   [33m[2m✓[22m[39m FR-016 earned WPM is never removed[2m > [22mno GREEN/NOT_GREEN sequence of up to 14 passages ever lowers WPM (AC-P08, exhaustive) [33m10227[2mms[22m[39m
+ [32m✓[39m hosted-app/tests/unit/v2/app-db-schema-postgres.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 62853[2mms[22m[39m
+   [33m[2m✓[22m[39m the migrations apply cleanly to a real Postgres engine[2m > [22m0001 -> 0003 create every table the adapters and requirements need [33m6961[2mms[22m[39m
+   [33m[2m✓[22m[39m retention checks are projected into their own append-only table, atomically with the state[2m > [22ma committed state with a retention log yields one row per check, replays add nothing, rows are immutable [33m4327[2mms[22m[39m
+   [33m[2m✓[22m[39m sr_commit_learner is atomic, idempotent and versioned (APP-DATA-007/008)[2m > [22mapplies state, attempt record and idempotency record together and bumps the version [33m4766[2mms[22m[39m
+   [33m[2m✓[22m[39m sr_commit_learner is atomic, idempotent and versioned (APP-DATA-007/008)[2m > [22ma replayed key is a no-op [33m3898[2mms[22m[39m
+   [33m[2m✓[22m[39m sr_commit_learner is atomic, idempotent and versioned (APP-DATA-007/008)[2m > [22ma stale writer gets VERSION_CONFLICT and nothing is written [33m4368[2mms[22m[39m
+   [33m[2m✓[22m[39m sr_commit_learner is atomic, idempotent and versioned (APP-DATA-007/008)[2m > [22ma failure inside the commit rolls the whole commit back (no half-applied Level Up) [33m3558[2mms[22m[39m
+   [33m[2m✓[22m[39m evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002..010)[2m > [22mattempt rows cannot be updated or deleted [33m3788[2mms[22m[39m
+   [33m[2m✓[22m[39m evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002..010)[2m > [22man attempt for an unknown learner violates the foreign key [33m4270[2mms[22m[39m
+   [33m[2m✓[22m[39m evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002..010)[2m > [22mlearner rows reject impossible speeds and pointers (150 WPM ceiling, 1..1501) [33m3700[2mms[22m[39m
+   [33m[2m✓[22m[39m evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002..010)[2m > [22mearned WPM can never decrease in a decision record, and decisions need evidence [33m3288[2mms[22m[39m
+   [33m[2m✓[22m[39m evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002..010)[2m > [22ma confirmed transcript cannot exist without the raw transcript (APP-COMP-010) [33m4321[2mms[22m[39m
+   [33m[2m✓[22m[39m evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002..010)[2m > [22ma readiness form can never be reused within a stream, roles and outcomes are constrained (APP-READY-006) [33m3659[2mms[22m[39m
+   [33m[2m✓[22m[39m evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002..010)[2m > [22mNews Reader attempts live in their own table, only reads 1 and 2 exist, and they are append-only (APP-NR-004) [33m3572[2mms[22m[39m
+   [33m[2m✓[22m[39m evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002..010)[2m > [22mitem scores are bounded and calibration versions never change [33m2503[2mms[22m[39m
+   [33m[2m✓[22m[39m the Supabase adapters run against the real schema and the real commit function[2m > [22mrepository: create, commit with attempt, replay, conflict, list [33m2036[2mms[22m[39m
+   [33m[2m✓[22m[39m the Supabase adapters run against the real schema and the real commit function[2m > [22massessment and session documents round-trip and upsert [33m1579[2mms[22m[39m
+   [33m[2m✓[22m[39m the Supabase adapters run against the real schema and the real commit function[2m > [22mthe entire v3 learner journey persists through the real SQL (assessment -> five stories -> Level Up) [33m2210[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m206 passed[39m[22m[90m (211)[39m
+[2m      Tests [22m [1m[31m70 failed[39m[22m[2m | [22m[1m[32m1682 passed[39m[22m[90m (1752)[39m
+[2m   Start at [22m 22:24:17
+[2m   Duration [22m 67.84s[2m (transform 32.25s, setup 0ms, collect 94.36s, tests 221.02s, environment 203ms, prepare 132.16s)[22m
+
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+[90mstderr[2m | hosted-app/tests/unit/content-gate.test.ts[2m > [22m[2mloadApprovedContent[2m > [22m[2mreturns only approved, valid content and drops the rest
+[22m[39mCONTENT_INVALID {
+  valid: [33mfalse[39m,
+  reasonCode: [32m'CONTENT_INVALID'[39m,
+  contentId: [32m'bad'[39m,
+  reasons: [ [32m'content not approved (approval_status="WIP")'[39m ]
+}
+
+[31m⎯⎯⎯⎯⎯⎯[1m[7m Failed Tests 70 [27m[22m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/cli.test.ts[2m > [22mpipeline CLI[2m > [22mfull manual Cowork loop: register -> next -> export-job -> import-result (creator) -> READY_FOR_INDEPENDENT_QA -> QA import -> approved
+[31m[1mAssertionError[22m: expected '' to contain 'registered W1-0001'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- registered W1-0001[39m
+
+[36m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/cli.test.ts:[2m34:52[22m[39m
+    [90m 32| [39m[34mdescribe[39m([32m"pipeline CLI"[39m[33m,[39m () [33m=>[39m {
+    [90m 33| [39m  [34mit[39m([32m"full manual Cowork loop: register -> next -> export-job -> impor[39m…
+    [90m 34| [39m    [34mexpect[39m(([35mawait[39m [34mcli[39m([32m"register"[39m[33m,[39m [32m"W1-0001"[39m))[33m.[39mout)[33m.[39m[34mtoContain[39m([32m"register[39m…
+    [90m   | [39m                                                   [31m^[39m
+    [90m 35| [39m    [35mconst[39m next [33m=[39m [35mawait[39m [34mcli[39m([32m"next"[39m)[33m;[39m
+    [90m 36| [39m    [34mexpect[39m(next[33m.[39mcode)[33m.[39m[34mtoBe[39m([34m0[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/cli.test.ts[2m > [22mpipeline CLI[2m > [22mstatus, passage, defects and jobs report state; resume is safe to repeat
+[31m[1mAssertionError[22m: expected '' to match /units: 1/[39m
+
+[32m- Expected:[39m 
+/units: 1/
+
+[31m+ Received:[39m 
+""
+
+[36m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/cli.test.ts:[2m71:19[22m[39m
+    [90m 69| [39m    [35mawait[39m [34mcli[39m([32m"register"[39m[33m,[39m [32m"W1-0001"[39m)[33m;[39m
+    [90m 70| [39m    [35mconst[39m s [33m=[39m [35mawait[39m [34mcli[39m([32m"status"[39m)[33m;[39m
+    [90m 71| [39m    [34mexpect[39m(s[33m.[39mout)[33m.[39m[34mtoMatch[39m([36m/units: 1/[39m)[33m;[39m
+    [90m   | [39m                  [31m^[39m
+    [90m 72| [39m    [34mexpect[39m(s[33m.[39mout)[33m.[39m[34mtoMatch[39m([36m/canonical: .*FREEZE_CANDIDATE_UNCERTIFIED/[39m)[33m;[39m
+    [90m 73| [39m    [35mconst[39m r1 [33m=[39m [35mawait[39m [34mcli[39m([32m"resume"[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/cli.test.ts[2m > [22mpipeline CLI[2m > [22mvalidate reports which roles are missing, then runs the Role 8 machine checks
+[31m[1mAssertionError[22m: expected 2 to be 1 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 2[39m
+
+[36m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/cli.test.ts:[2m87:24[22m[39m
+    [90m 85| [39m    [35mawait[39m [34mcli[39m([32m"register"[39m[33m,[39m [32m"W1-0001"[39m)[33m;[39m
+    [90m 86| [39m    [35mconst[39m early [33m=[39m [35mawait[39m [34mcli[39m([32m"validate"[39m[33m,[39m [32m"W1-0001"[39m)[33m;[39m
+    [90m 87| [39m    [34mexpect[39m(early[33m.[39mcode)[33m.[39m[34mtoBe[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                       [31m^[39m
+    [90m 88| [39m    [34mexpect[39m(early[33m.[39mout)[33m.[39m[34mtoMatch[39m([36m/not ready.*missing roles/i[39m)[33m;[39m
+    [90m 89| [39m    [34mexpect[39m(([35mawait[39m [34mcli[39m([32m"validate"[39m[33m,[39m [32m"W1-9999"[39m))[33m.[39mcode)[33m.[39m[34mtoBe[39m([34m2[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/cli.test.ts[2m > [22mpipeline CLI[2m > [22mretry re-issues a lost exported job
+[31m[1mAssertionError[22m: expected 2 to be +0 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 0[39m
+[31m+ 2[39m
+
+[36m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/cli.test.ts:[2m97:20[22m[39m
+    [90m 95| [39m    [35mawait[39m [34mcli[39m([32m"export-job"[39m[33m,[39m [32m"1"[39m)[33m;[39m
+    [90m 96| [39m    [35mconst[39m r [33m=[39m [35mawait[39m [34mcli[39m([32m"retry"[39m[33m,[39m [32m"1"[39m)[33m;[39m
+    [90m 97| [39m    [34mexpect[39m(r[33m.[39mcode)[33m.[39m[34mtoBe[39m([34m0[39m)[33m;[39m
+    [90m   | [39m                   [31m^[39m
+    [90m 98| [39m    [34mexpect[39m(r[33m.[39mout)[33m.[39m[34mtoMatch[39m([36m/job 1 cancelled; new job 2/[39m)[33m;[39m
+    [90m 99| [39m  })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts[2m > [22mSQLite state store[2m > [22mcreates the database file, parent directories and the full schema
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts:[2m21:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts[2m > [22mSQLite state store[2m > [22mpersists across close/reopen (restart safety)
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts:[2m30:14[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts[2m > [22mSQLite state store[2m > [22mre-opening an existing database is idempotent (no duplicate migration)
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts:[2m40:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts[2m > [22mSQLite state store[2m > [22mrefuses a database written by a newer schema version
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts:[2m47:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts[2m > [22mSQLite state store[2m > [22mtransactions commit atomically and roll back completely on error
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts:[2m54:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts[2m > [22mSQLite state store[2m > [22mnested transactions roll back only the inner scope
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts:[2m67:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts[2m > [22mSQLite state store[2m > [22menforces foreign keys and the explicit pipeline-state vocabulary
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts:[2m81:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts[2m > [22mSQLite state store[2m > [22mhistory is append-only: events, state_history and QA certificates cannot be edited or deleted
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts:[2m90:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts[2m > [22mSQLite state store[2m > [22man artifact's content hash and path are immutable once recorded
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/db.test.ts:[2m101:16[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22ma QA FAIL traverses QA_FAILED, preserves the failed attempt and schedules attempt 2 with the defect as context
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22mafter a correction passes, the defect closes and the new version is approved
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22mthree failed creator attempts (attempt 1 initial, 2 correction, 3 final) escalate to human review; no 4th job exists
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22msubstantially the same blocker twice in a row escalates early (after the 2nd failure)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22mdifferent blockers on consecutive failures do not trigger early escalation
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22ma human can resolve an escalation: the chain resets and a fresh attempt 1 job is created
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22ma QA FAIL must carry at least one complete BLOCKER defect
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22mnon-blocking observations never force rework
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mRole 6 QA reports a Role 4 defect: owner identified, Role 6 BLOCKED_UPSTREAM, Role 4 correction job created, nothing repaired by QA
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mthe Role 4 correction packet carries the defect context; after fresh independent QA and approval only true descendants are invalidated
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mwhen everything downstream was already approved, the whole descendant chain 5,6,7,8 is invalidated and 3 is kept
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22ma correction that reproduces the identical artifact hash invalidates nothing
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22ma Role 3 defect found in Role 6 QA is routed to Role 3, not to Role 4 or Role 5
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22ma Role 2 source defect found at Role 4 QA cascades: the approved Role 3 (relied on old Role 2) is invalidated, an exported Role 3 job goes stale
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22man approved Role 3 is invalidated when Role 2 is re-approved with a different hash
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22ma Role 4 creator that finds the cause in Role 2 reports BLOCKED_UPSTREAM; the creator's attempt is not consumed
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mowners must be this role or an upstream role; a downstream or unrelated owner is rejected
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mCANONICAL_OWNER (or the code-owned Role 1) escalates to human review instead of creating an LLM correction job
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mthe same upstream blocker reported again after the correction escalates the owner (not an endless loop)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mthe owner's retry budget bounds repeated touchbacks (third reopen escalates)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22maudit trail[2m > [22mevery transition and import is recorded in append-only history
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m Function.open hosted-app/lib/sr/pipeline-v2/engine.ts:[2m104:16[22m[39m
+[90m [2m❯[22m Module.makeEnv hosted-app/tests/unit/sr/pipeline-v2/helpers/harness.ts:[2m27:28[22m[39m
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts:[2m12:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22ma QA FAIL traverses QA_FAILED, preserves the failed attempt and schedules attempt 2 with the defect as context
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22mafter a correction passes, the defect closes and the new version is approved
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22mthree failed creator attempts (attempt 1 initial, 2 correction, 3 final) escalate to human review; no 4th job exists
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22msubstantially the same blocker twice in a row escalates early (after the 2nd failure)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22mdifferent blockers on consecutive failures do not trigger early escalation
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22ma human can resolve an escalation: the chain resets and a fresh attempt 1 job is created
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22ma QA FAIL must carry at least one complete BLOCKER defect
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mown-role QA failure, retry limit and escalation[2m > [22mnon-blocking observations never force rework
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mRole 6 QA reports a Role 4 defect: owner identified, Role 6 BLOCKED_UPSTREAM, Role 4 correction job created, nothing repaired by QA
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mthe Role 4 correction packet carries the defect context; after fresh independent QA and approval only true descendants are invalidated
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mwhen everything downstream was already approved, the whole descendant chain 5,6,7,8 is invalidated and 3 is kept
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22ma correction that reproduces the identical artifact hash invalidates nothing
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22ma Role 3 defect found in Role 6 QA is routed to Role 3, not to Role 4 or Role 5
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22ma Role 2 source defect found at Role 4 QA cascades: the approved Role 3 (relied on old Role 2) is invalidated, an exported Role 3 job goes stale
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22man approved Role 3 is invalidated when Role 2 is re-approved with a different hash
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22ma Role 4 creator that finds the cause in Role 2 reports BLOCKED_UPSTREAM; the creator's attempt is not consumed
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mowners must be this role or an upstream role; a downstream or unrelated owner is rejected
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mCANONICAL_OWNER (or the code-owned Role 1) escalates to human review instead of creating an LLM correction job
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mthe same upstream blocker reported again after the correction escalates the owner (not an endless loop)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22mupstream touchback[2m > [22mthe owner's retry budget bounds repeated touchbacks (third reopen escalates)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts[2m > [22maudit trail[2m > [22mevery transition and import is recorded in append-only history
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/engine-routing.test.ts:[2m13:21[22m[39m
+    [90m 11| [39m[35mconst[39m [33mQ[39m [33m=[39m [32m"W1-0002"[39m[33m;[39m
+    [90m 12| [39m[34mbeforeEach[39m(() [33m=>[39m { env [33m=[39m [34mmakeEnv[39m()[33m;[39m cw [33m=[39m [35mnew[39m [33mCowork[39m(env)[33m;[39m })[33m;[39m
+    [90m 13| [39m[34mafterEach[39m(() [33m=>[39m env[33m.[39m[34mcleanup[39m())[33m;[39m
+    [90m   | [39m                    [31m^[39m
+    [90m 14| [39m
+    [90m 15| [39m[35mconst[39m state [33m=[39m (p[33m:[39m string[33m,[39m r[33m:[39m number) [33m=>[39m env[33m.[39meng[33m.[39m[34mitem[39m(p[33m,[39m r)[33m.[39mstate[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mregistering a passage creates all eight work items; only Role 1 can start
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mregistering is idempotent and rejects unknown passages (no guessing)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mdeterministic Role 1 runs on resume and promotes through a machine certificate; Role 2 becomes READY with a creator job
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mdownstream roles become eligible only from APPROVED upstream (R3 needs R1+R2, R5 needs R2+R4, R6 needs R3+R4, R7 needs R6, R8 needs R1-R7)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mnext picks READY semantic jobs in delivery order; there is never a QA job without a candidate
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22ma creator result lands in WIP only; nothing is approved and downstream stays PENDING/READY-blocked
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22monly an independent QA PASS with the exact candidate hash promotes the artifact to APPROVED
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mQA PASS naming a different candidate hash is rejected and promotes nothing
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mif the WIP bytes change after the creator import, QA cannot approve them
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mself-approval is prevented: the creator's own context cannot QA, a creator cannot return PASS, a QA job cannot return creator output
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mQA is read-only: a QA result that carries an artifact is rejected
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mQA_PASS may not carry blocking defects
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22ma QA PASS is refused while an open blocker exists against that candidate
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mresults are single-use: replaying an imported job is rejected
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22ma result must match the job envelope (job id, passage, role) and validate against agent_result.schema.json
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22man unexported job cannot be imported
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22ma creator packet validates against job_packet.schema.json and the prompt is self-contained
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22mthe common contract is injected, not duplicated: role contract files do not repeat it
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22mthe packet for a role never contains unapproved WIP
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22mthe independent QA packet is generated automatically on creator import and carries NO creator reasoning
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22mRole 2 QA packets carry the COUNT-100 machine evidence computed by code
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22macknowledged canonical gaps travel in the packet as authority caveats
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mstale inputs and reopened upstream[2m > [22mimport itself rejects a job whose pinned inputs changed even if reconcile has not run yet
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mstale inputs and reopened upstream[2m > [22mwhile an upstream role is reopened for correction, downstream roles do not start new work from its old approval
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mRole 2 machine check (COUNT-100) gates the QA hand-off[2m > [22ma 99-token body is MACHINE_REJECTED: no QA job, the attempt is spent, a correction job carries the machine defect
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mRole 2 machine check (COUNT-100) gates the QA hand-off[2m > [22m101 tokens and hidden characters are rejected too; the LLM never decides the count
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mRole 2 machine check (COUNT-100) gates the QA hand-off[2m > [22ma passage the tokenizer counts as exactly 100 proceeds to independent QA
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mrestart and resume[2m > [22mstate, jobs and candidates survive closing and reopening the database mid-flow
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mrestart and resume[2m > [22mresume recovers interrupted file operations and does not duplicate work
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mrestart and resume[2m > [22mretry re-issues a lost exported job without spending an attempt and invalidates the old packet
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mrestart and resume[2m > [22mQA_BLOCKED_NOT_EXECUTED re-issues a fresh QA job and changes neither the verdict nor the attempt count
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mcanonical authority[2m > [22ma role whose canonical definition is missing fails closed as BLOCKED_CANONICAL_INPUT and names exactly what is missing
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mcanonical authority[2m > [22macknowledging a gap (human decision, config) lets the blocked role start on the next resume, with a caveat
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mcanonical authority[2m > [22ma production engine (requireFrozenCanonical) refuses an uncertified canonical freeze
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m Function.open hosted-app/lib/sr/pipeline-v2/engine.ts:[2m104:16[22m[39m
+[90m [2m❯[22m Module.makeEnv hosted-app/tests/unit/sr/pipeline-v2/helpers/harness.ts:[2m27:28[22m[39m
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts:[2m15:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mregistering a passage creates all eight work items; only Role 1 can start
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mregistering is idempotent and rejects unknown passages (no guessing)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mdeterministic Role 1 runs on resume and promotes through a machine certificate; Role 2 becomes READY with a creator job
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mdownstream roles become eligible only from APPROVED upstream (R3 needs R1+R2, R5 needs R2+R4, R6 needs R3+R4, R7 needs R6, R8 needs R1-R7)
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mregistration and queue eligibility[2m > [22mnext picks READY semantic jobs in delivery order; there is never a QA job without a candidate
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22ma creator result lands in WIP only; nothing is approved and downstream stays PENDING/READY-blocked
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22monly an independent QA PASS with the exact candidate hash promotes the artifact to APPROVED
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mQA PASS naming a different candidate hash is rejected and promotes nothing
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mif the WIP bytes change after the creator import, QA cannot approve them
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mself-approval is prevented: the creator's own context cannot QA, a creator cannot return PASS, a QA job cannot return creator output
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mQA is read-only: a QA result that carries an artifact is rejected
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mQA_PASS may not carry blocking defects
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22ma QA PASS is refused while an open blocker exists against that candidate
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22mresults are single-use: replaying an imported job is rejected
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22ma result must match the job envelope (job id, passage, role) and validate against agent_result.schema.json
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mWIP isolation and QA-gated approval[2m > [22man unexported job cannot be imported
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22ma creator packet validates against job_packet.schema.json and the prompt is self-contained
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22mthe common contract is injected, not duplicated: role contract files do not repeat it
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22mthe packet for a role never contains unapproved WIP
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22mthe independent QA packet is generated automatically on creator import and carries NO creator reasoning
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22mRole 2 QA packets carry the COUNT-100 machine evidence computed by code
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mCowork job packets[2m > [22macknowledged canonical gaps travel in the packet as authority caveats
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mstale inputs and reopened upstream[2m > [22mimport itself rejects a job whose pinned inputs changed even if reconcile has not run yet
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mstale inputs and reopened upstream[2m > [22mwhile an upstream role is reopened for correction, downstream roles do not start new work from its old approval
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mRole 2 machine check (COUNT-100) gates the QA hand-off[2m > [22ma 99-token body is MACHINE_REJECTED: no QA job, the attempt is spent, a correction job carries the machine defect
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mRole 2 machine check (COUNT-100) gates the QA hand-off[2m > [22m101 tokens and hidden characters are rejected too; the LLM never decides the count
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mRole 2 machine check (COUNT-100) gates the QA hand-off[2m > [22ma passage the tokenizer counts as exactly 100 proceeds to independent QA
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mrestart and resume[2m > [22mstate, jobs and candidates survive closing and reopening the database mid-flow
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mrestart and resume[2m > [22mresume recovers interrupted file operations and does not duplicate work
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mrestart and resume[2m > [22mretry re-issues a lost exported job without spending an attempt and invalidates the old packet
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mrestart and resume[2m > [22mQA_BLOCKED_NOT_EXECUTED re-issues a fresh QA job and changes neither the verdict nor the attempt count
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mcanonical authority[2m > [22ma role whose canonical definition is missing fails closed as BLOCKED_CANONICAL_INPUT and names exactly what is missing
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mcanonical authority[2m > [22macknowledging a gap (human decision, config) lets the blocked role start on the next resume, with a caveat
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts[2m > [22mcanonical authority[2m > [22ma production engine (requireFrozenCanonical) refuses an uncertified canonical freeze
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/engine.test.ts:[2m16:21[22m[39m
+    [90m 14| [39m[35mconst[39m [33mP[39m [33m=[39m [32m"W1-0001"[39m[33m;[39m
+    [90m 15| [39m[34mbeforeEach[39m(() [33m=>[39m { env [33m=[39m [34mmakeEnv[39m()[33m;[39m cw [33m=[39m [35mnew[39m [33mCowork[39m(env)[33m;[39m })[33m;[39m
+    [90m 16| [39m[34mafterEach[39m(() [33m=>[39m env[33m.[39m[34mcleanup[39m())[33m;[39m
+    [90m   | [39m                    [31m^[39m
+    [90m 17| [39m
+    [90m 18| [39m[35mconst[39m states [33m=[39m (passage [33m=[39m [33mP[39m) [33m=>[39m [33mObject[39m[33m.[39m[34mfromEntries[39m(env[33m.[39meng[33m.[39m[34mitems[39m(passa…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/phase-a-demo.test.ts[2m > [22mPhase-A infrastructure demonstration[2m > [22mruns end to end on the synthetic canonical fixture
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m Function.open hosted-app/lib/sr/pipeline-v2/engine.ts:[2m104:16[22m[39m
+[90m [2m❯[22m Module.runPhaseADemo hosted-app/lib/sr/pipeline-v2/demo.ts:[2m61:28[22m[39m
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/phase-a-demo.test.ts:[2m41:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/125]⎯[22m[39m
+
+[31m[1m[7m FAIL [27m[22m[39m hosted-app/tests/unit/sr/pipeline-v2/phase-a-demo.test.ts[2m > [22mPhase-A infrastructure demonstration[2m > [22mruns on the real v0.56 candidate package rows and reports its freeze status
+[31m[1mError[22m: No such built-in module: node:sqlite[39m
+[36m [2m❯[22m Module.openDb hosted-app/lib/sr/pipeline-v2/db.ts:[2m208:57[22m[39m
+    [90m206| [39m[35mexport[39m [35mfunction[39m [34mopenDb[39m(path[33m:[39m string)[33m:[39m [33mDb[39m {
+    [90m207| [39m  [35mif[39m (path [33m!==[39m [32m":memory:"[39m) [34mmkdirSync[39m([34mdirname[39m(path)[33m,[39m { recursive[33m:[39m [35mtrue[39m …
+    [90m208| [39m  [35mconst[39m { [33mDatabaseSync[39m } [33m=[39m [34mcreateRequire[39m([35mimport[39m[33m.[39mmeta[33m.[39murl)([32m"node:sqlite[39m…
+    [90m   | [39m                                                        [31m^[39m
+    [90m209| [39m  [35mconst[39m raw [33m=[39m [35mnew[39m [33mDatabaseSync[39m(path)[33m;[39m
+    [90m210| [39m  raw[33m.[39m[34mexec[39m([32m"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGM[39m…
+[90m [2m❯[22m Function.open hosted-app/lib/sr/pipeline-v2/engine.ts:[2m104:16[22m[39m
+[90m [2m❯[22m Module.runPhaseADemo hosted-app/lib/sr/pipeline-v2/demo.ts:[2m61:28[22m[39m
+[90m [2m❯[22m hosted-app/tests/unit/sr/pipeline-v2/phase-a-demo.test.ts:[2m49:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/125]⎯[22m[39m
+

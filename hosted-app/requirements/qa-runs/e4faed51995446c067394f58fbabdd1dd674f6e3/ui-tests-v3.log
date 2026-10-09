@@ -1,0 +1,13 @@
+$ npx playwright test hosted-app/tests/ui/learner-v3.spec.ts hosted-app/tests/ui/learner-v3-speech.spec.ts hosted-app/tests/ui/learner-v3-news-reader.spec.ts hosted-app/tests/ui/learner-v3-retention.spec.ts hosted-app/tests/ui/learner-v3-outcome.spec.ts hosted-app/tests/ui/learner-v3-a11y.spec.ts hosted-app/tests/ui/learner-v3-practice-session.spec.ts hosted-app/tests/ui/api-v3.spec.ts container/tests/app-launch.spec.ts
+# commit e4faed51995446c067394f58fbabdd1dd674f6e3 dirty=false node v20.11.1
+# exit 0
+
+
+Running 135 tests using 6 workers
+················································································
+·······················································
+  135 passed (1.8m)
+
+[WebServer] [launch] misconfigured: APP_LAUNCH_CLIENT_ID is required to process an app launch.
+[WebServer] [launch] misconfigured: APP_LAUNCH_CLIENT_ID is required to process an app launch.
+[WebServer] [launch] misconfigured: APP_LAUNCH_CLIENT_ID is required to process an app launch.

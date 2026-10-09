@@ -46,3 +46,10 @@ describe("V3 traceability ledger (#27)", () => {
     for (const id of ["APP-DB-003", "APP-DB-004", "APP-DB-005", "APP-DB-006", "APP-DB-007", "APP-DB-010"]) expect(status(id), id).toBe("IMPLEMENTED_TESTED");
   });
 });
+
+describe("device identity is described honestly (#35)", () => {
+  it("the ledger and the client code call the device id best-effort, not a security identity", () => {
+    expect(text).toMatch(/best-effort device signal, issue #35/);
+    expect(readFileSync("hosted-app/ui/learner/api.ts", "utf8")).toMatch(/NOT a security identity/);
+  });
+});

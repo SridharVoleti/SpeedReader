@@ -1,0 +1,46 @@
+{
+  "schema": "sr-qa-run/1",
+  "commitSha": "e4faed51995446c067394f58fbabdd1dd674f6e3",
+  "dirtyTree": false,
+  "node": "v20.11.1",
+  "startedAt": "2026-10-09T16:54:12.806Z",
+  "steps": [
+    {
+      "name": "unit-tests",
+      "command": "npx vitest run",
+      "exitCode": 1,
+      "logFile": "qa-runs/e4faed51995446c067394f58fbabdd1dd674f6e3/unit-tests.log",
+      "logSha256": "dd8e7396d82262c89a53929a1c4f524114662ed035c712a82cd89ebdb75776c2",
+      "summary": {},
+      "durationMs": 72970
+    },
+    {
+      "name": "typecheck",
+      "command": "npx tsc --noEmit",
+      "exitCode": 0,
+      "logFile": "qa-runs/e4faed51995446c067394f58fbabdd1dd674f6e3/typecheck.log",
+      "logSha256": "2599f297a764b37208aa88e5215363830ca0be98aca93ac8baeebac33a5974e0",
+      "summary": {},
+      "durationMs": 10489
+    },
+    {
+      "name": "build",
+      "command": "npx next build",
+      "exitCode": 0,
+      "logFile": "qa-runs/e4faed51995446c067394f58fbabdd1dd674f6e3/build.log",
+      "logSha256": "34be838a293134f5843c0d2ee1eaefffa68c66ba6f168e415a64bc4dec4c9bbe",
+      "summary": {},
+      "durationMs": 91129
+    },
+    {
+      "name": "ui-tests-v3",
+      "command": "npx playwright test hosted-app/tests/ui/learner-v3.spec.ts hosted-app/tests/ui/learner-v3-speech.spec.ts hosted-app/tests/ui/learner-v3-news-reader.spec.ts hosted-app/tests/ui/learner-v3-retention.spec.ts hosted-app/tests/ui/learner-v3-outcome.spec.ts hosted-app/tests/ui/learner-v3-a11y.spec.ts hosted-app/tests/ui/learner-v3-practice-session.spec.ts hosted-app/tests/ui/api-v3.spec.ts container/tests/app-launch.spec.ts",
+      "exitCode": 0,
+      "logFile": "qa-runs/e4faed51995446c067394f58fbabdd1dd674f6e3/ui-tests-v3.log",
+      "logSha256": "7611daed3154d921da79e09a1b00e7679ea7224c0e05b4f7d430eff3d36921ac",
+      "summary": {},
+      "durationMs": 114693
+    }
+  ],
+  "certification": "NOT_CERTIFIED"
+}

@@ -8,6 +8,11 @@ function safeStorage(): Storage | null {
   try { return window.localStorage; } catch { return null; }
 }
 
+/**
+ * Best-effort client-instance id for the single-active-device rule (issue #35). It is NOT a security identity: it is
+ * random, stored in localStorage and can be cleared or changed. No fingerprinting data is collected. Replace it with a
+ * trusted Babysteps device/session id server-side when the platform provides one.
+ */
 export function deviceId(): string {
   const ls = safeStorage();
   try {
