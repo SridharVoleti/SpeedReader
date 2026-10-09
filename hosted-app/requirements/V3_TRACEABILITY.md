@@ -9,6 +9,77 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 - `vitest run`: 1171 pass / 70 fail. All 70 failures are `hosted-app/tests/unit/sr/pipeline-v2/*` (content pipeline; needs `node:sqlite`, env has Node 20.11). Out of scope (CLAUDE-005).
 - `tsc --noEmit`: clean.
 
+
+## Status summary (all 194 requirements evaluated; last updated 2026-10-09)
+
+| Status | Count |
+|---|---:|
+| IMPLEMENTED_TESTED | 146 |
+| PARTIAL | 47 |
+| BLOCKED | 1 |
+
+**Verification (2026-10-09):** `vitest` 1352 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright 426 pass / 6 fail; the 6 are `progression.spec.ts` (legacy 36-level demo, 2 tests x 3 projects) and were confirmed failing identically at the pre-work baseline commit 730af66.
+
+### Open items (why each PARTIAL/BLOCKED is not done)
+1. **No production v3 learner UI.** `/` is still the legacy 36-level localStorage demo (APP-DATA-009, APP-NFR-007, AC-A18). Needed for: ASSESS-001, READ-001/002/005/006, UX-001..005, NFR-001/006/009, INFRA-001, COMP-010/011, NR-007/008, NORTH-002, PLAT-010 (sync payload). This is the Phase 5/7/11/12 UI build.
+2. **Supabase not provisioned.** Schema authored in `supabase/migrations/0001-0002` but never applied/tested; no `SupabaseLearnerRepository` adapter. Affects DATA-009/010, DB-001..010, INFRA-003.
+3. **Session registry is in-memory** (per server instance). Needs the platform session API or a shared store: PLAT-006..009, API-001/009.
+4. **No approved Knowledge Map / canonical scoring contract / BPC content.** KM-001/002/004/006, ORAL-002 steps 8-9 cannot run end to end; production BPC catalog is empty (fails closed).
+5. **Production semantic evaluator not wired** (fixtures only): COMP-008, API-005 input.
+6. **Platform dependencies:** parent authorization scope (internal key used as assumption), entitlement from launch grant, `/identity` route (501 stub): PLAT-003, API-008.
+7. **APP-NFR-005** needs the Babysteps accessibility QA gate (BLOCKED, not self-certifiable).
+8. CAL-003 analytics cuts missing (device/browser, ASR uncertainty, time-to-Level-Up, practice frequency, false-ready, stamina transitions).
+
+### Partial / blocked rows
+- APP-NORTH-002 Confidence-first
+- APP-PLAT-003 Standard launch protocol
+- APP-PLAT-006 Single active learner/device rule
+- APP-PLAT-007 Platform session envelope
+- APP-PLAT-008 Review-session integration
+- APP-PLAT-009 Accidental-close resume
+- APP-PLAT-010 Return to Babysteps
+- APP-INFRA-001 Web-first, mobile-required
+- APP-INFRA-003 Deployment
+- APP-ASSESS-001 Mandatory new-learner baseline
+- APP-READ-001 Canonical token stream
+- APP-READ-002 WPM-driven display
+- APP-READ-005 Technical interruption
+- APP-READ-006 Session boundary
+- APP-COMP-010 Editable transcript
+- APP-COMP-011 Browser-native STT
+- APP-UX-001 Scores are private
+- APP-UX-002 GREEN feedback
+- APP-UX-003 NOT_GREEN feedback
+- APP-UX-004 Level-Up celebration
+- APP-UX-005 Book-time impact
+- APP-NR-007 Browser TTS
+- APP-NR-008 Read-along highlight
+- APP-ORAL-002 Deterministic scoring order
+- APP-DATA-009 Server persistence
+- APP-DATA-010 Supabase responsibility
+- APP-DB-001 Learner app state
+- APP-DB-002 Attempts
+- APP-DB-003 Structured responses
+- APP-DB-004 Spoken evidence
+- APP-DB-005 Progression decisions
+- APP-DB-006 Practice selection/history
+- APP-DB-007 News Reader attempts
+- APP-DB-008 Readiness cycles/forms
+- APP-DB-009 Calibration versions
+- APP-DB-010 Content package identity
+- APP-CAL-003 Post-launch calibration evidence
+- APP-NFR-001 Responsive learner journey
+- APP-NFR-006 Child usability
+- APP-NFR-007 Diagnostics protection
+- APP-NFR-009 Performance
+- APP-API-001 Bootstrap
+- APP-API-009 Resume
+- APP-KM-001 Correct delivery coordinate
+- APP-KM-002 Shared canonical tokenizer
+- APP-KM-004 Deterministic scoring contracts
+- APP-KM-006 Primary/confirmation lifecycle
+- APP-NFR-005 Accessibility QA (BLOCKED)
+
 ## Matrix
 | Req ID | Title | Status | Modules | Tests | Evidence / notes |
 |---|---|---|---|---|---|
