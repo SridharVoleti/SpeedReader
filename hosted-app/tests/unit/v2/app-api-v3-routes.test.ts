@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { buildDeps, handleV3, internalAuthorized, makeProvider, speechFor, type Verified } from "../../../api/v3";
+import { buildDeps, handleV3, internalAuthorized, makeProvider, sanitizeStartedAt, speechFor, type Verified } from "../../../api/v3";
 import { ApprovedPackageProvider, FixtureContentProvider, type ContentProvider } from "../../../lib/v2/content-provider";
 import { createStore } from "../../../lib/sr/pipeline/storage";
 import { assertNoInternalLeak } from "../../../lib/v2/learner-feedback";
@@ -164,5 +164,23 @@ describe("transport basics", () => {
     expect(internalAuthorized(new Request("http://x", { headers: { "x-sr-internal-key": "k".repeat(24) } }), env)).toBe(true);
     expect(internalAuthorized(new Request("http://x", { headers: { "x-sr-internal-key": "wrong" } }), env)).toBe(false);
     expect(internalAuthorized(new Request("http://x"), env)).toBe(false);
+  });
+});
+
+describe("client clocks are never trusted", () => {
+  const now = Date.parse("2026-10-09T10:00:00Z");
+  it("accepts a sane recent start time and replaces future, ancient or invalid ones with server time", () => {
+    expect(sanitizeStartedAt("2026-10-09T09:58:00Z", now)).toBe("2026-10-09T09:58:00.000Z");
+    expect(sanitizeStartedAt("2026-10-09T11:00:00Z", now)).toBe("2026-10-09T10:00:00.000Z"); // skewed into the future
+    expect(sanitizeStartedAt("2026-10-08T09:00:00Z", now)).toBe("2026-10-09T10:00:00.000Z"); // outside the session window
+    expect(sanitizeStartedAt("garbage", now)).toBe("2026-10-09T10:00:00.000Z");
+    expect(sanitizeStartedAt(undefined, now)).toBe("2026-10-09T10:00:00.000Z");
+  });
+  it("a learner whose device clock is hours ahead still completes a story normally", async () => {
+    await onboard(70);
+    const r = await call("POST", "passage/submit", { attemptId: "skew", passageId: "FX-0001", answers: ALL_RIGHT, startedAt: "2099-01-01T00:00:00Z", ...story(GOOD_RETELLING) });
+    expect(r.status).toBe(200);
+    const rec = deps.repo.load("kid")!.learner.ledger[0];
+    expect(Date.parse(rec.startedAt)).toBeLessThanOrEqual(Date.parse(rec.completedAt));
   });
 });

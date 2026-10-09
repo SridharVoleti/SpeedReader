@@ -21,7 +21,7 @@ export default defineConfig({
       APP_LAUNCH_APP_KEY: "", APP_LAUNCH_EXCHANGE_URL: "", APP_LAUNCH_RETURN_URL: "",
       APP_LAUNCH_SIGNING_PRIVATE_KEY: "", APP_LAUNCH_BOOTSTRAP_SECRET: "",
       // The e2e server is a test deployment: it exercises the demo/diagnostic pages and anonymous learners.
-      SR_ENABLE_DIAGNOSTICS: "true", SR_ALLOW_ANONYMOUS_LEARNER: "true",
+      SR_ENABLE_DIAGNOSTICS: "true", SR_ALLOW_ANONYMOUS_LEARNER: "true", SR_CONTENT: "fixture",
       SR_APPROVED_ROOT: resolve(SR_E2E, "approved"),
       SR_WIP_ROOT: resolve(SR_E2E, "wip"),
       SR_DATA_DIR: resolve(SR_E2E, "data")

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("home page shows the level map with six worlds", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/legacy-demo");
 
   await expect(page.getByRole("heading", { name: /Climb from 100 to 200 WPM/i })).toBeVisible();
   await expect(page.getByTestId("level-map")).toBeVisible();
@@ -13,7 +13,7 @@ test("home page shows the level map with six worlds", async ({ page }) => {
 // SR-R1-013: Persist learner progress.
 // "Reload restores same learner state/history and never exposes another learner's state."
 test("learner progress is scoped by BabySteps identity and never leaks between learners", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/legacy-demo");
 
   async function setLearnerCookie(learnerId: string, displayName: string) {
     await page.evaluate(
@@ -55,7 +55,7 @@ test("learner progress is scoped by BabySteps identity and never leaks between l
 });
 
 test("only the first level starts unlocked", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/legacy-demo");
 
   await expect(page.getByTestId("level-node-1")).toBeEnabled();
   await expect(page.getByTestId("level-node-2")).toBeDisabled();
@@ -63,7 +63,7 @@ test("only the first level starts unlocked", async ({ page }) => {
 });
 
 test("level 1 plays the passage one word at a time at 100 WPM", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
 
   await expect(page.getByRole("heading", { name: /Level 1 — 1 word at 100 WPM/i })).toBeVisible();
@@ -78,7 +78,7 @@ test("level 1 plays the passage one word at a time at 100 WPM", async ({ page })
 test("passing the comprehension check unlocks the next level", async ({ page }) => {
   // The 79-word passage plays for ~47 s at 100 WPM before the quiz appears.
   test.setTimeout(120_000);
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
   await page.getByRole("button", { name: "Start reading" }).click();
 
@@ -127,7 +127,7 @@ test("passing the comprehension check unlocks the next level", async ({ page }) 
 });
 
 test("read along highlights the passage one word at a time like a news reader", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
   await page.getByRole("button", { name: "Read along like a news reader" }).click();
 
@@ -173,7 +173,7 @@ test("speech-to-text lets a student dictate their comprehension answer", async (
       FakeSpeechRecognition;
   });
 
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
   await page.getByRole("button", { name: "Start reading" }).click();
   await expect(page.getByTestId("quiz-answer")).toBeVisible({ timeout: 60_000 });
@@ -207,7 +207,7 @@ test("comprehension check falls back to typing when speech isn't supported", asy
     delete (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition;
   });
 
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
   await page.getByRole("button", { name: "Start reading" }).click();
   await expect(page.getByTestId("quiz-answer")).toBeVisible({ timeout: 60_000 });
@@ -218,7 +218,7 @@ test("comprehension check falls back to typing when speech isn't supported", asy
 
 test("a weak answer fails the assessment and keeps the next level locked", async ({ page }) => {
   test.setTimeout(120_000);
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
   await page.getByRole("button", { name: "Start reading" }).click();
 

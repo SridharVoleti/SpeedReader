@@ -310,7 +310,9 @@ export class LearnerService {
     }
 
     const now = this.now();
-    const out = recordNewProgressionAttempt(snap.learner, {
+    let out: ReturnType<typeof recordNewProgressionAttempt>;
+    try {
+      out = recordNewProgressionAttempt(snap.learner, {
       attemptId: req.attemptId,
       idempotencyKey: key,
       sessionId: ctx.sessionId,
@@ -325,7 +327,11 @@ export class LearnerService {
       spokenReason: speech.status === "UNRESOLVED_TECHNICAL" ? speech.reason : null,
       rawTranscript: speech.rawTranscript,
       confirmedTranscript: speech.confirmedTranscript
-    });
+      });
+    } catch (e) {
+      // an invalid record is rejected as a request problem, never a crash and never stored (APP-DATA-002 validation)
+      return fail(422, e instanceof Error ? e.message : "invalid attempt");
+    }
     const committed = this.deps.repo.commit(ctx.learnerId, out.learner, { expectedVersion: snap.version, idempotencyKey: key });
     if (!committed.ok) return fail(committed.reason === "VERSION_CONFLICT" ? 409 : 500, committed.reason);
     this.checkpoint(ctx, "PASSAGE_COMPLETE", out.learner.canonicalPointer, key);

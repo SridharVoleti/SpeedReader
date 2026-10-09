@@ -61,6 +61,16 @@ async function body<T>(req: Request): Promise<T | null> {
   try { return (await req.json()) as T; } catch { return null; }
 }
 
+/**
+ * Client clocks are not trusted (skew, wrong date, tampering): a start time is accepted only when it is valid, not in
+ * the future and within the session window; otherwise the server's own time is used.
+ */
+export function sanitizeStartedAt(clientIso: string | undefined, serverNowMs: number, windowMs = 45 * 60_000): string {
+  const t = clientIso ? Date.parse(clientIso) : NaN;
+  const ok = Number.isFinite(t) && t <= serverNowMs && serverNowMs - t <= windowMs;
+  return new Date(ok ? t : serverNowMs).toISOString();
+}
+
 type ExplanationInput = { text?: string; mode?: "typed" | "spoken"; raw?: string; asrConfidence?: number; asrFailed?: boolean };
 
 /** Turn the learner's explanation into the speech-evidence contract; the semantic score is computed server-side. */
@@ -146,7 +156,7 @@ export async function handleV3(req: Request, path: string[], who: Verified, deps
         displayedWpm: snap.learner.core.wpm,
         items: scoreItems(passage, b.answers),
         speech: speechFor({ passageId: passage.passageId, ideas: passage.ideas }, b.explanation),
-        startedAt: b.startedAt
+        startedAt: sanitizeStartedAt(b.startedAt, Date.now())
       };
       return respond(service.completePassage(ctx, completion));
     }

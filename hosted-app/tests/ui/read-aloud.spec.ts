@@ -45,7 +45,7 @@ const spokenText = (page: Page) => page.evaluate(() => (window as unknown as { _
 
 test("home screen is read aloud with the current block highlighted", async ({ page }) => {
   await installFakeSpeech(page);
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("read-aloud-listen").click();
   await expect.poll(() => spokenText(page)).toContain("Climb from 100 to 200 words per minute");
   await expect.poll(() => spokenText(page)).toContain("Levels cleared");
@@ -56,7 +56,7 @@ test("home screen is read aloud with the current block highlighted", async ({ pa
 
 test("progress and settings tabs each offer Listen and speak their own content", async ({ page }) => {
   await installFakeSpeech(page);
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByRole("button", { name: /^.?\s*Progress$/ }).click();
   await page.getByTestId("read-aloud-listen").click();
   await expect.poll(() => spokenText(page)).not.toContain("Climb from");
@@ -74,7 +74,7 @@ for (const route of ["training-demo", "certification-demo", "item-types-demo", "
 
 test("level intro is narrated, but timed reading is locked so the passage is never spoken", async ({ page }) => {
   await installFakeSpeech(page);
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
   await page.getByTestId("read-aloud-listen").click();
   await expect.poll(() => spokenText(page)).toContain("Start reading");
@@ -90,7 +90,7 @@ test("level intro is narrated, but timed reading is locked so the passage is nev
 test("read along like a news reader speaks sentence by sentence and the highlight follows the voice", async ({ page }) => {
   await installFakeSpeech(page);
   await page.addInitScript(() => { (window as unknown as { __speakMs: number }).__speakMs = 1500; });
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
   await page.getByTestId("read-along-start").click();
   await expect(page.getByTestId("read-along-active-word")).toHaveText("Ravi");
@@ -114,7 +114,7 @@ test("read-along highlight waits for the voice to start, then follows the spoken
     const w = window as unknown as { __speakMs: number; __startLagMs: number; __boundaries: boolean };
     w.__speakMs = 4000; w.__startLagMs = 1200; w.__boundaries = true; // slow cloud voice with word events
   });
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
   await page.getByTestId("read-along-start").click();
   // During the 1.2 s start-up lag nothing has been said, so the highlight must still be on word one.
@@ -130,7 +130,7 @@ test("read-along without word events still ends the sentence's highlight with th
     const w = window as unknown as { __speakMs: number; __startLagMs: number };
     w.__speakMs = 3000; w.__startLagMs = 800; // no boundaries: interpolation only
   });
-  await page.goto("/");
+  await page.goto("/legacy-demo");
   await page.getByTestId("level-node-1").click();
   await page.getByTestId("read-along-start").click();
   await page.waitForTimeout(500);

@@ -23,7 +23,7 @@ describe("APP-NFR-007 / APP-PRIV-004 diagnostics protection", () => {
     expect(learner).not.toMatch(/-demo/);
     expect(src).toMatch(/pages: diagnosticsEnabled\(\) \? \{ \.\.\.learnerPages, \.\.\.diagnosticPages \} : learnerPages/);
     const diagnostic = src.slice(src.indexOf("const diagnosticPages"), src.indexOf("export const DIAGNOSTIC_ROUTES"));
-    expect((diagnostic.match(/-demo"/g) ?? []).length).toBe(12);
+    expect((diagnostic.match(/-demo"/g) ?? []).length).toBe(13);
   });
 });
 

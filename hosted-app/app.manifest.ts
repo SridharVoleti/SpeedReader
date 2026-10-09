@@ -15,6 +15,7 @@ const learnerPages: AppManifest["pages"] = {
 };
 
 const diagnosticPages: AppManifest["pages"] = {
+    "legacy-demo": () => import("./ui/legacy-demo/page"),
     "adaptive-speed-demo": () => import("./ui/adaptive-speed-demo/page"),
     "book-mode-demo": () => import("./ui/book-mode-demo/page"),
     "certification-demo": () => import("./ui/certification-demo/page"),
