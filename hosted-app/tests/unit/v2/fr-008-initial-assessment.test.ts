@@ -79,3 +79,22 @@ describe("FR-008 ten-minute initial assessment", () => {
     expect(() => recordAssessmentAttempt(newAssessment(cfg), attempt(70, 0.9))).toThrow(/expected attempt at 60/);
   });
 });
+
+// APP-ASSESS-005 baseline persistence record
+import { toAssessmentRecord } from "../../../lib/v2/initial-assessment";
+describe("APP-ASSESS-005 assessment record", () => {
+  it("captures id, learner, attempts, version, config, starting WPM and completion time; later passage 1 starts there (APP-ASSESS-006)", () => {
+    const done = runAssessment(learnerWithLimit(90), cfg);
+    const rec = toAssessmentRecord(done, { assessmentId: "as-1", learnerId: "kid" }, "2026-10-09T10:00:00Z");
+    expect(rec).toMatchObject({ assessmentId: "as-1", learnerId: "kid", startingWpm: 90, algorithmVersion: cfg.algorithmVersion, completedAt: "2026-10-09T10:00:00Z" });
+    expect(rec.attempts).toHaveLength(done.attempts.length);
+    expect(rec.configSnapshot).toEqual(cfg);
+    expect(Object.isFrozen(rec)).toBe(true);
+  });
+  it("refuses an incomplete assessment, missing ids or a bad timestamp", () => {
+    expect(() => toAssessmentRecord(newAssessment(), { assessmentId: "a", learnerId: "k" }, "2026-10-09T10:00:00Z")).toThrow(/completed/);
+    const done = runAssessment(learnerWithLimit(90), cfg);
+    expect(() => toAssessmentRecord(done, { assessmentId: "", learnerId: "k" }, "2026-10-09T10:00:00Z")).toThrow(/required/);
+    expect(() => toAssessmentRecord(done, { assessmentId: "a", learnerId: "k" }, "nope")).toThrow(RangeError);
+  });
+});

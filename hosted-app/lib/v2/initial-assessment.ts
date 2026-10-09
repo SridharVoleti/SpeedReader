@@ -133,3 +133,25 @@ export function runAssessment(
   while (state.status === "IN_PROGRESS") state = recordAssessmentAttempt(state, respond(state.currentWpm));
   return state;
 }
+
+/** APP-ASSESS-005: the persisted baseline record. Only a COMPLETE assessment can be recorded. */
+export type AssessmentRecord = {
+  assessmentId: string;
+  learnerId: string;
+  attempts: readonly RecordedAttempt[];
+  algorithmVersion: string;
+  configSnapshot: AssessmentConfig;
+  startingWpm: number;
+  completedAt: string;
+};
+
+export function toAssessmentRecord(state: AssessmentState, ids: { assessmentId: string; learnerId: string }, completedAt: string): AssessmentRecord {
+  if (state.status !== "COMPLETE" || state.startingWpm === null) throw new Error("only a completed assessment can be persisted");
+  if (!ids.assessmentId || !ids.learnerId) throw new Error("assessmentId and learnerId are required");
+  if (Number.isNaN(Date.parse(completedAt))) throw new RangeError("completedAt must be a valid timestamp");
+  return Object.freeze({
+    assessmentId: ids.assessmentId, learnerId: ids.learnerId, attempts: Object.freeze([...state.attempts]),
+    algorithmVersion: state.algorithmVersion, configSnapshot: Object.freeze({ ...state.config }),
+    startingWpm: state.startingWpm, completedAt
+  });
+}
