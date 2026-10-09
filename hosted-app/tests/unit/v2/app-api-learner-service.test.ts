@@ -56,8 +56,8 @@ describe("APP-API-001 bootstrap and APP-PLAT-006 single device", () => {
     expect(b.next).toEqual({ activity: "INITIAL_ASSESSMENT" });
     expect(b.session).toMatchObject({ sessionId: "S1", kind: "LEARNING", ordinal: 1 });
     expect(Object.keys(b.config)).toEqual(expect.arrayContaining(["calibration", "recency", "session", "asr", "assessment"]));
-    expect(b.capabilities.required).toContain("audioPlayback");
-    expect(b.capabilities.optional).toContain("speechRecognition");
+    expect(b.capabilities.required).toContain("audio-playback");
+    expect(b.capabilities.optional).toContain("speech-recognition");
   });
   it("is idempotent for the same session/device and refuses a second device", () => {
     ok(svc.bootstrap(ctx));

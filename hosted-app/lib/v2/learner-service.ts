@@ -67,8 +67,8 @@ export type Activity =
   | { activity: "NONE"; reason: string };
 
 export const CLIENT_CAPABILITIES = Object.freeze({
-  required: ["audioPlayback"],
-  optional: ["microphone", "speechRecognition", "speechSynthesis", "voices"],
+  required: ["audio-playback"],
+  optional: ["microphone", "speech-recognition", "speech-synthesis", "voices"],
   note: "Missing optional speech capability degrades gracefully and never changes earned WPM."
 });
 
