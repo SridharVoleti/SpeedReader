@@ -44,7 +44,8 @@ export type ServiceDeps = {
   repo: LearnerRepository;
   assessments: AssessmentStore;
   sessions: SessionRegistry;
-  bpcCatalog: readonly BpcContent[];
+  /** Approved BPC content: a fixed list, or a per-passage lookup backed by the content provider. */
+  bpcCatalog: readonly BpcContent[] | ((passageId: string) => BpcContent | null);
   referenceAudio?: readonly ReferenceAudio[];
   readiness?: (learnerId: string) => readonly ReadinessStream[];
   now?: () => string;
@@ -198,6 +199,16 @@ export class LearnerService {
       this.deps.assessments.save(ctx.learnerId, stored);
     }
     return { ok: true, assessmentId: stored.assessmentId, nextWpm: stored.state.currentWpm, status: stored.state.status };
+  }
+
+  /** Where the in-progress assessment stands: the next speed to read at and how many attempts are done. */
+  assessmentPending(ctx: Ctx): Ok<{ nextWpm: number; attemptsDone: number }> | ServiceError {
+    const s = this.session(ctx); if ("ok" in s) return s;
+    if (this.deps.repo.load(ctx.learnerId)) return fail(409, "assessment already completed");
+    const stored = this.deps.assessments.load(ctx.learnerId);
+    if (!stored) return fail(409, "assessment not started");
+    if (stored.state.status === "COMPLETE") return fail(409, "assessment is complete: finalize it");
+    return { ok: true, nextWpm: stored.state.currentWpm, attemptsDone: stored.state.attempts.length };
   }
 
   submitAssessmentAttempt(ctx: Ctx, req: { key: string; wpm: number; comprehensionScore: number; durationSec: number }): Ok<{ nextWpm: number | null; status: AssessmentState["status"]; replayed: boolean }> | ServiceError {
@@ -367,7 +378,10 @@ export class LearnerService {
     // no committed, scored-or-technically-resolved record means scoring is not locked: nothing is released
     let attempt = newBpcAttempt(attemptId, record?.passageId ?? "");
     if (record) attempt = lockScoring(submitAttempt(attempt), { score: record.comprehensionScore, classification: record.classification });
-    const r = bestComprehensionFor(attempt, this.deps.bpcCatalog);
+    const catalog = typeof this.deps.bpcCatalog === "function"
+      ? ([this.deps.bpcCatalog(attempt.passageId)].filter(Boolean) as BpcContent[])
+      : this.deps.bpcCatalog;
+    const r = bestComprehensionFor(attempt, catalog);
     if (!r.available) return fail(r.reason === "NOT_SUBMITTED" ? 403 : r.reason === "SCORING_NOT_LOCKED" ? 403 : 404, r.reason);
     return { ok: true, text: r.content.text, version: r.content.version };
   }
