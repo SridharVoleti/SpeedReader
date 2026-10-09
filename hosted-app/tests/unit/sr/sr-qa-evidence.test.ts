@@ -9,7 +9,7 @@ const SHA = "a".repeat(40);
 const h = "b".repeat(64);
 const report = (over: Partial<RunReport> = {}): RunReport => ({
   schema: "sr-qa-run/1", commitSha: SHA, dirtyTree: false, node: "v22", startedAt: "2026-10-08T00:00:00Z", certification: "NOT_CERTIFIED",
-  steps: ["unit-tests", "typecheck", "build"].map((name) => ({ name: name as "build", command: `run ${name}`, exitCode: 0, logFile: `qa-runs/${SHA}/${name}.log`, logSha256: h })),
+  steps: ["unit-tests", "typecheck", "build", "ui-tests-v3"].map((name) => ({ name: name as "build", command: `run ${name}`, exitCode: 0, logFile: `qa-runs/${SHA}/${name}.log`, logSha256: h })),
   ...over
 });
 const args = (r = report(), over = {}) => ({ report: r, currentCommitSha: SHA, certifier: "qa-reviewer", authors: ["builder"], now: () => new Date("2026-10-08T01:00:00Z"), ...over });
@@ -17,7 +17,7 @@ const args = (r = report(), over = {}) => ({ report: r, currentCommitSha: SHA, c
 describe("run report validation", () => {
   it("accepts a complete report", () => expect(validateReport(report())).toEqual([]));
   it("requires test, typecheck and build steps, each with a command and a hashed log", () => {
-    for (const missing of ["unit-tests", "typecheck", "build"]) {
+    for (const missing of ["unit-tests", "typecheck", "build", "ui-tests-v3"]) {
       expect(validateReport(report({ steps: report().steps.filter((s) => s.name !== missing) })).join()).toMatch(new RegExp(`${missing} was not run`));
     }
     const noHash = report(); noHash.steps[0] = { ...noHash.steps[0], logSha256: "x" };

@@ -7,8 +7,9 @@
 
 import { canonicalHash } from "../pipeline/hash";
 
-export const REQUIRED_STEPS = Object.freeze(["unit-tests", "typecheck", "build"] as const);
-export type StepName = (typeof REQUIRED_STEPS)[number] | "ui-tests-sr";
+/** ui-tests-v3 = the production V3 learner suite (issue #28). The diagnostics-only /explain run can never replace it. */
+export const REQUIRED_STEPS = Object.freeze(["unit-tests", "typecheck", "build", "ui-tests-v3"] as const);
+export type StepName = (typeof REQUIRED_STEPS)[number] | "ui-tests-diagnostics-explain";
 
 export type RunStep = { name: StepName; command: string; exitCode: number; logFile: string; logSha256: string; summary?: Record<string, number> };
 export type RunReport = {

@@ -5,12 +5,14 @@
 // different person (see hosted-app/lib/sr/qa/run-report.ts).
 //
 //   node tools/sr-qa-run.mjs            unit tests + typecheck + build
-//   node tools/sr-qa-run.mjs --ui       also run the SR Playwright journey specs (needs a free port 3001)
+//   node tools/sr-qa-run.mjs --ui       also run the production V3 learner Playwright suite on every project (needs port 3001)
+//   node tools/sr-qa-run.mjs --ui --diagnostics-ui   additionally run the diagnostics-only legacy /explain spec (separate step)
 
 import { spawnSync, execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { qaPlan } from "./sr-qa-plan.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const git = (...a) => execFileSync("git", a, { cwd: root, encoding: "utf8" }).trim();
@@ -19,12 +21,9 @@ const dirty = git("status", "--porcelain", "--untracked-files=no").length > 0;
 const outDir = join(root, "hosted-app", "requirements", "qa-runs", sha);
 mkdirSync(outDir, { recursive: true });
 
-const steps = [
-  { name: "unit-tests", command: "npx vitest run" },
-  { name: "typecheck", command: "npx tsc --noEmit" },
-  { name: "build", command: "npx next build" }
-];
-if (process.argv.includes("--ui")) steps.push({ name: "ui-tests-sr", command: "npx playwright test hosted-app/tests/ui/sr-explain.spec.ts" });
+// --ui runs the production V3 learner suite (all Playwright projects); --diagnostics-ui additionally runs the legacy
+// /explain spec under its own name. A report without ui-tests-v3 cannot be certified.
+const steps = qaPlan({ ui: process.argv.includes("--ui"), diagnosticsUi: process.argv.includes("--diagnostics-ui") });
 
 const report = { schema: "sr-qa-run/1", commitSha: sha, dirtyTree: dirty, node: process.version, startedAt: new Date().toISOString(), steps: [], certification: "NOT_CERTIFIED" };
 
