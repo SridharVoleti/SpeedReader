@@ -201,3 +201,8 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-KM-007 | P10 primary item | TODO | | | |
 | APP-KM-008 | No compensation across independent evidence types | TODO | | | |
 | APP-KM-009 | Package/version validation | TODO | | | |
+| CLAUDE-001 | Read before editing | TODO | | | |
+| CLAUDE-002 | Reuse verified domain logic | TODO | | | |
+| CLAUDE-003 | TDD for every requirement | TODO | | | |
+| CLAUDE-004 | Traceability is mandatory | TODO | | | |
+| CLAUDE-005 | Do not implement content authoring | TODO | | | |

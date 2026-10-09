@@ -40,6 +40,7 @@ export const THRESHOLD_REGISTRY: readonly ThresholdEntry[] = Object.freeze([
   { key: "weight-spoken", value: CURRENT_CALIBRATION.comprehensionWeights.spoken, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "recency-max-age-days", value: RECENCY_POLICY_V1.maxAgeDays, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "recency-max-sessions", value: RECENCY_POLICY_V1.maxSessionsSince, frozen: false, state: "PROVISIONAL_PILOT" },
+  { key: "recency-inactive-days", value: RECENCY_POLICY_V1.inactiveDays, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "asr-min-confidence", value: ASR_POLICY.minConfidence, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "asr-max-retries", value: ASR_POLICY.maxRetries, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "assessment-start-wpm", value: ASSESSMENT_CONFIG.startWpm, frozen: false, state: "PROVISIONAL_PILOT" },
