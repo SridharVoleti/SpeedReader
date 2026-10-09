@@ -3,15 +3,12 @@
 // function. It verifies our SQL (types, constraints, triggers, plpgsql); it does not exercise Supabase's own
 // PostgREST, auth or row-level-security layers.
 
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
 
-export const MIGRATIONS = [
-  "0001_speedreader_learner_state.sql",
-  "0002_speedreader_evidence_domains.sql",
-  "0003_speedreader_documents.sql",
-  "0004_speedreader_retention.sql"
-];
+const MIGRATION_DIR = "hosted-app/supabase/migrations";
+/** Every migration in order; discovered from disk so a new migration can never be left out of the tests. */
+export const MIGRATIONS = readdirSync(MIGRATION_DIR).filter((f) => f.endsWith(".sql")).sort();
 
 export async function migratedDb(): Promise<PGlite> {
   const db = new PGlite();
