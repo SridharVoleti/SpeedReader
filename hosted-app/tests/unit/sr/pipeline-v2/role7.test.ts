@@ -9,6 +9,7 @@ import { CanonicalError, loadCanonicalPackage } from "../../../../lib/sr/pipelin
 import { loadRegistry } from "../../../../lib/sr/pipeline-v2/registry";
 import { applyAttempt, buildAttemptContract, parseOutcomeMachine, resolveAttemptOutcome, verifyAttemptContract } from "../../../../lib/sr/pipeline-v2/role7";
 import { buildCanonicalFixture, FIXTURE_VERSION, sha, toCsv } from "./helpers/canonical-fixture";
+import { canonicalGate } from "../../../../lib/sr/canonical-authority";
 
 let dir: string;
 let names: ReturnType<typeof buildCanonicalFixture>["names"];
@@ -141,8 +142,11 @@ describe("Role 7 - ATTEMPT_OUTCOME_CONTRACT artifact", () => {
 });
 
 describe("Role 7 against the real v0.56 candidate package (skipped when absent)", () => {
-  const real = process.env.SR_CANONICAL_DIR ?? "D:\\Sridhar\\Projects\\SpeedReader_CC\\SpeedReader_W1_BandA_v0.56_FINAL_FREEZE_CANDIDATE_FULL_PACKAGE";
-  it.skipIf(!existsSync(real))("parses the real matrix with no mirror drift and reproduces PRIMARY->CONFIRMATION->CONFIRMED_READY", () => {
+  const gate = canonicalGate();
+  const real = gate.dir;
+  it.skipIf(gate.skip)("parses the real matrix with no mirror drift and reproduces PRIMARY->CONFIRMATION->CONFIRMED_READY", () => {
+    gate.assertUsable();
+    console.info(gate.report);
     const m = parseOutcomeMachine(loadCanonicalPackage(real, { requireFrozen: false }));
     expect(m.table).toHaveLength(40);
     expect(applyAttempt(m, { before: "CONFIRMATION_PENDING", role: "CONFIRMATION", outcome: "PASS" }).after).toBe("CONFIRMED_READY");

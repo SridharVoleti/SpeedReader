@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { runPhaseADemo } from "../../../../lib/sr/pipeline-v2/demo";
 import { findArchitectureDir } from "../../../../lib/sr/pipeline-v2/config";
 import { buildCanonicalFixture } from "./helpers/canonical-fixture";
+import { canonicalGate } from "../../../../lib/sr/canonical-authority";
 
 let base: string;
 beforeEach(() => { base = mkdtempSync(join(tmpdir(), "sr-demo-")); });
@@ -44,8 +45,11 @@ describe("Phase-A infrastructure demonstration", () => {
     expect(existsSync(join(base, "demo", "approved", "role2", "W1-0001", "v1.json"))).toBe(true);
   });
 
-  const real = process.env.SR_CANONICAL_DIR ?? "D:\\Sridhar\\Projects\\SpeedReader_CC\\SpeedReader_W1_BandA_v0.56_FINAL_FREEZE_CANDIDATE_FULL_PACKAGE";
-  it.skipIf(!existsSync(real))("runs on the real v0.56 candidate package rows and reports its freeze status", async () => {
+  const gate = canonicalGate();
+  const real = gate.dir;
+  it.skipIf(gate.skip)("runs on the real v0.56 candidate package rows and reports its freeze status", async () => {
+    gate.assertUsable();
+    console.info(gate.report);
     const r = await runPhaseADemo({ canonicalDir: real, root: join(base, "demo-real"), architectureDir: arch });
     expectReport(r);
     expect(r.canonical).toMatchObject({ version: "v0.56", freeze: "FREEZE_CANDIDATE_UNCERTIFIED" });

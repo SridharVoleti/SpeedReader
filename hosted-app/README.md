@@ -44,6 +44,11 @@ Legacy 36-level demo only (diagnostics route `/legacy-demo`): level data lives i
 design — `backend/speed_reading/scoring.py` (source of truth, unit-tested)
 and `lib/scoring.ts` (browser port); keep their weights in sync.
 
+## Supported runtime and CI
+Node.js 22.13 or newer (`engines` in `package.json`, `.nvmrc`; required by Pipeline V2's `node:sqlite`). `.github/workflows/ci.yml` runs on every pull request and on `main` / `feature/app-v3-acceptance`: `npm ci` (lockfile verified), Pipeline V2 tests, backend tests, then `npm run qa:sr -- --ui` (typecheck, unit tests including migrations on Postgres, production build, production V3 Playwright suites) with logs, hashes and the report retained as `qa-evidence-<sha>`. Make the `verify` job a required check on the release branch.
+
+Canonical authority (Band A v0.56): set `SR_CANONICAL_DIR` to the package directory or place it in `./canonical` (gitignored). Its Package Lock hash is pinned in `hosted-app/lib/sr/canonical-authority.ts`. Local runs without it skip those conformance tests visibly; `SR_REQUIRE_CANONICAL=1` (release gate, `canonical-authority` workflow job) makes a missing or mismatching package a failure.
+
 ## Local file repository: lock policy (dev/test only)
 `FileLearnerRepository` serialises writers with an exclusive `<learner>.learner.json.lock` file that records `{pid, host, createdAt}`. A lock left behind by a crash is recovered automatically when its owner process on this host no longer exists, or when it is older than 30 s (`lockStaleMs`; covers pid reuse, foreign hosts and a crash between creating and filling the file). A fresh lock held by a live, foreign or unreadable owner is never removed and the commit returns `LOCKED`. The stale file is renamed aside and verified before it is deleted. This is a single-machine policy; production multi-instance concurrency is handled by the Supabase path (versioned compare-and-swap), not by this adapter.
 
