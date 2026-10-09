@@ -78,7 +78,8 @@ describe("FR-037 News Reader reference delivery", () => {
   it("device speech synthesis is confined to the on-screen narrator and never feeds reference audio", () => {
     const root = resolve(__dirname, "../../..");
     const files = [...sourceFiles(join(root, "ui")), ...sourceFiles(join(root, "lib"))];
-    const allowed = new Set([join(root, "lib", "narrator.ts"), join(root, "ui", "components", "ReadAloud.tsx")]);
+    // capabilities.ts only DETECTS whether the API exists (APP-NFR-003); it never speaks, so it cannot feed reference audio
+    const allowed = new Set([join(root, "lib", "narrator.ts"), join(root, "ui", "components", "ReadAloud.tsx"), join(root, "lib", "v2", "capabilities.ts")]);
     const offenders = files.filter((f) => !allowed.has(f) && /speechSynthesis|SpeechSynthesisUtterance/.test(readFileSync(f, "utf8")));
     expect(offenders).toEqual([]);
     const referenceSource = readFileSync(join(root, "lib", "v2", "reference-audio.ts"), "utf8");
