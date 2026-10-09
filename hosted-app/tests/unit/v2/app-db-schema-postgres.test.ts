@@ -25,9 +25,26 @@ describe("the migrations apply cleanly to a real Postgres engine", () => {
   it("0001 -> 0003 create every table the adapters and requirements need", async () => {
     const db = await migratedDb();
     const tables = ((await db.query("select table_name from information_schema.tables where table_schema='public' order by 1")).rows as { table_name: string }[]).map((r) => r.table_name);
-    for (const t of ["sr_learner_state", "sr_applied_event", "sr_attempt", "sr_structured_response", "sr_spoken_evidence", "sr_progression_decision", "sr_practice_event", "sr_news_reader_attempt", "sr_readiness_stream", "sr_readiness_attempt", "sr_calibration_version", "sr_content_package", "sr_assessment_state", "sr_session_state"]) {
+    for (const t of ["sr_learner_state", "sr_applied_event", "sr_attempt", "sr_structured_response", "sr_spoken_evidence", "sr_progression_decision", "sr_practice_event", "sr_news_reader_attempt", "sr_readiness_stream", "sr_readiness_attempt", "sr_calibration_version", "sr_content_package", "sr_assessment_state", "sr_session_state", "sr_retention_check"]) {
       expect(tables).toContain(t);
     }
+  });
+});
+
+describe("retention checks are projected into their own append-only table, atomically with the state", () => {
+  const rec = { attemptId: "r1", passageId: "P1", checkNumber: 1, correct: 3, total: 4, remembered: true, delaySeconds: 90000, delayBucket: "24h", immediateScore: 0.9, sessionId: "s", at: "2026-10-05T10:00:00Z", policyVersion: "RET-1" };
+
+  it("a committed state with a retention log yields one row per check, replays add nothing, rows are immutable", async () => {
+    const db = await migratedDb();
+    await insertLearner(db, afterFour());
+    const next = { ...afterFour(), retentionLog: [rec] } as LearnerAggregate;
+    await commit(db, "kid", 1, "retention:r1", next);
+    expect(await count(db, "sr_retention_check")).toBe(1);
+    const again = { ...next, retentionLog: [rec, { ...rec, attemptId: "r2", checkNumber: 2 }] } as LearnerAggregate;
+    await commit(db, "kid", 2, "retention:r2", again);
+    expect(await count(db, "sr_retention_check")).toBe(2);
+    expect((await db.query("select remembered, delay_bucket from sr_retention_check where attempt_id='r1'")).rows[0]).toEqual({ remembered: true, delay_bucket: "24h" });
+    await expect(db.query("update sr_retention_check set correct = 4")).rejects.toThrow();
   });
 });
 

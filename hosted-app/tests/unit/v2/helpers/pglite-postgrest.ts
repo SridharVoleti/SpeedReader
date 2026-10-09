@@ -9,7 +9,8 @@ import { PGlite } from "@electric-sql/pglite";
 export const MIGRATIONS = [
   "0001_speedreader_learner_state.sql",
   "0002_speedreader_evidence_domains.sql",
-  "0003_speedreader_documents.sql"
+  "0003_speedreader_documents.sql",
+  "0004_speedreader_retention.sql"
 ];
 
 export async function migratedDb(): Promise<PGlite> {
