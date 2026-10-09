@@ -312,14 +312,14 @@ test("FR-044 readiness-critical forms are pre-approved", async ({ page }) => {
 test("FR-045 readiness evidence recency", async ({ page }) => {
   await page.goto("/frozen-v2-demo");
   await expect(page.getByTestId("result-FR-045")).toHaveText(
-    "recent evidence current=true; 21-month-old current=false; 500 sessions later current=false; policy PROVISIONAL_PILOT v=recency-2026-10-pilot-1; one stale competency -> SEQUENCE_COMPLETE_READINESS_PENDING (missing RS06)"
+    "recent evidence current=true; 21-month-old current=false; 500 sessions later current=false; policy PROVISIONAL_PILOT v=recency-2026-10-pilot-2; one stale competency -> SEQUENCE_COMPLETE_READINESS_PENDING (missing RS06)"
   );
 });
 
 test("FR-046 threshold lifecycle governance", async ({ page }) => {
   await page.goto("/frozen-v2-demo");
   await expect(page.getByTestId("result-FR-046")).toHaveText(
-    "4 states; 6 frozen + 10 calibratable thresholds; change ASR confidence: allowed; change 75% GREEN threshold: blocked; PROVISIONAL->APPROVED directly: blocked"
+    "4 states; 6 frozen + 11 calibratable thresholds; change ASR confidence: allowed; change 75% GREEN threshold: blocked; PROVISIONAL->APPROVED directly: blocked"
   );
 });
 

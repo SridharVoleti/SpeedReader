@@ -29,7 +29,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-PLAT-007 | Platform session envelope | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | 45min/2 per week/every-6th configured+tested; platform remains authoritative. Not yet wired into launch route. |
 | APP-PLAT-008 | Review-session integration | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | attemptRulesForSession domain rule tested; practice selection wiring is APP-PRAC/Phase 9. |
 | APP-PLAT-009 | Accidental-close resume | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | Resume window/idempotent-replay domain logic tested; not yet wired to routes/persistence. |
-| APP-PLAT-010 | Return to Babysteps | TODO | | | |
+| APP-PLAT-010 | Return to Babysteps | PARTIAL | container/routes/return.ts; progress-sync.ts | container/tests/app-launch.spec.ts | Return redirect + cookie clearing tested; sync payload is still the legacy level/stars summary - remap to v3 WPM/Level-Up summary when the v3 reader ships. |
 | APP-INFRA-001 | Web-first, mobile-required | TODO | | | |
 | APP-INFRA-002 | Reference browser | TODO | | | |
 | APP-INFRA-003 | Deployment | TODO | | | |
@@ -175,13 +175,13 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-NFR-004 | Graceful degradation | TODO | | | |
 | APP-NFR-005 | Accessibility QA | TODO | | | |
 | APP-NFR-006 | Child usability | TODO | | | |
-| APP-NFR-007 | Diagnostics protection | TODO | | | |
+| APP-NFR-007 | Diagnostics protection | PARTIAL | hosted-app/lib/diagnostics-gate.ts; hosted-app/app.manifest.ts | v2/app-nfr-diagnostics-and-auth.test.ts; production build verified | 12 demo/diagnostic routes mounted only with SR_ENABLE_DIAGNOSTICS (never on VERCEL_ENV=production). Home route is still the legacy 36-level localStorage demo - open until Phase 5 (AC-A18). |
 | APP-NFR-008 | Fail safe | TODO | | | |
 | APP-NFR-009 | Performance | TODO | | | |
-| APP-PRIV-001 | Least necessary learner data | TODO | | | |
-| APP-PRIV-002 | Container identity | TODO | | | |
-| APP-PRIV-003 | Structured cross-app progress only | TODO | | | |
-| APP-PRIV-004 | No public debug evidence | TODO | | | |
+| APP-PRIV-001 | Least necessary learner data | IMPLEMENTED_TESTED | lib/v2 aggregates; supabase/migrations/0001 | v2/app-data-learner-repository.test.ts | Stores learner id + learning evidence only; no audio or credentials in any schema/type. |
+| APP-PRIV-002 | Container identity | IMPLEMENTED_TESTED | container/launch/session.ts; app/api/sr/authorize.ts | v2/app-nfr-diagnostics-and-auth.test.ts; container/tests/app-launch.spec.ts | Platform learner id + signed session claims only; no parent credentials stored. |
+| APP-PRIV-003 | Structured cross-app progress only | IMPLEMENTED_TESTED | container/launch/platform-api.ts (ProgressSummary) | container/tests/app-launch.spec.ts | Sync type is structured scalars only (no transcript/audio fields). |
+| APP-PRIV-004 | No public debug evidence | IMPLEMENTED_TESTED | app/api/sr/authorize.ts; hosted-app/api/sr-explain.ts; diagnostics-gate.ts | v2/app-nfr-diagnostics-and-auth.test.ts | Found+fixed: /api/sr/package and /api/sr/attempt trusted a caller-supplied learnerId with no session. Learner now comes only from the signed session; mismatch -> 403; anonymous -> 401 unless non-production opt-in. |
 | APP-API-001 | Bootstrap | TODO | | | |
 | APP-API-002 | Initial assessment | TODO | | | |
 | APP-API-003 | Next activity | TODO | | | |
