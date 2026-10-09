@@ -46,7 +46,7 @@ describe("APP-PLAT-004 / APP-PRIV-004 learner identity comes from the signed ses
   it("allows anonymous only with the explicit non-production opt-in, never on Vercel production", async () => {
     expect(anonymousAllowed({ SR_ALLOW_ANONYMOUS_LEARNER: "true" })).toBe(true);
     expect(anonymousAllowed({ SR_ALLOW_ANONYMOUS_LEARNER: "true", VERCEL_ENV: "production" })).toBe(false);
-    expect(await authorizeLearner(req(), { SR_ALLOW_ANONYMOUS_LEARNER: "true" })).toEqual({ ok: true, learnerId: null });
+    expect(await authorizeLearner(req(), { SR_ALLOW_ANONYMOUS_LEARNER: "true" })).toEqual({ ok: true, learnerId: null, sessionId: null });
   });
 
   it("rejects a forged/garbage session cookie even when anonymous is allowed", async () => {
@@ -57,7 +57,7 @@ describe("APP-PLAT-004 / APP-PRIV-004 learner identity comes from the signed ses
 
   it("returns the learner id from a valid signed session", async () => {
     const r = await authorizeLearner(req(`${SESSION_COOKIE}=${await token("learner-42")}`), {});
-    expect(r).toEqual({ ok: true, learnerId: "learner-42" });
+    expect(r).toEqual({ ok: true, learnerId: "learner-42", sessionId: "s1" });
   });
 
   it("a session learner cannot act as another learner: mismatching body or query is refused with 403", async () => {

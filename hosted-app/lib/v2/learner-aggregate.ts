@@ -25,7 +25,13 @@ export type LearnerAggregate = {
   attempts: readonly InternalAttemptRecord[];
   /** Full FR-047 attempt records (immutable ledger), written by recordNewProgressionAttempt. */
   ledger: readonly AttemptRecord[];
+  /** Familiar-practice log: its own namespace, never progression evidence (APP-DB-006). */
+  practiceLog?: readonly PracticeLogEntry[];
+  /** True once a familiar passage has been served since the last new canonical passage (scheduler alternation). */
+  practiceServedSinceLastNew?: boolean;
 };
+
+export type PracticeLogEntry = { attemptId: string; passageId: string; wpm: number; attemptType: "FAMILIAR_PRACTICE"; sessionId: string; recordedAt: string };
 
 export type NewPassageEvent = CoreWpmEvent | "LEVEL_UP_DEFERRED_BY_LENGTH_STEP";
 
@@ -69,6 +75,7 @@ export function applyNewPassage(learner: LearnerAggregate, attemptId: string, co
       core,
       // A passage with scored evidence is complete; technically-unresolved evidence leaves the pointer in place.
       canonicalPointer: scored ? Math.min(learner.canonicalPointer + 1, WORLD1_LAST_PASSAGE + 1) : learner.canonicalPointer,
+      practiceServedSinceLastNew: scored ? false : learner.practiceServedSinceLastNew,
       attempts: [...learner.attempts, out.record]
     },
     feedback,

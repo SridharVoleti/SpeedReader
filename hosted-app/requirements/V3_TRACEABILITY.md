@@ -182,16 +182,16 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-PRIV-002 | Container identity | IMPLEMENTED_TESTED | container/launch/session.ts; app/api/sr/authorize.ts | v2/app-nfr-diagnostics-and-auth.test.ts; container/tests/app-launch.spec.ts | Platform learner id + signed session claims only; no parent credentials stored. |
 | APP-PRIV-003 | Structured cross-app progress only | IMPLEMENTED_TESTED | container/launch/platform-api.ts (ProgressSummary) | container/tests/app-launch.spec.ts | Sync type is structured scalars only (no transcript/audio fields). |
 | APP-PRIV-004 | No public debug evidence | IMPLEMENTED_TESTED | app/api/sr/authorize.ts; hosted-app/api/sr-explain.ts; diagnostics-gate.ts | v2/app-nfr-diagnostics-and-auth.test.ts | Found+fixed: /api/sr/package and /api/sr/attempt trusted a caller-supplied learnerId with no session. Learner now comes only from the signed session; mismatch -> 403; anonymous -> 401 unless non-production opt-in. |
-| APP-API-001 | Bootstrap | TODO | | | |
-| APP-API-002 | Initial assessment | TODO | | | |
-| APP-API-003 | Next activity | TODO | | | |
-| APP-API-004 | Passage completion | TODO | | | |
-| APP-API-005 | Speech evidence | TODO | | | |
-| APP-API-006 | BPC retrieval | TODO | | | |
-| APP-API-007 | News Reader | TODO | | | |
-| APP-API-008 | Progress | TODO | | | |
-| APP-API-009 | Resume | TODO | | | |
-| APP-API-010 | Calibration/ops | TODO | | | |
+| APP-API-001 | Bootstrap | PARTIAL | lib/v2/learner-service.ts (bootstrap); hosted-app/api/v3.ts; app/api/v3/[...path]/route.ts | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts; tests/ui/api-v3.spec.ts | Returns learner/session/state/next/config ids/capabilities. Session registry is in-memory per server instance; durable session state is the platform's (needs the platform session API or a shared store). Entitlement context not yet read from the launch grant. |
+| APP-API-002 | Initial assessment | IMPLEMENTED_TESTED | lib/v2/learner-service.ts; lib/v2/file-assessment-store.ts | v2/app-api-learner-service.test.ts; tests/ui/api-v3.spec.ts | Start/submit/finalize idempotent; durable file store. |
+| APP-API-003 | Next activity | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (nextActivity) | v2/app-api-learner-service.test.ts | Deterministic across assessment/new/practice/review/readiness. Readiness provider is an injected port (no stream persistence yet); News Reader is a parallel path, never chosen over core. |
+| APP-API-004 | Passage completion | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (completePassage) | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts | Validates, stores immutable attempt, scores, decides, returns child-safe feedback; idempotent; engine-owned WPM enforced; review sessions refused. |
+| APP-API-005 | Speech evidence | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (resolveSpeechSubmission) | v2/app-api-learner-service.test.ts | Raw+confirmed transcripts, ASR state, evaluator output+version, rule version. The semantic evaluator itself is an upstream input (production judge not wired). |
+| APP-API-006 | BPC retrieval | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (bpc) | v2/app-api-learner-service.test.ts | Only after the attempt is committed; GREEN, NOT_GREEN and technical alike. Production BPC catalog is empty until approved content exists (fails closed with CONTENT_MISSING). |
+| APP-API-007 | News Reader | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (newsReader*) | v2/app-api-learner-service.test.ts | Separate start/submit/reference/coaching; core state provably untouched. |
+| APP-API-008 | Progress | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (progress, parentProgress) | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts; tests/ui/api-v3.spec.ts | Child-safe vs internal-key-authorized parent detail. The parent authorization model (internal key) is an assumption pending a platform parent scope. |
+| APP-API-009 | Resume | PARTIAL | lib/v2/learner-service.ts (resume); lib/v2/session-envelope.ts | v2/app-api-learner-service.test.ts | Resume within 15 min with no duplicated events is tested; same in-memory session-registry caveat as API-001. |
+| APP-API-010 | Calibration/ops | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (opsSummary) | v2/app-api-learner-service.test.ts; tests/ui/api-v3.spec.ts | Aggregate-only, internal-key-gated; fails closed when no key configured. |
 | APP-KM-001 | Correct delivery coordinate | PARTIAL | lib/sr/runtime/package-loader.ts; lib/world1-framework.ts | sr/sr-001b-approved-profile.test.ts | Loader fails closed; no approved Knowledge Map package exists yet, so delivery_session path cannot run end-to-end. |
 | APP-KM-002 | Shared canonical tokenizer | PARTIAL | lib/sr/pipeline-v2/count100.ts; lib/v2/oral-telemetry.ts | sr/pipeline-v2 count100 tests | Telemetry consumes canonical tokens; learner renderer not yet built on it (Phase 5). |
 | APP-KM-003 | Fixed segment coordinates | IMPLEMENTED_TESTED | lib/sr/pipeline-v2/count100.ts (segment100) | sr/pipeline-v2 count100 tests | Fixed token-coordinate thirds/quartiles; telemetry never resegments. |

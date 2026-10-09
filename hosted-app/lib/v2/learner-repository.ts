@@ -8,7 +8,7 @@
 // supabase/migrations/0001_speedreader_learner_state.sql defines the equivalent Supabase schema
 // (APP-DATA-010) for a SupabaseLearnerRepository to implement against this same port.
 
-import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, renameSync, unlinkSync, writeSync } from "node:fs";
+import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, unlinkSync, writeSync } from "node:fs";
 import { join } from "node:path";
 import type { LearnerAggregate } from "./learner-aggregate";
 import { consistencyErrors } from "./progress-store";
@@ -76,6 +76,14 @@ export class FileLearnerRepository implements LearnerRepository {
   load(learnerId: string): StoredSnapshot | null {
     const row = this.read(learnerId);
     return row ? { learner: row.learner, version: row.version } : null;
+  }
+
+  /** Every stored learner (aggregate operational metrics only; never exposed to learners). */
+  list(): StoredSnapshot[] {
+    return readdirSync(this.root)
+      .filter((f) => f.endsWith(".learner.json"))
+      .map((f) => JSON.parse(readFileSync(join(this.root, f), "utf8")) as Row)
+      .map((row) => ({ learner: row.learner, version: row.version }));
   }
 
   create(learner: LearnerAggregate): StoredSnapshot {

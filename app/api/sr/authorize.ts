@@ -3,7 +3,7 @@
 // environment explicitly opts in (SR_ALLOW_ANONYMOUS_LEARNER=true); a Vercel production deployment can never opt in.
 import { SESSION_COOKIE, verifySessionToken } from "../../../container/launch/session";
 
-export type LearnerAuth = { ok: true; learnerId: string | null } | { ok: false; response: Response };
+export type LearnerAuth = { ok: true; learnerId: string | null; sessionId: string | null } | { ok: false; response: Response };
 
 const deny = (status: number, error: string): LearnerAuth => ({
   ok: false,
@@ -27,8 +27,8 @@ export async function authorizeLearner(req: Request, env: Record<string, string 
   const token = cookieValue(req.headers.get("cookie"), SESSION_COOKIE);
   if (token) {
     const session = await verifySessionToken(token);
-    if (session) return { ok: true, learnerId: session.learnerId };
+    if (session) return { ok: true, learnerId: session.learnerId, sessionId: session.learnerSessionId };
     return deny(401, "invalid session");
   }
-  return anonymousAllowed(env) ? { ok: true, learnerId: null } : deny(401, "learner session required");
+  return anonymousAllowed(env) ? { ok: true, learnerId: null, sessionId: null } : deny(401, "learner session required");
 }
