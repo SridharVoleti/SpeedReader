@@ -13,6 +13,9 @@ import { evaluateSpokenExpression, SPOKEN_EXPRESSION_CONFIG } from "../lib/v2/sp
 import { diagnosticsEnabled } from "../lib/diagnostics-gate";
 import { createStore } from "../lib/sr/pipeline/storage";
 import type { BpcContent } from "../lib/v2/best-comprehension";
+import { metricsFromCapture, type ReadCapture } from "../lib/v2/news-reader-metrics";
+import { COUNT100_VERSION, count100 } from "../lib/sr/pipeline-v2/count100";
+import type { NewsReaderAttempt } from "../lib/v2/news-reader";
 
 export type Verified = { learnerId: string; sessionId: string; deviceId: string };
 
@@ -69,6 +72,13 @@ export function sanitizeStartedAt(clientIso: string | undefined, serverNowMs: nu
   const t = clientIso ? Date.parse(clientIso) : NaN;
   const ok = Number.isFinite(t) && t <= serverNowMs && serverNowMs - t <= windowMs;
   return new Date(ok ? t : serverNowMs).toISOString();
+}
+
+/** Passages the learner has genuinely completed (scored new-progression evidence), oldest first, unique. */
+function completedPassageIds(learner: { ledger: readonly { attemptType: string; classification: string | null; passageId: string }[] }): string[] {
+  const seen: string[] = [];
+  for (const r of learner.ledger) if (r.attemptType === "NEW_PROGRESSION" && r.classification !== null && !seen.includes(r.passageId)) seen.push(r.passageId);
+  return seen;
 }
 
 type ExplanationInput = { text?: string; mode?: "typed" | "spoken"; raw?: string; asrConfidence?: number; asrFailed?: boolean };
@@ -186,14 +196,40 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
     }
 
     case "GET bpc": return respond(service.bpc(ctx, url.searchParams.get("attemptId") ?? ""));
+    case "GET news-reader/passages": {
+      const snap = repo.load(ctx.learnerId);
+      if (!snap) return json({ error: "initial assessment required" }, 409);
+      return json({ ok: true, passages: completedPassageIds(snap.learner).slice(-10).map((passageId) => ({ passageId })) });
+    }
     case "POST news-reader/start": {
       const b = await body<{ passageId: string; platform?: "ios" | "android" | "web" | "desktop" }>(req);
-      return b?.passageId ? respond(service.newsReaderStart(ctx, b.passageId, b.platform)) : json({ error: "passageId required" }, 400);
+      if (!b?.passageId) return json({ error: "passageId required" }, 400);
+      const snap = repo.load(ctx.learnerId);
+      if (!snap) return json({ error: "initial assessment required" }, 409);
+      // News Reader may share a canonical passage, but only one the learner has already completed: never a spoiler
+      if (!completedPassageIds(snap.learner).includes(b.passageId)) return json({ error: "choose a story you have already read" }, 400);
+      const passage = content.byPassageId(b.passageId);
+      if (!passage) return unavailable();
+      const started = service.newsReaderStart(ctx, b.passageId, b.platform);
+      return isError(started) ? respond(started) : json({ ...started, passage: { passageId: passage.passageId, tokens: learnerView(passage).tokens } });
     }
-    case "POST news-reader/submit": {
-      const b = await body<Parameters<LearnerService["newsReaderSubmit"]>[1]>(req);
-      return b ? respond(service.newsReaderSubmit(ctx, b)) : json({ error: "invalid JSON body" }, 400);
+    case "POST news-reader/read": {
+      const b = await body<{ passageId: string; readNumber: 1 | 2; key: string } & ReadCapture>(req);
+      if (!b?.passageId || !b.key || (b.readNumber !== 1 && b.readNumber !== 2)) return json({ error: "passageId, readNumber (1 or 2) and key are required" }, 400);
+      const snap = repo.load(ctx.learnerId);
+      if (!snap) return json({ error: "initial assessment required" }, 409);
+      if (!completedPassageIds(snap.learner).includes(b.passageId)) return json({ error: "choose a story you have already read" }, 400);
+      const passage = content.byPassageId(b.passageId);
+      if (!passage) return unavailable();
+      const m = metricsFromCapture(count100(passage.text).tokens, COUNT100_VERSION, { micState: b.micState, transcript: b.transcript, confidence: b.confidence });
+      const attempt: NewsReaderAttempt = {
+        attemptId: `nr-${b.passageId}-${b.readNumber}-${b.key}`, passageId: b.passageId, readNumber: b.readNumber,
+        metrics: m.metrics, technicalState: m.technicalState, recordedAt: new Date().toISOString()
+      };
+      const r = service.newsReaderSubmit(ctx, attempt);
+      return isError(r) ? respond(r) : json({ ok: true, technicalState: m.technicalState, coaching: r.coaching });
     }
+    case "POST news-reader/submit": return json({ error: "use news-reader/read" }, 404);
     case "GET progress": return respond(service.progress(ctx));
     case "GET progress/parent": return respond(service.parentProgress(who.learnerId, internalAuthorized(req)));
     case "GET ops/summary": return respond(service.opsSummary(repo.list(), internalAuthorized(req)));

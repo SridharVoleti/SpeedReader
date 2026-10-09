@@ -9,6 +9,7 @@ import identity from "../../app.identity";
 import { api, friendlyProblem, type Feedback, type StoryView } from "./api";
 import { levelUpSyncPayload } from "../../lib/v2/babysteps-sync";
 import Story, { type StoryMode, type StoryResult } from "./Story";
+import NewsReader from "./NewsReader";
 import styles from "./learner.module.css";
 
 type Next =
@@ -23,6 +24,7 @@ type View =
   | { k: "problem"; message: string }
   | { k: "welcome" }
   | { k: "home"; next: Next }
+  | { k: "news" }
   | { k: "story"; mode: StoryMode; wpm: number; story: StoryView; key: string }
   | { k: "feedback"; feedback: Feedback; attemptId: string; mode: "progress" | "practice" };
 
@@ -36,13 +38,14 @@ const WAITING_COPY: Record<string, string> = {
 export default function LearnerApp() {
   const [view, setView] = useState<View>({ k: "boot" });
   const [speed, setSpeed] = useState<number | null>(null);
+  const [storiesRead, setStoriesRead] = useState(0);
   const [bpcText, setBpcText] = useState<string | null>(null);
   const [launched, setLaunched] = useState(false);
   const booted = useRef(false);
 
   const refreshSpeed = useCallback(async () => {
-    const p = await api<{ currentWpm: number }>("GET", "progress");
-    if (p.ok) setSpeed(p.data.currentWpm);
+    const p = await api<{ currentWpm: number; storiesRead: number }>("GET", "progress");
+    if (p.ok) { setSpeed(p.data.currentWpm); setStoriesRead(p.data.storiesRead); }
   }, []);
 
   const goHome = useCallback(async () => {
@@ -162,9 +165,12 @@ export default function LearnerApp() {
           )}
           {view.next.activity === "READINESS" && <p>Your reading check-in is coming up soon.</p>}
           {view.next.activity === "NONE" && <p>{WAITING_COPY[view.next.reason] ?? "Nothing to read right now. Come back soon!"}</p>}
+          {storiesRead > 0 && <div className={styles.row}><button type="button" className={styles.secondary} onClick={() => setView({ k: "news" })} data-testid="open-news-reader">Practise reading aloud</button></div>}
           {launched && <div className={styles.row}><a href="/return" className={styles.secondary} data-testid="return-to-babysteps">Back to Babysteps</a></div>}
         </section>
       )}
+
+      {view.k === "news" && <NewsReader onExit={() => void goHome()} onProblem={(message) => setView({ k: "problem", message })} />}
 
       {view.k === "story" && (
         <Story key={view.key} mode={view.mode} wpm={view.wpm} story={view.story} attemptKey={view.key}

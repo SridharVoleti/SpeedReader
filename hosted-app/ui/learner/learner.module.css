@@ -206,3 +206,16 @@
   0% { transform: scale(0.6); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+.nrText {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  margin: 0 0 8px;
+}
+
+.nrActive {
+  background: var(--saffron);
+  border-radius: 4px;
+  color: var(--ink);
+  font-weight: 700;
+}
