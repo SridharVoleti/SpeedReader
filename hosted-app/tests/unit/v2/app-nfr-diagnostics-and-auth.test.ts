@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
 import { diagnosticsEnabled } from "../../../lib/diagnostics-gate";
-import { authorizeLearner, anonymousAllowed, cookieValue } from "../../../../app/api/sr/authorize";
+import { authorizeLearner, anonymousAllowed, cookieValue, entitlementDenied } from "../../../../app/api/sr/authorize";
 import { SESSION_COOKIE, signSessionToken } from "../../../../container/launch/session";
 import { postAttempt, getPackage } from "../../../api/sr-explain";
 
@@ -46,7 +46,7 @@ describe("APP-PLAT-004 / APP-PRIV-004 learner identity comes from the signed ses
   it("allows anonymous only with the explicit non-production opt-in, never on Vercel production", async () => {
     expect(anonymousAllowed({ SR_ALLOW_ANONYMOUS_LEARNER: "true" })).toBe(true);
     expect(anonymousAllowed({ SR_ALLOW_ANONYMOUS_LEARNER: "true", VERCEL_ENV: "production" })).toBe(false);
-    expect(await authorizeLearner(req(), { SR_ALLOW_ANONYMOUS_LEARNER: "true" })).toEqual({ ok: true, learnerId: null, sessionId: null });
+    expect(await authorizeLearner(req(), { SR_ALLOW_ANONYMOUS_LEARNER: "true" })).toEqual({ ok: true, learnerId: null, sessionId: null, entitlement: null });
   });
 
   it("rejects a forged/garbage session cookie even when anonymous is allowed", async () => {
@@ -57,7 +57,7 @@ describe("APP-PLAT-004 / APP-PRIV-004 learner identity comes from the signed ses
 
   it("returns the learner id from a valid signed session", async () => {
     const r = await authorizeLearner(req(`${SESSION_COOKIE}=${await token("learner-42")}`), {});
-    expect(r).toEqual({ ok: true, learnerId: "learner-42", sessionId: "s1" });
+    expect(r).toEqual({ ok: true, learnerId: "learner-42", sessionId: "s1", entitlement: null });
   });
 
   it("a session learner cannot act as another learner: mismatching body or query is refused with 403", async () => {
@@ -78,5 +78,48 @@ describe("APP-PLAT-004 / APP-PRIV-004 learner identity comes from the signed ses
     // package lookup happens first and fails closed (404) for an unknown package: no data either way
     const res = getPackage(new Request("http://localhost/api/sr/package?id=PKG-NOPE&learnerId=victim"), "attacker");
     expect([403, 404]).toContain(res.status);
+  });
+});
+
+describe("APP-API-001 entitlement context from the verified launch grant", () => {
+  beforeAll(() => { process.env.SESSION_SECRET = "x".repeat(40); });
+  const grant = (active: boolean) => ({ grantId: "g1", accessToken: "SECRET-TOKEN", accessTokenExpiresAt: "2099-01-01T00:00:00Z", scopes: ["progress:write", "progress:read"], active });
+  const token = (active: boolean | null) =>
+    signSessionToken({ learnerId: "learner-42", learnerSessionId: "s1", displayName: "Kid", grant: active === null ? undefined : grant(active) }, new Date(Date.now() + 3_600_000));
+
+  it("exposes whether the platform grant is active and its scopes, but never the access token", async () => {
+    const r = await authorizeLearner(req(`${SESSION_COOKIE}=${await token(true)}`), {});
+    expect(r).toMatchObject({ ok: true, learnerId: "learner-42", entitlement: { active: true, scopes: ["progress:write", "progress:read"] } });
+    expect(JSON.stringify(r)).not.toContain("SECRET-TOKEN");
+  });
+
+  it("a session with no grant (standalone) has no entitlement context and is not denied", async () => {
+    const r = await authorizeLearner(req(`${SESSION_COOKIE}=${await token(null)}`), {});
+    expect(r).toMatchObject({ ok: true, entitlement: null });
+    if (r.ok) expect(entitlementDenied(r)).toBeNull();
+  });
+
+  it("a revoked grant is refused with 403 so a withdrawn entitlement cannot keep a session alive", async () => {
+    const r = await authorizeLearner(req(`${SESSION_COOKIE}=${await token(false)}`), {});
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      const denied = entitlementDenied(r)!;
+      expect(denied.status).toBe(403);
+      expect(await denied.json()).toEqual({ error: "ENTITLEMENT_INACTIVE" });
+    }
+  });
+
+  it("the bootstrap response carries the entitlement context", async () => {
+    const { buildDeps, handleV3 } = await import("../../../api/v3");
+    const { FixtureContentProvider } = await import("../../../lib/v2/content-provider");
+    const { mkdtempSync, rmSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { join } = await import("node:path");
+    const dir = mkdtempSync(join(tmpdir(), "sr-ent-"));
+    try {
+      const deps = buildDeps(dir, new FixtureContentProvider());
+      const res = await handleV3(new Request("http://x/api/v3/bootstrap", { method: "POST" }), ["bootstrap"], { learnerId: "kid", sessionId: "S", deviceId: "d", entitlement: { active: true, scopes: ["progress:write"] } }, deps);
+      expect(await res.json()).toMatchObject({ ok: true, entitlement: { active: true, scopes: ["progress:write"] } });
+    } finally { rmSync(dir, { recursive: true, force: true }); }
   });
 });

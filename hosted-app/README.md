@@ -1,23 +1,32 @@
 # Speed Reading App
 
-AI-free, Python-heavy speed reading trainer with a Candy Crush–style level
-progression: pass each level's comprehension check to unlock the next.
+Babysteps SpeedReader: **read faster, understand deeply, explain clearly.** The product contract is
+`../requirements/SpeedReader_Definitive_App_Requirements_Claude_Code_Acceptance_v3.0.md`; per-requirement status,
+tests and open items are in `requirements/V3_TRACEABILITY.md`.
 
-## Progression
+## How the learner journey works (v3)
 
-- **6 worlds × 6 levels = 36 levels.** Each world fixes how many words are
-  highlighted at a time (the "chunk"), from 1 word up to 6 words.
-- **Within a world the speed climbs 100 → 120 → 140 → 160 → 180 → 200 WPM.**
-- **Finishing 200 WPM promotes you to the next world**, which restarts at
-  100 WPM with one more word per chunk (e.g. after 1-word @ 200 WPM comes
-  2-words @ 100 WPM), all the way to 6 words at a time.
-- **Every level ends with a comprehension check**: the student retells the
-  passage in their own words and a deterministic scorer (length, key facts,
-  main ideas, originality, clarity) awards 0–100 points. 70+ passes and
-  unlocks the next level; 80+ earns 2 stars, 90+ earns 3 stars.
-- Progress (best score, stars, unlocks) is stored in the browser's
-  localStorage. Auth and payment are intentionally deferred, except for the
-  BabySteps launch handoff below.
+- **Start:** a short adaptive assessment finds the learner's sustainable starting speed (comprehension decides it).
+- **Read:** each story appears one word at a time at the learner's earned WPM (max 150 in World 1).
+- **Check:** structured questions plus a retelling in the learner's own words (typed, or spoken with an editable
+  transcript). Scoring is server-side and internal: the learner never sees scores or pass/fail labels.
+- **Level Up = +1 WPM.** Earned speed is never taken away. The first five stories at a speed decide the Level Up
+  (4 of 5 good), then three good stories in a row; a weak story just means the speed holds and a familiar story may
+  be offered for confidence. Longer stories arrive in 25-word steps and never at the same moment as a speed rise.
+- **After every story** the learner can see how a strong reader might tell it (Best Possible Comprehension).
+- **Reading aloud (News Reader)** is a separate optional activity: listen to a female reference voice at 145 WPM with a
+  read-along highlight, then read aloud twice. It never affects speed or progress.
+- Sessions follow the Babysteps envelope (45 minutes, 2 per week, every 6th a review session of familiar stories,
+  15-minute accidental-close resume, one device at a time).
+
+## Architecture in one paragraph
+
+`ui/learner/*` is a thin client over `/api/v3/*` (`api/v3.ts`), which delegates to `lib/v2/learner-service.ts`; every
+rule lives in a tested `lib/v2/*` domain module. State is durable through ports: file adapters locally, Supabase
+adapters when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set (schema in `supabase/migrations`, verified in
+tests against real Postgres via PGlite). Content comes only from approved SR packages; with none approved the journey
+fails closed with a friendly message. Demo/diagnostic pages (including the old 36-level demo at `/legacy-demo`) are
+mounted only when `SR_ENABLE_DIAGNOSTICS=true` and never on a Vercel production deployment.
 
 ## BabySteps launch integration
 
@@ -27,7 +36,7 @@ every embedded app. See `../container/docs/app-launch-integration.md` for the fu
 `../.env.local.example` for the required `APP_LAUNCH_*` / `SESSION_SECRET` environment variables.
 The app works standalone (without any of this configured) exactly as before.
 
-Level data lives in `data/progression.json`, passages in
+Legacy 36-level demo only (diagnostics route `/legacy-demo`): level data lives in `data/progression.json`, passages in
 `data/passages/level-1.json`. The comprehension scorer exists twice by
 design — `backend/speed_reading/scoring.py` (source of truth, unit-tested)
 and `lib/scoring.ts` (browser port); keep their weights in sync.

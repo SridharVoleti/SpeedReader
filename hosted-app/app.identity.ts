@@ -8,7 +8,7 @@ const identity: AppIdentity = {
   cookiePrefix: "speedreader",
   journey: {
     title: "Speed Reading Journey",
-    shortDescription: "Climb from 100 to 200 WPM across 36 levels, with a comprehension check after every passage."
+    shortDescription: "Read faster, understand deeply and explain clearly - one words-per-minute Babystep at a time, with a story and a retelling every step of the way."
   }
 };
 

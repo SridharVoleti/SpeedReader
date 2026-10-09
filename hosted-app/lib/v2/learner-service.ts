@@ -117,6 +117,7 @@ export type PassageCompletionRequest = {
   startedAt?: string;
   completedAt?: string;
   registry?: { registryPassageId: string; rsId: string; p: number } | null;
+  client?: import("./client-class").ClientClass | null;
 };
 
 export type ChildFeedback = LearnerFeedback & { newWpm?: number; bookTime?: BookTimeImpact; retry?: boolean };
@@ -344,6 +345,7 @@ export class LearnerService {
       startedAt: req.startedAt ?? now,
       completedAt: req.completedAt ?? now,
       registry: req.registry ?? null,
+      client: req.client ?? null,
       comprehension,
       spokenReason: speech.status === "UNRESOLVED_TECHNICAL" ? speech.reason : null,
       rawTranscript: speech.rawTranscript,

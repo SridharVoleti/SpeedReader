@@ -6,6 +6,7 @@
 // before/after; technical/ASR uncertainty state; and the rules/spec version used.
 
 import { ATTEMPT_TYPES, isAttemptType, type AttemptType } from "./attempt-types";
+import type { ClientClass } from "./client-class";
 import type { Classification } from "./comprehension-threshold";
 import type { StructuredEvidence, ComprehensionResult } from "./comprehension-score";
 import { applyNewPassage, type LearnerAggregate, type NewPassageEvent } from "./learner-aggregate";
@@ -72,6 +73,8 @@ export type AttemptRecord = {
   pointerAfter: number;
   technicalState: TechnicalState;
   assistance: AssistanceFlags;
+  /** Coarse device/browser class only (APP-CAL-003); the raw user agent is never stored. */
+  client?: ClientClass | null;
   ruleVersions: RuleVersions;
 };
 
@@ -145,6 +148,7 @@ export type NewProgressionInput = {
   rawTranscript?: string | null;
   confirmedTranscript?: string | null;
   assistance?: Partial<AssistanceFlags>;
+  client?: ClientClass | null;
 };
 
 /** Complete a NEW canonical passage and append the full, frozen FR-047 record to the learner's ledger. */
@@ -184,6 +188,7 @@ export function recordNewProgressionAttempt(learner: LearnerAggregate, input: Ne
     levelUpAfter: { wpm: out.learner.core.wpm, event: out.event },
     pointerBefore: learner.canonicalPointer,
     pointerAfter: out.learner.canonicalPointer,
+    client: input.client ?? null,
     assistance: { bpcExposedBeforeEvidence: false, modelAnswerExposedBeforeEvidence: false, technicalRetryUsed: !scored, ...input.assistance },
     technicalState: scored ? "CLEAR" : input.spokenReason ? "ASR_UNCERTAIN" : "TECHNICAL_RETRY",
     ruleVersions: input.ruleVersions ?? currentRuleVersions()

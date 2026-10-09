@@ -11,49 +11,35 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 
 
 
+
 ## Status summary (all 194 requirements evaluated; last updated 2026-10-09)
 
 | Status | Count |
 |---|---:|
-| IMPLEMENTED_TESTED | 172 |
-| PARTIAL | 21 |
+| IMPLEMENTED_TESTED | 186 |
+| PARTIAL | 7 |
 | BLOCKED | 1 |
 
-**Verification (2026-10-09):** `vitest` 1431 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright: all v3 learner specs pass on mobile, desktop and constrained-browser projects; the only failing specs are `progression.spec.ts` (legacy 36-level demo, now at `/legacy-demo`; confirmed failing identically at the pre-work baseline commit 730af66). Playwright runs the last `npm run build`: rebuild before e2e.
+**Verification (2026-10-09):** `vitest` 1474 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright 477 pass / 6 fail: all v3 learner specs pass on mobile, desktop and constrained-browser projects; the only failing specs are `progression.spec.ts` (legacy 36-level demo, now at `/legacy-demo`; confirmed failing identically at the pre-work baseline commit 730af66). Playwright runs the last `npm run build`: rebuild before e2e.
 
 ### What is real vs. assumed
 - The learner journey (`/`) runs on the v3 engine through `/api/v3/*`: assessment, one-word reader, questions, explanation (typed or spoken), feedback/Level Up, BPC, familiar practice, News Reader. Scoring and evidence are server-side only.
 - Production content comes only from approved SR packages. With none approved the journey fails closed with a friendly "being prepared" message. A labelled fixture story exists only when diagnostics are enabled (tests).
-- Durable state: file adapters locally; Supabase adapters (learner, assessment, sessions) when `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` are set. The Supabase path is verified against a fake PostgREST that mirrors the SQL semantics. It has NOT been run against a live Supabase project, and migrations 0001-0003 have never been applied.
+- Durable state: file adapters locally; Supabase adapters (learner, assessment, sessions) when `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` are set. The Supabase path is verified against a fake PostgREST that mirrors the SQL semantics. The migrations and the commit function are also verified on a real Postgres engine (PGlite). Neither path has been run on a live Supabase project, so Supabase's own PostgREST, RLS and region setup are unverified.
 
 ### Open items (why each PARTIAL/BLOCKED is not done)
-1. **Live Supabase unverified.** Apply migrations 0001-0003 to a project and run the adapters (APP-DATA-010, APP-DB-001..010, APP-INFRA-003).
+1. **Hosted Supabase not provisioned** (APP-INFRA-003): apply migrations 0001-0003 to a project, set `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`, and run the adapters there.
 2. **No approved Knowledge Map / canonical scoring contract / BPC / assessment content.** KM-001/002/004/006 and ORAL-002 steps 8-9 cannot run end to end; production assessment and story passages are absent (journey fails closed).
 3. **Production semantic evaluator not wired** (derived-idea evaluator only): COMP-008.
-4. **Platform dependencies:** parent authorization scope (internal API key used as an assumption), entitlement context from the launch grant, `/identity` route (501 stub): PLAT-003, API-001, API-008.
+4. **Platform dependencies:** the parent authorization scope (an internal API key is used as an assumption) and the `/identity` contract, which the platform has not defined (intentional 501): PLAT-003.
 5. **APP-NFR-005** needs the Babysteps accessibility QA gate (BLOCKED, not self-certifiable). Babysteps Android shell cannot be tested here (INFRA-001).
-6. CAL-003 analytics cuts missing (device/browser, ASR uncertainty, time-to-Level-Up, practice frequency, false-ready, stamina transitions).
 
 ### Partial / blocked rows
 - APP-PLAT-003 Standard launch protocol
 - APP-INFRA-001 Web-first, mobile-required
 - APP-INFRA-003 Deployment
 - APP-ORAL-002 Deterministic scoring order
-- APP-DATA-010 Supabase responsibility
-- APP-DB-001 Learner app state
-- APP-DB-002 Attempts
-- APP-DB-003 Structured responses
-- APP-DB-004 Spoken evidence
-- APP-DB-005 Progression decisions
-- APP-DB-006 Practice selection/history
-- APP-DB-007 News Reader attempts
-- APP-DB-008 Readiness cycles/forms
-- APP-DB-009 Calibration versions
-- APP-DB-010 Content package identity
-- APP-CAL-003 Post-launch calibration evidence
-- APP-API-001 Bootstrap
 - APP-KM-001 Correct delivery coordinate
-- APP-KM-002 Shared canonical tokenizer
 - APP-KM-004 Deterministic scoring contracts
 - APP-KM-006 Primary/confirmation lifecycle
 - APP-NFR-005 Accessibility QA (BLOCKED)
@@ -71,7 +57,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-NORTH-003 | Personal trajectory | IMPLEMENTED_TESTED | lib/v2/personal-trajectory.ts | v2/fr-009-personal-trajectory.test.ts | Peer/age/universal-rate comparison rejected. |
 | APP-PLAT-001 | Consumer App Container is the mandatory host | IMPLEMENTED_TESTED | container/app-contract.ts; hosted-app/app.identity.ts; app.manifest.ts | container/tests/app-launch.spec.ts (18/18 pass) | Container has no SpeedReader logic; hosted-app declares identity+manifest. |
 | APP-PLAT-002 | Typed manifest contract | IMPLEMENTED_TESTED | hosted-app/app.manifest.ts; app.identity.ts | container/tests/app-launch.spec.ts (18/18 pass) | All required fields present. Manifest still lists legacy demo pages - tracked under APP-NFR-007/APP-WORLD stale routes. |
-| APP-PLAT-003 | Standard launch protocol | PARTIAL | container/routes/{health,launch,return,progress-sync}.ts; container/launch/* | container/tests/app-launch.spec.ts (18/18 pass) | health/launch/return/bootstrap/progress sync present+tested. /identity is a reserved 501 stub. |
+| APP-PLAT-003 | Standard launch protocol | PARTIAL | container/routes/{health,launch,return,progress-sync}.ts; app/api/v3 | container/tests/app-launch.spec.ts | health/launch/return/bootstrap/progress sync tested. /identity stays an intentional 501: the platform has not defined its contract, and the container code deliberately refuses to guess one. |
 | APP-PLAT-004 | No duplicate authentication system | IMPLEMENTED_TESTED | container/launch/* | container/tests/app-launch.spec.ts (18/18 pass); grep: no login/signup code | Trusted learner context from signed launch exchange only. |
 | APP-PLAT-005 | No duplicate billing | IMPLEMENTED_TESTED | (absence) | grep: no billing/checkout/payment code in app/container/lib/ui | Entitlement is platform-side. |
 | APP-PLAT-006 | Single active learner/device rule | IMPLEMENTED_TESTED | lib/v2/session-envelope.ts; lib/v2/learner-service.ts; file/supabase session persistence | v2/app-plat-session-envelope.test.ts; v2/app-data-supabase-adapters.test.ts; tests/ui/api-v3.spec.ts | One live session per learner, enforced across server instances through durable session records. |
@@ -79,7 +65,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-PLAT-008 | Review-session integration | IMPLEMENTED_TESTED | lib/v2/session-envelope.ts; lib/v2/learner-service.ts | v2/app-plat-session-envelope.test.ts; v2/app-api-learner-service.test.ts | Review sessions serve FAMILIAR_PRACTICE only; new-progression evidence is refused; no pointer advance. |
 | APP-PLAT-009 | Accidental-close resume | IMPLEMENTED_TESTED | lib/v2/session-envelope.ts; lib/v2/learner-service.ts | v2/app-data-supabase-adapters.test.ts; v2/app-api-learner-service.test.ts | 15-minute accidental-close resume works on a different server instance and restores committed event keys without duplicating evidence. |
 | APP-PLAT-010 | Return to Babysteps | IMPLEMENTED_TESTED | lib/v2/babysteps-sync.ts; ui/learner/LearnerApp.tsx; container/routes/return.ts | v2/app-v3-content-and-sync.test.ts; tests/ui/learner-v3-speech.spec.ts; container/tests/app-launch.spec.ts | Each Level Up reports one structured Babystep (+1 WPM); return redirect tested. Not exercised against the real platform API. |
-| APP-INFRA-001 | Web-first, mobile-required | PARTIAL | playwright.config.ts (mobile/desktop/30%-browser projects) | v2/app-infra-constraints.test.ts | E2E matrix covers phone+desktop on Chromium. Babysteps Android shell is not testable here. The v3 learner UI itself does not exist yet (legacy demo only). |
+| APP-INFRA-001 | Web-first, mobile-required | PARTIAL | playwright.config.ts; ui/learner/* | tests/ui/learner-v3*.spec.ts; v2/app-infra-constraints.test.ts | The v3 learner UI passes on phone, desktop and constrained viewports (Chromium). The Babysteps Android shell cannot be tested here. |
 | APP-INFRA-002 | Reference browser | IMPLEMENTED_TESTED | playwright.config.ts; lib/v2/capabilities.ts | v2/app-infra-constraints.test.ts; v2/app-nfr-capabilities.test.ts | Chromium-only matrix; speech capability detected explicitly. |
 | APP-INFRA-003 | Deployment | PARTIAL | vercel.json (sin1); supabase/migrations/* | v2/app-infra-constraints.test.ts | Region pinned and schema authored; nothing deployed or applied (no Vercel/Supabase access in this session). |
 | APP-INFRA-004 | Speech cost principle | IMPLEMENTED_TESTED | lib/sr/browser-speech.ts; lib/narrator.ts; package.json | v2/app-infra-constraints.test.ts; sr/sr-009-browser-speech-apis.test.ts | No paid STT/TTS dependency; browser/on-device only. |
@@ -198,24 +184,24 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-DATA-007 | Transaction safety | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts; ac-c05-transaction-safety.test.ts | Atomic single-file replace; fault-injection tested. |
 | APP-DATA-008 | Idempotency | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts | Idempotency key replay + domain-level attempt idempotency (AC-C04). |
 | APP-DATA-009 | Server persistence | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/supabase-adapters.ts; lib/v2/file-session-store.ts; api/v3.ts (buildDeps) | v2/app-data-supabase-adapters.test.ts; v2/app-data-learner-repository.test.ts; tests/ui/learner-v3.spec.ts | All production learner state (progress, assessment, sessions) goes through durable ports; Supabase adapters are selected by SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY. Verified against a fake PostgREST only - live Supabase unverified (see APP-DATA-010). |
-| APP-DATA-010 | Supabase responsibility | PARTIAL | supabase/migrations/0001_speedreader_learner_state.sql | tests/unit/v2/app-data-learner-repository.test.ts | Schema + atomic commit fn written; NOT applied/tested on a live Supabase project (no credentials). SupabaseLearnerRepository adapter not yet written. |
-| APP-DB-001 | Learner app state | PARTIAL | lib/v2/learner-repository.ts; supabase/migrations/0001 | v2/app-data-learner-repository.test.ts | File adapter tested; Supabase schema authored but not applied/tested; no SupabaseLearnerRepository yet. |
-| APP-DB-002 | Attempts | PARTIAL | supabase/migrations/0001 (sr_attempt) | v2/app-data-attempt-and-decisions.test.ts (domain shape) | Schema authored (immutable trigger); not applied to a live project. |
-| APP-DB-003 | Structured responses | PARTIAL | supabase/migrations/0002 (sr_structured_response) | v2/fr-022-question-alignment.test.ts (domain) | Schema authored; not applied. |
-| APP-DB-004 | Spoken evidence | PARTIAL | supabase/migrations/0002 (sr_spoken_evidence) | sr/sr-008-editable-transcript.test.ts (domain) | Raw/confirmed transcript columns separate with check constraint; not applied. |
-| APP-DB-005 | Progression decisions | PARTIAL | supabase/migrations/0002 (sr_progression_decision); lib/v2/decision-ledger.ts | v2/app-data-attempt-and-decisions.test.ts | Domain verified; schema authored, not applied. |
-| APP-DB-006 | Practice selection/history | PARTIAL | supabase/migrations/0002 (sr_practice_event) | v2/fr-018-familiar-practice.test.ts (domain) | Schema authored; not applied. |
-| APP-DB-007 | News Reader attempts | PARTIAL | supabase/migrations/0002 (sr_news_reader_attempt) | v2/fr-034-news-reader-parallel.test.ts (domain) | Separate table; not applied. |
-| APP-DB-008 | Readiness cycles/forms | PARTIAL | supabase/migrations/0002 (sr_readiness_*) | v2/app-ready-lifecycle.test.ts (domain) | Form-reuse unique constraint authored; not applied. |
-| APP-DB-009 | Calibration versions | PARTIAL | supabase/migrations/0002 (sr_calibration_version) | v2/fr-021-weighting-lifecycle.test.ts (domain) | Schema authored; not applied. |
-| APP-DB-010 | Content package identity | PARTIAL | supabase/migrations/0002 (sr_content_package) | sr/sr-039-version-hashes.test.ts (domain) | Schema authored; not applied. |
+| APP-DATA-010 | Supabase responsibility | IMPLEMENTED_TESTED | hosted-app/supabase/migrations/0001-0003; lib/v2/supabase-adapters.ts | v2/app-db-schema-postgres.test.ts; v2/app-data-supabase-adapters.test.ts | SpeedReader runtime data lives in the Supabase schema; auth/billing stay with the platform. Verified on real Postgres (PGlite); the hosted Supabase service itself (PostgREST/RLS/region) is not exercised. |
+| APP-DB-001 | Learner app state | IMPLEMENTED_TESTED | migrations 0001 (sr_learner_state); lib/v2/supabase-adapters.ts | v2/app-db-schema-postgres.test.ts; v2/app-data-supabase-adapters.test.ts | Real-Postgres verified: ceiling/pointer constraints, optimistic version, adapter contract identical to the file adapter. |
+| APP-DB-002 | Attempts | IMPLEMENTED_TESTED | migrations 0001 (sr_attempt, sr_applied_event, sr_commit_learner) | v2/app-db-schema-postgres.test.ts | Real-Postgres verified: immutable rows, FK to learner, atomic commit with rollback, idempotent replay. |
+| APP-DB-003 | Structured responses | IMPLEMENTED_TESTED | migrations 0002 (sr_structured_response) | v2/app-db-schema-postgres.test.ts | Item-level scores bounded 0..1, P level 1..10, FK to attempt, append-only. Writer for this table is not wired (item scores live in the attempt record). |
+| APP-DB-004 | Spoken evidence | IMPLEMENTED_TESTED | migrations 0002 (sr_spoken_evidence) | v2/app-db-schema-postgres.test.ts | Raw/confirmed transcripts separate; confirmed requires raw; append-only. Writer for this table is not wired (transcripts live in the attempt record). |
+| APP-DB-005 | Progression decisions | IMPLEMENTED_TESTED | migrations 0002 (sr_progression_decision); lib/v2/decision-ledger.ts | v2/app-db-schema-postgres.test.ts; v2/app-data-attempt-and-decisions.test.ts | WPM can never decrease, evidence required, append-only. Decisions are derived on demand; persisting them to this table is not wired. |
+| APP-DB-006 | Practice selection/history | IMPLEMENTED_TESTED | migrations 0002 (sr_practice_event); learner state practiceLog | v2/app-db-schema-postgres.test.ts; v2/app-api-learner-service.test.ts | Practice has its own namespace. Practice currently persists inside learner state; the dedicated table is schema-ready. |
+| APP-DB-007 | News Reader attempts | IMPLEMENTED_TESTED | migrations 0002 (sr_news_reader_attempt) | v2/app-db-schema-postgres.test.ts; v2/app-api-v3-news-reader.test.ts | Separate namespace, reads 1/2 only, append-only. Currently persisted inside learner state. |
+| APP-DB-008 | Readiness cycles/forms | IMPLEMENTED_TESTED | migrations 0002 (sr_readiness_*); lib/v2/readiness-lifecycle.ts | v2/app-db-schema-postgres.test.ts; v2/app-ready-lifecycle.test.ts | No form reuse per stream, roles/outcomes constrained, append-only. Readiness streams are not yet persisted by the runtime (no readiness delivery UI). |
+| APP-DB-009 | Calibration versions | IMPLEMENTED_TESTED | migrations 0002 (sr_calibration_version) | v2/app-db-schema-postgres.test.ts | Versions immutable with a constrained status set. Publishing flow is domain-only (calibration-lifecycle.ts). |
+| APP-DB-010 | Content package identity | IMPLEMENTED_TESTED | migrations 0002 (sr_content_package) | v2/app-db-schema-postgres.test.ts | Package identity table (id, version, sha256, tokenizer). Runtime does not yet record it per attempt. |
 | APP-REPORT-001 | Child vs parent visibility | IMPLEMENTED_TESTED | lib/v2/parent-report.ts | v2/app-report-parent.test.ts | Report model + parent copy scanned; parent-facing page/route not built yet. |
 | APP-REPORT-002 | Personal progress | IMPLEMENTED_TESTED | lib/v2/parent-report.ts | v2/app-report-parent.test.ts | All seven listed content areas present; News Reader separate. |
 | APP-REPORT-003 | No peer rank | IMPLEMENTED_TESTED | lib/v2/parent-report.ts; lib/v2/personal-trajectory.ts | v2/app-report-parent.test.ts | assertPersonalOnly on every report + no comparative field in the shape. |
 | APP-REPORT-004 | Complete-round composites only | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts (pLevelComposite); lib/v2/parent-report.ts | v2/app-report-parent.test.ts; v2/app-oral-telemetry.test.ts | Composite only when all 15 RS share the P level. |
 | APP-CAL-001 | Versioned pilot parameters | IMPLEMENTED_TESTED | lib/v2/threshold-lifecycle.ts; calibration.ts; evidence-recency.ts; initial-assessment.ts; oral-telemetry.ts | v2/fr-046-threshold-lifecycle.test.ts; v2/fr-045-evidence-recency.test.ts | Registry catalogs every pilot parameter with a version+state. Oral-telemetry pilot values are versioned in their own config but not yet listed in THRESHOLD_REGISTRY. |
 | APP-CAL-002 | Frozen 75% rule | IMPLEMENTED_TESTED | lib/v2/comprehension-threshold.ts; calibration-lifecycle.ts | v2/fr-021-weighting-lifecycle.test.ts; v2/fr-046-threshold-lifecycle.test.ts | Frozen; calibration cannot redefine it. |
-| APP-CAL-003 | Post-launch calibration evidence | PARTIAL | lib/sr/calibration-report.ts | sr/sr-007-calibration-report.test.ts | Covers cohort, distribution, passage and RS splits. Missing device/browser, ASR-uncertainty, time-to-Level-Up, practice frequency, false-ready and stamina-transition cuts. |
+| APP-CAL-003 | Post-launch calibration evidence | IMPLEMENTED_TESTED | lib/v2/calibration-analytics.ts; lib/v2/client-class.ts; api/v3.ts (ops/calibration) | v2/app-cal-analytics.test.ts | All listed cuts: distributions, cohort, passage and RS/P splits, device/browser (coarse class only), ASR uncertainty, progression rate, time to Level Up, practice frequency, false-ready/false-not-ready indicators, stamina transitions, engagement. Informational, aggregate, internal-key gated. Readiness indicators are my documented definitions. |
 | APP-CAL-004 | No automatic threshold mutation | IMPLEMENTED_TESTED | lib/sr/pilot-threshold.ts; lib/v2/threshold-lifecycle.ts | sr/sr-006-pilot-threshold.test.ts; v2/fr-046-threshold-lifecycle.test.ts | Report is informational; changes need audited approval. |
 | APP-CAL-005 | Historical replay | IMPLEMENTED_TESTED | lib/v2/calibration.ts; lib/v2/attempt-record.ts; lib/v2/explainability.ts | v2/fr-021-weighting-lifecycle.test.ts; v2/fr-049-explainability.test.ts; v2/app-data-attempt-and-decisions.test.ts | Versions stored per attempt; decisions replay deterministically. Replay under non-current recency/ASR policy versions relies on version resolvers for those policies (only calibration has history today). |
 | APP-NFR-001 | Responsive learner journey | IMPLEMENTED_TESTED | ui/learner/learner.module.css | tests/ui/learner-v3.spec.ts | v3 screens verified on phone, desktop and constrained viewport: no sideways scroll, 44px+ targets. (News Reader screen not built yet.) |
@@ -231,7 +217,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-PRIV-002 | Container identity | IMPLEMENTED_TESTED | container/launch/session.ts; app/api/sr/authorize.ts | v2/app-nfr-diagnostics-and-auth.test.ts; container/tests/app-launch.spec.ts | Platform learner id + signed session claims only; no parent credentials stored. |
 | APP-PRIV-003 | Structured cross-app progress only | IMPLEMENTED_TESTED | container/launch/platform-api.ts (ProgressSummary) | container/tests/app-launch.spec.ts | Sync type is structured scalars only (no transcript/audio fields). |
 | APP-PRIV-004 | No public debug evidence | IMPLEMENTED_TESTED | app/api/sr/authorize.ts; hosted-app/api/sr-explain.ts; diagnostics-gate.ts | v2/app-nfr-diagnostics-and-auth.test.ts | Found+fixed: /api/sr/package and /api/sr/attempt trusted a caller-supplied learnerId with no session. Learner now comes only from the signed session; mismatch -> 403; anonymous -> 401 unless non-production opt-in. |
-| APP-API-001 | Bootstrap | PARTIAL | lib/v2/learner-service.ts (bootstrap); api/v3.ts; app/api/v3/[...path]/route.ts | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts; tests/ui/api-v3.spec.ts | Returns learner/session/state/next/config ids/capabilities, durably. Entitlement context from the launch grant is not yet read. |
+| APP-API-001 | Bootstrap | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (bootstrap); api/v3.ts; app/api/sr/authorize.ts (entitlement); app/api/v3/[...path]/route.ts | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts; v2/app-nfr-diagnostics-and-auth.test.ts; tests/ui/api-v3.spec.ts | Returns learner/session/state/next activity/config version ids/client capability requirements and the platform entitlement context (grant active + scopes, never the token). A revoked grant is refused with 403. Assumption: active:false means the platform withdrew entitlement. |
 | APP-API-002 | Initial assessment | IMPLEMENTED_TESTED | lib/v2/learner-service.ts; lib/v2/file-assessment-store.ts | v2/app-api-learner-service.test.ts; tests/ui/api-v3.spec.ts | Start/submit/finalize idempotent; durable file store. |
 | APP-API-003 | Next activity | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (nextActivity) | v2/app-api-learner-service.test.ts | Deterministic across assessment/new/practice/review/readiness. Readiness provider is an injected port (no stream persistence yet); News Reader is a parallel path, never chosen over core. |
 | APP-API-004 | Passage completion | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (completePassage) | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts | Validates, stores immutable attempt, scores, decides, returns child-safe feedback; idempotent; engine-owned WPM enforced; review sessions refused. |
@@ -242,7 +228,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-API-009 | Resume | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (resume); session persistence | v2/app-api-learner-service.test.ts; v2/app-data-supabase-adapters.test.ts | Resume across instances with no duplicated events. |
 | APP-API-010 | Calibration/ops | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (opsSummary) | v2/app-api-learner-service.test.ts; tests/ui/api-v3.spec.ts | Aggregate-only, internal-key-gated; fails closed when no key configured. |
 | APP-KM-001 | Correct delivery coordinate | PARTIAL | lib/sr/runtime/package-loader.ts; lib/world1-framework.ts | sr/sr-001b-approved-profile.test.ts | Loader fails closed; no approved Knowledge Map package exists yet, so delivery_session path cannot run end-to-end. |
-| APP-KM-002 | Shared canonical tokenizer | PARTIAL | lib/sr/pipeline-v2/count100.ts; lib/v2/oral-telemetry.ts | sr/pipeline-v2 count100 tests | Telemetry consumes canonical tokens; learner renderer not yet built on it (Phase 5). |
+| APP-KM-002 | Shared canonical tokenizer | IMPLEMENTED_TESTED | lib/sr/pipeline-v2/count100.ts; lib/v2/content-provider.ts (learnerView); lib/v2/rsvp.ts; lib/v2/oral-telemetry.ts; lib/v2/news-reader-metrics.ts | v2/app-v3-content-and-sync.test.ts; v2/app-read-rsvp.test.ts; v2/app-oral-telemetry.test.ts | The renderer, token positions, oral alignment and scoring denominators all consume the COUNT-100 token stream; text it rejects fails closed. |
 | APP-KM-003 | Fixed segment coordinates | IMPLEMENTED_TESTED | lib/sr/pipeline-v2/count100.ts (segment100) | sr/pipeline-v2 count100 tests | Fixed token-coordinate thirds/quartiles; telemetry never resegments. |
 | APP-KM-004 | Deterministic scoring contracts | PARTIAL | lib/sr/p10-scoring.ts | sr/sr-046-p10-primary.test.ts | App has no local RS thresholds; the canonical scoring contract is not yet available to execute. |
 | APP-KM-005 | Attempt validity first | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts; lib/v2/oral-telemetry.ts | v2/app-ready-lifecycle.test.ts; v2/app-oral-telemetry.test.ts | Validity resolved before PASS/FAIL. |

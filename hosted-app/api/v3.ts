@@ -17,9 +17,11 @@ import { createStore } from "../lib/sr/pipeline/storage";
 import type { BpcContent } from "../lib/v2/best-comprehension";
 import { metricsFromCapture, type ReadCapture } from "../lib/v2/news-reader-metrics";
 import { COUNT100_VERSION, count100 } from "../lib/sr/pipeline-v2/count100";
+import { classifyClient } from "../lib/v2/client-class";
+import { calibrationAnalytics } from "../lib/v2/calibration-analytics";
 import type { NewsReaderAttempt } from "../lib/v2/news-reader";
 
-export type Verified = { learnerId: string; sessionId: string; deviceId: string };
+export type Verified = { learnerId: string; sessionId: string; deviceId: string; entitlement?: { active: boolean; scopes: string[] } | null };
 
 export const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
@@ -122,7 +124,10 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
   const url = new URL(req.url);
 
   switch (route) {
-    case "POST bootstrap": return respond(await service.bootstrap(ctx));
+    case "POST bootstrap": {
+      const r = await service.bootstrap(ctx);
+      return respond(isError(r) ? r : { ...r, entitlement: who.entitlement ?? null });
+    }
     case "POST resume": return respond(await service.resume(ctx));
     case "POST assessment/start": return respond(await service.startAssessment(ctx));
 
@@ -183,7 +188,8 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
         displayedWpm: snap.learner.core.wpm,
         items: scoreItems(passage, b.answers),
         speech: speechFor({ passageId: passage.passageId, ideas: passage.ideas }, b.explanation),
-        startedAt: sanitizeStartedAt(b.startedAt, Date.now())
+        startedAt: sanitizeStartedAt(b.startedAt, Date.now()),
+        client: classifyClient(req.headers.get("user-agent"))
       };
       return respond(await service.completePassage(ctx, completion));
     }
@@ -240,6 +246,11 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
     case "POST news-reader/submit": return json({ error: "use news-reader/read" }, 404);
     case "GET progress": return respond(await service.progress(ctx));
     case "GET progress/parent": return respond(await service.parentProgress(who.learnerId, internalAuthorized(req)));
+    case "GET ops/calibration": {
+      if (!internalAuthorized(req)) return json({ error: "internal authorization required" }, 403);
+      const snaps = await repo.list();
+      return json({ ok: true, report: calibrationAnalytics({ learners: snaps.map((x) => x.learner) }) });
+    }
     case "GET ops/summary": return respond(await service.opsSummary(await repo.list(), internalAuthorized(req)));
     default: return json({ error: "not found" }, 404);
   }
