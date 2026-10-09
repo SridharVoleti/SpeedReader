@@ -138,7 +138,7 @@ test("a Level Up reports exactly one structured Babystep to Babysteps and nothin
     await readAndAnswer(page);
     await page.getByTestId("questions-next").click();
   }
-  const start = Number((await page.getByTestId("speed-badge").innerText()).match(/\d+/)![0]);
+  const start = Number(await page.getByTestId("book-time-now").getAttribute("data-wpm"));
   for (let story = 1; story <= 5; story += 1) {
     await page.getByTestId("start-story").click();
     await readAndAnswer(page);

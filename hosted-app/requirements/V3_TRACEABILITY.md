@@ -16,6 +16,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 
 
 
+
 ## Status summary (all 194 requirements evaluated; last updated 2026-10-09)
 
 | Status | Count |
@@ -54,7 +55,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-GOV-003 | Requirement states | IMPLEMENTED_TESTED | lib/v2/threshold-lifecycle.ts | v2/fr-046-threshold-lifecycle.test.ts | Lifecycle states + frozen/pilot registry. |
 | APP-GOV-004 | No silent product redesign | IMPLEMENTED_TESTED | lib/v2/stale-rules.ts; supersession.ts | v2/ac-c01-stale-rules.test.ts; v2/fr-039-oral-gate-superseded.test.ts | Superseded rules guarded from restoration. |
 | APP-GOV-005 | Historical outcomes remain historical | IMPLEMENTED_TESTED | lib/v2/calibration.ts; attempt-record.ts | v2/fr-021-weighting-lifecycle.test.ts; v2/fr-047-attempt-record.test.ts | Versions stored with every attempt; history never rewritten. |
-| APP-NORTH-001 | Three outcomes | IMPLEMENTED_TESTED | (product statement) | satisfied by APP-WPM/COMP/BPC rows | Outcome statement; no separate test. |
+| APP-NORTH-001 | Three outcomes | IMPLEMENTED_TESTED | ui/learner/OutcomeHeader.tsx; lib/v2/book-goal.ts | v2/app-ui-book-goal.test.ts; tests/ui/learner-v3-outcome.spec.ts | The learner header now states the outcome - 'Read a 200-page book in under 3 hours - with understanding and retention.' - on every screen, instead of a speed figure. |
 | APP-NORTH-002 | Confidence-first | IMPLEMENTED_TESTED | ui/learner/*; lib/v2/learner-language.ts | tests/ui/learner-v3.spec.ts | Rendered learner screens scanned on every step: encouraging copy, no internal or negative labels. |
 | APP-NORTH-003 | Personal trajectory | IMPLEMENTED_TESTED | lib/v2/personal-trajectory.ts | v2/fr-009-personal-trajectory.test.ts | Peer/age/universal-rate comparison rejected. |
 | APP-PLAT-001 | Consumer App Container is the mandatory host | IMPLEMENTED_TESTED | container/app-contract.ts; hosted-app/app.identity.ts; app.manifest.ts | container/tests/app-launch.spec.ts (18/18 pass) | Container has no SpeedReader logic; hosted-app declares identity+manifest. |
@@ -135,7 +136,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-UX-002 | GREEN feedback | IMPLEMENTED_TESTED | ui/learner/LearnerApp.tsx | tests/ui/learner-v3.spec.ts | Celebratory, number-free feedback for a strong story. |
 | APP-UX-003 | NOT_GREEN feedback | IMPLEMENTED_TESTED | ui/learner/LearnerApp.tsx | tests/ui/learner-v3.spec.ts | Weak story: neutral encouragement, BPC offered, next story open, speed unchanged. |
 | APP-UX-004 | Level-Up celebration | IMPLEMENTED_TESTED | ui/learner/LearnerApp.tsx | tests/ui/learner-v3.spec.ts | Five good stories -> 'You Levelled Up!' with the new speed. |
-| APP-UX-005 | Book-time impact | IMPLEMENTED_TESTED | ui/learner/LearnerApp.tsx; lib/v2/book-time.ts | tests/ui/learner-v3.spec.ts | 50,000-word book time and time saved shown on the Level Up. |
+| APP-UX-005 | Book-time impact | IMPLEMENTED_TESTED | ui/learner/OutcomeHeader.tsx; ui/learner/LearnerApp.tsx; lib/v2/book-goal.ts; lib/v2/book-time.ts | v2/app-ui-book-goal.test.ts; tests/ui/learner-v3-outcome.spec.ts; tests/ui/learner-v3.spec.ts | Book time is now persistent in the header ('Today, a 200-page book would take you about ...', goal under 3 hours, journey bar, time saved since starting) as well as on each Level Up. 'About' wording only; the 3-hour goal needs ~278 WPM against a World 1 ceiling of 150, so it is shown as a journey and never as already reachable. |
 | APP-UX-006 | No peer comparison | IMPLEMENTED_TESTED | lib/v2/personal-trajectory.ts; learner-language.ts | v2/fr-009-personal-trajectory.test.ts; v2/fr-019-support-invisible.test.ts |  |
 | APP-UX-007 | Confidence-first language scan | IMPLEMENTED_TESTED | lib/v2/learner-language.ts | v2/fr-019-support-invisible.test.ts | String-level scan exists; must also run against real UI when built. |
 | APP-NR-001 | Parallel namespace | IMPLEMENTED_TESTED | lib/v2/news-reader.ts | v2/fr-034-news-reader-parallel.test.ts |  |

@@ -5,7 +5,7 @@
 // feedback; it never shows scores, thresholds or result labels.
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import identity from "../../app.identity";
+import OutcomeHeader from "./OutcomeHeader";
 import { api, friendlyProblem, type Feedback, type StoryView } from "./api";
 import { levelUpSyncPayload } from "../../lib/v2/babysteps-sync";
 import Story, { type StoryMode, type StoryResult } from "./Story";
@@ -38,14 +38,15 @@ const WAITING_COPY: Record<string, string> = {
 export default function LearnerApp() {
   const [view, setView] = useState<View>({ k: "boot" });
   const [speed, setSpeed] = useState<number | null>(null);
+  const [startSpeed, setStartSpeed] = useState<number | null>(null);
   const [storiesRead, setStoriesRead] = useState(0);
   const [bpcText, setBpcText] = useState<string | null>(null);
   const [launched, setLaunched] = useState(false);
   const booted = useRef(false);
 
   const refreshSpeed = useCallback(async () => {
-    const p = await api<{ currentWpm: number; storiesRead: number }>("GET", "progress");
-    if (p.ok) { setSpeed(p.data.currentWpm); setStoriesRead(p.data.storiesRead); }
+    const p = await api<{ currentWpm: number; startingWpm: number; storiesRead: number }>("GET", "progress");
+    if (p.ok) { setSpeed(p.data.currentWpm); setStartSpeed(p.data.startingWpm); setStoriesRead(p.data.storiesRead); }
   }, []);
 
   const goHome = useCallback(async () => {
@@ -129,10 +130,7 @@ export default function LearnerApp() {
 
   return (
     <main className={styles.shell}>
-      <header className={styles.top}>
-        <p className={styles.brand}>{identity.displayName}</p>
-        {speed !== null && view.k !== "welcome" && <span className={styles.speed} data-testid="speed-badge">Your speed: {speed} words a minute</span>}
-      </header>
+      <OutcomeHeader speed={view.k === "welcome" ? null : speed} startSpeed={view.k === "welcome" ? null : startSpeed} />
 
       {view.k === "boot" && <section className={styles.card} role="status"><p>Getting your stories ready...</p></section>}
 
@@ -148,7 +146,7 @@ export default function LearnerApp() {
 
       {view.k === "welcome" && (
         <section className={styles.card}>
-          <h1>Let us find your reading speed</h1>
+          <h2>Let us find where you are today</h2>
           <p>You will read a few short stories and answer some questions. Take your time - there is no hurry, just do your best.</p>
           <div className={styles.row}><button type="button" className={styles.primary} onClick={() => void beginAssessment()} data-testid="begin-assessment">Let us begin</button></div>
         </section>
@@ -156,7 +154,7 @@ export default function LearnerApp() {
 
       {view.k === "home" && (
         <section className={styles.card}>
-          <h1>Ready to read?</h1>
+          <h2>Ready to read?</h2>
           {view.next.activity === "NEW_PROGRESSION" && (
             <><p>Your next story is waiting for you.</p><div className={styles.row}><button type="button" className={styles.primary} onClick={() => void startNext(view.next)} data-testid="start-story">Read a story</button></div></>
           )}

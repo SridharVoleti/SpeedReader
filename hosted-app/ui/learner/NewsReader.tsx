@@ -163,7 +163,7 @@ export default function NewsReader({ onExit, onProblem }: { onExit: () => void; 
   if (stage === "pick") {
     return (
       <section className={styles.card} data-testid="nr-pick">
-        <h1>Reading aloud</h1>
+        <h2>Reading aloud</h2>
         <p>Pick a story you already know. First listen to a newsreader, then read it out loud yourself.</p>
         {stories === null && <p role="status">Looking for your stories...</p>}
         {stories?.length === 0 && <p>Read a story first, then come back here to practise reading it out loud.</p>}

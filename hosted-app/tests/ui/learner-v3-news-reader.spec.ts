@@ -104,7 +104,7 @@ test("listen with a female reference voice and a read-along highlight, then read
   await installSpeech(page, "full");
   await page.goto("/");
   await reachHomeWithOneStoryRead(page);
-  const speedBefore = await page.getByTestId("speed-badge").innerText();
+  const speedBefore = await page.getByTestId("book-time-now").innerText();
 
   await page.getByTestId("open-news-reader").click();
   await expect(page.getByTestId("nr-pick")).toBeVisible();
@@ -128,7 +128,7 @@ test("listen with a female reference voice and a read-along highlight, then read
 
   await page.getByTestId("nr-exit").click();
   await expect(page.getByTestId("start-story")).toBeVisible(); // the next canonical story is still open
-  await expect(page.getByTestId("speed-badge")).toHaveText(speedBefore); // earned speed is untouched
+  await expect(page.getByTestId("book-time-now")).toHaveText(speedBefore); // the book time (earned speed) is untouched
 });
 
 test("no microphone: the learner can skip recording, is thanked, and nothing else changes", async ({ page }) => {
@@ -136,7 +136,7 @@ test("no microphone: the learner can skip recording, is thanked, and nothing els
   await installSpeech(page, "no-mic");
   await page.goto("/");
   await reachHomeWithOneStoryRead(page);
-  const speedBefore = await page.getByTestId("speed-badge").innerText();
+  const speedBefore = await page.getByTestId("book-time-now").innerText();
   await page.getByTestId("open-news-reader").click();
   await page.getByTestId("nr-pick-0").click();
   await page.getByTestId("nr-ready").click();
@@ -148,7 +148,7 @@ test("no microphone: the learner can skip recording, is thanked, and nothing els
   await expect(page.getByTestId("nr-coaching")).toContainText("Practising out loud");
   await leak(page);
   await page.getByTestId("nr-exit").click();
-  await expect(page.getByTestId("speed-badge")).toHaveText(speedBefore);
+  await expect(page.getByTestId("book-time-now")).toHaveText(speedBefore);
   await expect(page.getByTestId("start-story")).toBeVisible();
 });
 

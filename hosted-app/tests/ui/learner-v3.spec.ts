@@ -54,9 +54,10 @@ test("a new learner finds their speed, reads a story, tells it, gets feedback an
   await completeAssessment(page);
 
   // the baseline speed is shown in the learner's own words
-  const badge = page.getByTestId("speed-badge");
-  await expect(badge).toHaveText(/Your speed: \d+ words a minute/);
-  const startSpeed = Number((await badge.innerText()).match(/\d+/)![0]);
+  const badge = page.getByTestId("book-time-now");
+  await expect(badge).toHaveText(/Today, a 200-page book would take you about/);
+  const startSpeed = Number(await badge.getAttribute("data-wpm"));
+  const timeAtStart = await badge.innerText();
   expect(startSpeed).toBeGreaterThanOrEqual(60);
   expect(startSpeed).toBeLessThanOrEqual(150);
   await noInternalLeak(page);
@@ -82,14 +83,14 @@ test("a new learner finds their speed, reads a story, tells it, gets feedback an
 
   await page.getByTestId("continue").click();
   await expect(page.getByTestId("start-story")).toBeVisible();
-  await expect(badge).toHaveText(`Your speed: ${startSpeed} words a minute`); // one story does not change the earned speed
+  await expect(badge).toHaveText(timeAtStart); // one story does not change the earned speed (or the book time)
 });
 
 test("a weak answer is met with encouragement: no failure language, the speed is never lowered, the next story is open", async ({ page }) => {
   await newLearner(page);
   await page.goto("/");
   await completeAssessment(page);
-  const before = await page.getByTestId("speed-badge").innerText();
+  const before = await page.getByTestId("book-time-now").innerText();
   await page.getByTestId("start-story").click();
   await readAndAnswer(page, WRONG);
   await page.getByTestId("questions-next").click();
@@ -100,7 +101,7 @@ test("a weak answer is met with encouragement: no failure language, the speed is
   await expect(page.getByTestId("new-speed")).toHaveCount(0);
   await page.getByTestId("continue").click();
   await expect(page.getByTestId("start-story")).toBeVisible();
-  await expect(page.getByTestId("speed-badge")).toHaveText(before);
+  await expect(page.getByTestId("book-time-now")).toHaveText(before);
 });
 
 test("five good stories earn a celebrated Level Up with the new speed and book-time impact", async ({ page }) => {
@@ -108,7 +109,8 @@ test("five good stories earn a celebrated Level Up with the new speed and book-t
   await newLearner(page);
   await page.goto("/");
   await completeAssessment(page);
-  const startSpeed = Number((await page.getByTestId("speed-badge").innerText()).match(/\d+/)![0]);
+  const startSpeed = Number(await page.getByTestId("book-time-now").getAttribute("data-wpm"));
+  const timeBefore = await page.getByTestId("book-time-now").innerText();
   for (let story = 1; story <= 5; story += 1) {
     await page.getByTestId("start-story").click();
     await readAndAnswer(page, RIGHT);
@@ -123,7 +125,9 @@ test("five good stories earn a celebrated Level Up with the new speed and book-t
   await expect(page.getByTestId("book-time")).toContainText("50,000-word book");
   await noInternalLeak(page);
   await page.getByTestId("continue").click();
-  await expect(page.getByTestId("speed-badge")).toHaveText(`Your speed: ${startSpeed + 1} words a minute`);
+  await expect(page.getByTestId("book-time-now")).toHaveAttribute("data-wpm", String(startSpeed + 1));
+  expect(await page.getByTestId("book-time-now").innerText()).not.toBe(timeBefore); // the outcome moved: the book now takes less time
+  await expect(page.getByTestId("book-goal-line")).toContainText("You have already saved about");
 });
 
 test("missing stories are explained kindly, never as an error page", async ({ page }) => {
