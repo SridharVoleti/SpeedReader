@@ -18,6 +18,7 @@ import type { BpcContent } from "../lib/v2/best-comprehension";
 import { metricsFromCapture, type ReadCapture } from "../lib/v2/news-reader-metrics";
 import { COUNT100_VERSION, count100 } from "../lib/sr/pipeline-v2/count100";
 import { classifyClient } from "../lib/v2/client-class";
+import { registryCoordinateFor } from "../lib/v2/delivery-order";
 import { calibrationAnalytics } from "../lib/v2/calibration-analytics";
 import type { NewsReaderAttempt } from "../lib/v2/news-reader";
 
@@ -189,7 +190,9 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
         items: scoreItems(passage, b.answers),
         speech: speechFor({ passageId: passage.passageId, ideas: passage.ideas }, b.explanation),
         startedAt: sanitizeStartedAt(b.startedAt, Date.now()),
-        client: classifyClient(req.headers.get("user-agent"))
+        client: classifyClient(req.headers.get("user-agent")),
+        // only approved canonical content carries a registry coordinate; fixtures never pretend to
+        registry: passage.source === "APPROVED_PACKAGE" ? registryCoordinateFor(passage.passageId) : null
       };
       return respond(await service.completePassage(ctx, completion));
     }

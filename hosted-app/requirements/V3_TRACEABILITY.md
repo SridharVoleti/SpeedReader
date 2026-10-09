@@ -12,12 +12,13 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 
 
 
+
 ## Status summary (all 194 requirements evaluated; last updated 2026-10-09)
 
 | Status | Count |
 |---|---:|
-| IMPLEMENTED_TESTED | 186 |
-| PARTIAL | 7 |
+| IMPLEMENTED_TESTED | 187 |
+| PARTIAL | 6 |
 | BLOCKED | 1 |
 
 **Verification (2026-10-09):** `vitest` 1474 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright 477 pass / 6 fail: all v3 learner specs pass on mobile, desktop and constrained-browser projects; the only failing specs are `progression.spec.ts` (legacy 36-level demo, now at `/legacy-demo`; confirmed failing identically at the pre-work baseline commit 730af66). Playwright runs the last `npm run build`: rebuild before e2e.
@@ -29,7 +30,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 
 ### Open items (why each PARTIAL/BLOCKED is not done)
 1. **Hosted Supabase not provisioned** (APP-INFRA-003): apply migrations 0001-0003 to a project, set `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`, and run the adapters there.
-2. **No approved Knowledge Map / canonical scoring contract / BPC / assessment content.** KM-001/002/004/006 and ORAL-002 steps 8-9 cannot run end to end; production assessment and story passages are absent (journey fails closed).
+2. **No approved Knowledge Map / canonical scoring contract / BPC / assessment content.** KM-004/006 and ORAL-002 steps 8-9 cannot run end to end; production assessment and story passages are absent (journey fails closed).
 3. **Production semantic evaluator not wired** (derived-idea evaluator only): COMP-008.
 4. **Platform dependencies:** the parent authorization scope (an internal API key is used as an assumption) and the `/identity` contract, which the platform has not defined (intentional 501): PLAT-003.
 5. **APP-NFR-005** needs the Babysteps accessibility QA gate (BLOCKED, not self-certifiable). Babysteps Android shell cannot be tested here (INFRA-001).
@@ -39,7 +40,6 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 - APP-INFRA-001 Web-first, mobile-required
 - APP-INFRA-003 Deployment
 - APP-ORAL-002 Deterministic scoring order
-- APP-KM-001 Correct delivery coordinate
 - APP-KM-004 Deterministic scoring contracts
 - APP-KM-006 Primary/confirmation lifecycle
 - APP-NFR-005 Accessibility QA (BLOCKED)
@@ -74,7 +74,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-WORLD-002 | World 1 implementation scope | IMPLEMENTED_TESTED | lib/v2/catalog.ts; worlds.ts | v2/fr-003-catalog.test.ts; v2/fr-001-worlds.test.ts | World 1 fully specified; worlds keyed by id. |
 | APP-WORLD-003 | World 2–5 broad strategy support | IMPLEMENTED_TESTED | lib/v2/world-strategies.ts | v2/fr-002-world-strategies.test.ts |  |
 | APP-W1-001 | 1,500 canonical sequence positions | IMPLEMENTED_TESTED | lib/v2/catalog.ts | v2/fr-003-catalog.test.ts | 1500 positions; pointer independent of practice. |
-| APP-W1-002 | First 150 | IMPLEMENTED_TESTED | lib/v2/foundation.ts | v2/fr-004-first-150.test.ts | delivery_session ordering depends on an approved package (none approved yet - see memory). |
+| APP-W1-002 | First 150 | IMPLEMENTED_TESTED | lib/v2/foundation.ts; lib/v2/delivery-order.ts | v2/fr-004-first-150.test.ts; v2/app-km-delivery-order.test.ts | 100-token one-word display for 1-150; delivery order follows delivery_session (verified against the real registry). The 15 RS x 10 P coordinate is stored with each attempt. |
 | APP-W1-003 | Stamina staircase | IMPLEMENTED_TESTED | lib/v2/stamina.ts | v2/fr-005-staircase.test.ts |  |
 | APP-W1-004 | One meaningful challenge increase at a time | IMPLEMENTED_TESTED | lib/v2/stamina-transition.ts; learner-aggregate.ts | v2/fr-006-transition-precedence.test.ts |  |
 | APP-W1-005 | Progressive stamina validation | IMPLEMENTED_TESTED | lib/v2/ac53r.ts | v2/fr-007-ac53r.test.ts | +25 step validation at domain level; production validation needs real content. |
@@ -227,7 +227,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-API-008 | Progress | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (progress, parentProgress) | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts; tests/ui/api-v3.spec.ts | Child-safe vs internal-key-authorized parent detail. The parent authorization model (internal key) is an assumption pending a platform parent scope. |
 | APP-API-009 | Resume | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (resume); session persistence | v2/app-api-learner-service.test.ts; v2/app-data-supabase-adapters.test.ts | Resume across instances with no duplicated events. |
 | APP-API-010 | Calibration/ops | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (opsSummary) | v2/app-api-learner-service.test.ts; tests/ui/api-v3.spec.ts | Aggregate-only, internal-key-gated; fails closed when no key configured. |
-| APP-KM-001 | Correct delivery coordinate | PARTIAL | lib/sr/runtime/package-loader.ts; lib/world1-framework.ts | sr/sr-001b-approved-profile.test.ts | Loader fails closed; no approved Knowledge Map package exists yet, so delivery_session path cannot run end-to-end. |
+| APP-KM-001 | Correct delivery coordinate | IMPLEMENTED_TESTED | lib/v2/delivery-order.ts; lib/v2/content-provider.ts (ApprovedPackageProvider); api/v3.ts | v2/app-km-delivery-order.test.ts | Found+fixed a real bug: production content mapped sequence n to W1-n (registry order); delivery must follow delivery_session = (P-1)*15+RS (sequence 2 = RS02-P1 = W1-0011). Mapping verified against all 150 rows of the real registry CSV and the readiness matrix; the registry coordinate is stored on each attempt. The runtime package carries no delivery metadata, so the coordinate is derived by the registry-validated formula; positions beyond 150 are an explicit unspecified placeholder. |
 | APP-KM-002 | Shared canonical tokenizer | IMPLEMENTED_TESTED | lib/sr/pipeline-v2/count100.ts; lib/v2/content-provider.ts (learnerView); lib/v2/rsvp.ts; lib/v2/oral-telemetry.ts; lib/v2/news-reader-metrics.ts | v2/app-v3-content-and-sync.test.ts; v2/app-read-rsvp.test.ts; v2/app-oral-telemetry.test.ts | The renderer, token positions, oral alignment and scoring denominators all consume the COUNT-100 token stream; text it rejects fails closed. |
 | APP-KM-003 | Fixed segment coordinates | IMPLEMENTED_TESTED | lib/sr/pipeline-v2/count100.ts (segment100) | sr/pipeline-v2 count100 tests | Fixed token-coordinate thirds/quartiles; telemetry never resegments. |
 | APP-KM-004 | Deterministic scoring contracts | PARTIAL | lib/sr/p10-scoring.ts | sr/sr-046-p10-primary.test.ts | App has no local RS thresholds; the canonical scoring contract is not yet available to execute. |

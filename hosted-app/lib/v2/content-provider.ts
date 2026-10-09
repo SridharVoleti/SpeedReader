@@ -12,6 +12,7 @@ import type { createStore } from "../sr/pipeline/storage";
 import type { AuthoredIdea } from "./spoken-expression";
 import type { BpcContent } from "./best-comprehension";
 import { stem } from "./stem";
+import { deliveryCoordinateFor, sequenceForPassageId } from "./delivery-order";
 import { count100 } from "../sr/pipeline-v2/count100";
 import type { RsvpToken } from "./rsvp";
 
@@ -81,9 +82,9 @@ type Store = ReturnType<typeof createStore>;
 const pad4 = (n: number) => String(n).padStart(4, "0");
 
 function fromPackage(pkg: LearnerPackage): V3Passage {
-  const seq = Number.parseInt(pkg.passageId.split("-").pop() ?? "", 10);
   return {
-    sequence: Number.isInteger(seq) ? seq : null,
+    // delivery order (delivery_session), NOT registry order: the same passage id sits at a different sequence
+    sequence: sequenceForPassageId(pkg.passageId),
     passageId: pkg.passageId,
     packageId: pkg.packageId,
     text: pkg.text,
@@ -99,14 +100,18 @@ export class ApprovedPackageProvider implements ContentProvider {
   constructor(private readonly store: Store) {}
 
   bySequence(sequence: number): V3Passage | null {
-    if (!Number.isInteger(sequence) || sequence < 1 || sequence > 9999) return null;
-    const r = loadApprovedPackage(this.store, `PKG-W1-${pad4(sequence)}`);
-    return r.ok ? fromPackage(r.pkg) : null;
+    if (!Number.isInteger(sequence) || sequence < 1 || sequence > 1500) return null;
+    // APP-KM-001: serve by delivery_session, e.g. sequence 2 is RS02-P1 = W1-0011, not W1-0002
+    return this.byRegistryId(deliveryCoordinateFor(sequence).passageId);
   }
 
   byPassageId(passageId: string): V3Passage | null {
-    const m = /^W1-(\d{4})$/.exec(passageId);
-    return m ? this.bySequence(Number.parseInt(m[1], 10)) : null;
+    return /^W1-\d{4}$/.test(passageId) ? this.byRegistryId(passageId) : null;
+  }
+
+  private byRegistryId(passageId: string): V3Passage | null {
+    const r = loadApprovedPackage(this.store, `PKG-${passageId}`);
+    return r.ok ? fromPackage(r.pkg) : null;
   }
 
   /** No assessment passages are specified by the content package yet: fail closed. */
