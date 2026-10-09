@@ -23,13 +23,19 @@ parent can open with a single tap, with the child already signed in.
    avatar, age, and locale. We verify it (`lib/app-launch/bootstrap-assertion.ts`) with a
    secret only BabySteps and we hold.
 4. We mint our own signed session token (`lib/app-launch/session.ts`) and set it as an
-   httpOnly cookie, plus a small non-httpOnly cookie the client reads to greet the learner and
-   namespace their `localStorage` progress by `learnerId` (see `lib/progression.ts`).
+   httpOnly cookie, plus a small non-httpOnly cookie the client reads only to greet the learner
+   (display fields, nothing sensitive).
 
-**No database is involved.** Speed Reading has no backend store - progress lives entirely in
-the browser's localStorage (see the main README). So unlike a database-backed app, "starting a
-session" here just means minting a signed, self-contained cookie; there is nothing to persist
-server-side and nothing to look up on the next request.
+**Learner state is server-authoritative (V3).** The launch itself only mints a signed,
+self-contained session cookie. The learner's reading state (WPM, canonical pointer, decision
+ledger, attempts, sessions, retention and readiness evidence) is persisted server-side through
+the `LearnerRepository` port: Supabase/Postgres in production (service-role access from the
+server only, RLS on every table, migrations in `hosted-app/supabase/migrations`) and file-backed
+adapters for local development and tests only. A Vercel production deployment (`VERCEL_ENV=production`)
+fails closed without valid Supabase configuration (`/health` returns 503 `CONFIGURATION_ERROR`);
+it never falls back to local files. Browser storage is never authoritative for learner progress.
+Diagnostics routes (including the legacy `/explain` journey) are mounted only when
+`SR_ENABLE_DIAGNOSTICS=true` outside production. The pre-V3 localStorage-only model is historical.
 
 ## Progress sync (BabySteps "platform API")
 
@@ -40,8 +46,8 @@ Speed Reading**, so there was no reference handler to copy; this was reverse-eng
 directly from the BabySteps source (`src/lib/authorization/platform-api-contracts.ts`,
 `src/lib/app-authorization/service.ts`, `src/lib/app-progress/service.ts`).
 
-localStorage remains the source of truth for gameplay. This is best-effort on top of it, never
-a dependency: a standalone visit (no BabySteps session) or any failure along this path is
+This syncs only a progress summary to the Babysteps platform; it is distinct from SpeedReader's
+own server-authoritative learner state above and is best-effort on top of it, never a dependency: a standalone visit (no BabySteps session) or any failure along this path is
 silently a no-op - see `lib/app-launch/platform-api.ts` for the extensive "never let this block
 a learner reading a passage" framing.
 
@@ -51,7 +57,7 @@ a learner reading a passage" framing.
    it - this is also what starts the learner's session clock on BabySteps' side, so it has to
    happen right as we're about to show them the app, not speculatively. The resulting grant
    (a rotating ~5-minute access token) rides along in the same signed session cookie, right
-   alongside our own `progressVersion`/`checkpointSequence` counters - still no database.
+   alongside our own `progressVersion`/`checkpointSequence` counters (platform-sync bookkeeping only).
 2. **Every call is "dual proof".** A Bearer access token (the grant) plus a *fresh* Ed25519
    app-assertion, same mechanism as the `/launch` exchange but with a different `aud` claim per
    endpoint (`babysteps:platform-api` for progress calls, `babysteps:app-session-grants:renew`
