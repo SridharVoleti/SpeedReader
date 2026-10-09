@@ -8,7 +8,7 @@ import { FileLearnerRepository } from "../lib/v2/learner-repository";
 import { FileAssessmentStore } from "../lib/v2/file-assessment-store";
 import { SessionRegistry } from "../lib/v2/session-envelope";
 import { LearnerService, type Ctx, type PassageCompletionRequest, type ServiceError, type SpeechSubmission } from "../lib/v2/learner-service";
-import { ApprovedPackageProvider, FixtureContentProvider, learnerView, scoreItems, type ContentProvider } from "../lib/v2/content-provider";
+import { ApprovedPackageProvider, ContentError, FixtureContentProvider, learnerView, scoreItems, type ContentProvider } from "../lib/v2/content-provider";
 import { evaluateSpokenExpression, SPOKEN_EXPRESSION_CONFIG } from "../lib/v2/spoken-expression";
 import { diagnosticsEnabled } from "../lib/diagnostics-gate";
 import { createStore } from "../lib/sr/pipeline/storage";
@@ -89,6 +89,15 @@ export function speechFor(passageIdeas: Parameters<typeof evaluateSpokenExpressi
 
 /** `path` is the segments after /api/v3. */
 export async function handleV3(req: Request, path: string[], who: Verified, deps: Deps = getDeps()): Promise<Response> {
+  try {
+    return await dispatch(req, path, who, deps);
+  } catch (e) {
+    if (e instanceof ContentError) return unavailable(); // bad content is a content problem, not a learner problem
+    throw e;
+  }
+}
+
+async function dispatch(req: Request, path: string[], who: Verified, deps: Deps): Promise<Response> {
   const { service, repo, content } = deps;
   const ctx: Ctx = { learnerId: who.learnerId, sessionId: who.sessionId, deviceId: who.deviceId };
   const route = `${req.method} ${path.join("/")}`;

@@ -12,7 +12,11 @@ import type { createStore } from "../sr/pipeline/storage";
 import type { AuthoredIdea } from "./spoken-expression";
 import type { BpcContent } from "./best-comprehension";
 import { stem } from "./stem";
-import { tokensFromText, type RsvpToken } from "./rsvp";
+import { count100 } from "../sr/pipeline-v2/count100";
+import type { RsvpToken } from "./rsvp";
+
+/** A content defect (never a learner failure): the journey fails closed with the friendly "being prepared" message. */
+export class ContentError extends Error {}
 
 export type V3Item = { itemId: string; stem: string; options: string[]; answerIndex: number };
 
@@ -44,7 +48,10 @@ export type LearnerPassageView = {
 
 /** The only passage shape that reaches the browser: no answer keys, no authored ideas, no BPC. */
 export function learnerView(p: V3Passage): LearnerPassageView {
-  return { passageId: p.passageId, tokens: tokensFromText(p.text), items: p.items.map((i) => ({ itemId: i.itemId, stem: i.stem, options: [...i.options] })) };
+  // APP-READ-001 / APP-KM-002: the reader consumes the canonical COUNT-100 token stream, never its own split.
+  const canonical = count100(p.text);
+  if (canonical.status !== "VALID_TOKENIZATION") throw new ContentError(`passage ${p.passageId} fails the canonical tokenizer: ${canonical.errors.join("; ")}`);
+  return { passageId: p.passageId, tokens: canonical.tokens.map((t) => ({ index: t.index, text: t.text })), items: p.items.map((i) => ({ itemId: i.itemId, stem: i.stem, options: [...i.options] })) };
 }
 
 /** Deterministic item scoring on the server: 1 for the keyed option, else 0. A missing/invalid choice is 0, never an error. */

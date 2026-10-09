@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import identity from "../../app.identity";
 import { api, friendlyProblem, type Feedback, type StoryView } from "./api";
+import { levelUpSyncPayload } from "../../lib/v2/babysteps-sync";
 import Story, { type StoryMode, type StoryResult } from "./Story";
 import styles from "./learner.module.css";
 
@@ -109,6 +110,12 @@ export default function LearnerApp() {
       return;
     }
     void refreshSpeed();
+    if (r.feedback.newWpm !== undefined) {
+      // best-effort: a Level Up is one completed Babystep; a standalone visit or any failure is a silent no-op
+      try {
+        void fetch("/api/babysteps-progress", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(levelUpSyncPayload(r.feedback.newWpm - 1, r.feedback.newWpm)) }).catch(() => undefined);
+      } catch { /* never blocks the learner */ }
+    }
     setView({ k: "feedback", feedback: r.feedback, attemptId: r.attemptId, mode: r.mode });
   }
 
