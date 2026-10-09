@@ -15,15 +15,16 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 
 
 
+
 ## Status summary (all 194 requirements evaluated; last updated 2026-10-09)
 
 | Status | Count |
 |---|---:|
-| IMPLEMENTED_TESTED | 187 |
-| PARTIAL | 6 |
+| IMPLEMENTED_TESTED | 188 |
+| PARTIAL | 5 |
 | BLOCKED | 1 |
 
-**Verification (2026-10-09):** `vitest` 1474 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright 477 pass / 6 fail: all v3 learner specs pass on mobile, desktop and constrained-browser projects; the only failing specs are `progression.spec.ts` (legacy 36-level demo, now at `/legacy-demo`; confirmed failing identically at the pre-work baseline commit 730af66). Playwright runs the last `npm run build`: rebuild before e2e.
+**Verification (2026-10-09):** `vitest` 1546 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright 477 pass / 6 fail: all v3 learner specs pass on mobile, desktop and constrained-browser projects; the only failing specs are `progression.spec.ts` (legacy 36-level demo, now at `/legacy-demo`; confirmed failing identically at the pre-work baseline commit 730af66). Playwright runs the last `npm run build`: rebuild before e2e.
 
 ### What is real vs. assumed
 - The learner journey (`/`) runs on the v3 engine through `/api/v3/*`: assessment, one-word reader, questions, explanation (typed or spoken), feedback/Level Up, BPC, familiar practice, News Reader. Scoring and evidence are server-side only.
@@ -32,7 +33,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 
 ### Open items (why each PARTIAL/BLOCKED is not done)
 1. **Hosted Supabase not provisioned** (APP-INFRA-003): apply migrations 0001-0003 to a project, set `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`, and run the adapters there.
-2. **No approved Knowledge Map / canonical scoring contract / BPC / assessment content.** KM-004/006 and ORAL-002 steps 8-9 cannot run end to end; production assessment and story passages are absent (journey fails closed).
+2. **No approved Knowledge Map / canonical scoring contract / BPC / assessment content.** The P10 readiness executor (lib/v2/p10-readiness.ts) runs a versioned non-canonical table (Blocker-4 v1.0) and must be diffed against the approved v0.56 package when it exists (KM-004/006); the measure-capture layer for tags, silences, thirds and quartiles is not built, so those rules return REASSESS. Production assessment and story passages are absent (journey fails closed).
 3. **Production semantic evaluator not wired** (derived-idea evaluator only): COMP-008.
 4. **Platform dependencies:** the parent authorization scope (an internal API key is used as an assumption) and the `/identity` contract, which the platform has not defined (intentional 501): PLAT-003.
 5. **APP-NFR-005** needs the Babysteps accessibility QA gate (BLOCKED, not self-certifiable). Babysteps Android shell cannot be tested here (INFRA-001).
@@ -41,7 +42,6 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 - APP-PLAT-003 Standard launch protocol
 - APP-INFRA-001 Web-first, mobile-required
 - APP-INFRA-003 Deployment
-- APP-ORAL-002 Deterministic scoring order
 - APP-KM-004 Deterministic scoring contracts
 - APP-KM-006 Primary/confirmation lifecycle
 - APP-NFR-005 Accessibility QA (BLOCKED)
@@ -149,7 +149,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-NR-009 | Two-read coaching | IMPLEMENTED_TESTED | ui/learner/NewsReader.tsx; api/v3.ts; lib/v2/news-reader-metrics.ts; lib/v2/news-reader-coaching.ts | tests/ui/learner-v3-news-reader.spec.ts; v2/app-api-v3-news-reader.test.ts | Two reads stored separately, improvement computed, second read framed as practice. Metrics limited to what speech recognition can measure (pronunciation, clarity). |
 | APP-NR-010 | Missing microphone is nonblocking | IMPLEMENTED_TESTED | ui/learner/NewsReader.tsx; api/v3.ts | tests/ui/learner-v3-news-reader.spec.ts; v2/app-api-v3-news-reader.test.ts | Denied/absent microphone offers 'Skip recording'; stored unscored; speed, progress and next story unchanged. |
 | APP-ORAL-001 | Telemetry capture | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | All 16 listed telemetry fields. Capture parameters are PROVISIONAL_PILOT config. Live audio capture UI pending (Phase 12/13). |
-| APP-ORAL-002 | Deterministic scoring order | PARTIAL | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | Steps 1-7 implemented and tested. Steps 8-9 (apply the supplied RS/P rule, resolve the attempt outcome) wait on the approved canonical rule table - see APP-KM-004. |
+| APP-ORAL-002 | Deterministic scoring order | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts (steps 1-7); lib/v2/p10-readiness.ts (steps 8-9) | v2/app-oral-telemetry.test.ts; v2/app-kmp10-readiness.test.ts | Order implemented: validate sample -> canonical tokens -> align -> classify -> self-corrections -> accuracy -> time/hesitation/restart -> apply the supplied RS/P rule -> resolve the outcome (READY / READY_NO_ERROR_OPPORTUNITY / REASSESS / NOT_YET -> lifecycle PASS / FAIL / INSUFFICIENT_EVIDENCE). Caveat: the telemetry does not yet capture every measure the rules need (reorderings, silence length, word tags, quartile pace, thirds), so those rules return REASSESS rather than guess; see APP-KM-004. |
 | APP-ORAL-003 | Sample validity before specialist score | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | Unusable/silent/short sample -> UNASSESSABLE, learnerError:false. |
 | APP-ORAL-004 | ASR uncertainty is not child error | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | Low/missing confidence words wildcard-aligned as unassessed. |
 | APP-ORAL-005 | Accent fairness | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | Approved accepted variants per word; accent not detected/penalised. |
@@ -232,9 +232,9 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-KM-001 | Correct delivery coordinate | IMPLEMENTED_TESTED | lib/v2/delivery-order.ts; lib/v2/content-provider.ts (ApprovedPackageProvider); api/v3.ts | v2/app-km-delivery-order.test.ts | Found+fixed a real bug: production content mapped sequence n to W1-n (registry order); delivery must follow delivery_session = (P-1)*15+RS (sequence 2 = RS02-P1 = W1-0011). Mapping verified against all 150 rows of the real registry CSV and the readiness matrix; the registry coordinate is stored on each attempt. The runtime package carries no delivery metadata, so the coordinate is derived by the registry-validated formula; positions beyond 150 are an explicit unspecified placeholder. |
 | APP-KM-002 | Shared canonical tokenizer | IMPLEMENTED_TESTED | lib/sr/pipeline-v2/count100.ts; lib/v2/content-provider.ts (learnerView); lib/v2/rsvp.ts; lib/v2/oral-telemetry.ts; lib/v2/news-reader-metrics.ts | v2/app-v3-content-and-sync.test.ts; v2/app-read-rsvp.test.ts; v2/app-oral-telemetry.test.ts | The renderer, token positions, oral alignment and scoring denominators all consume the COUNT-100 token stream; text it rejects fails closed. |
 | APP-KM-003 | Fixed segment coordinates | IMPLEMENTED_TESTED | lib/sr/pipeline-v2/count100.ts (segment100) | sr/pipeline-v2 count100 tests | Fixed token-coordinate thirds/quartiles; telemetry never resegments. |
-| APP-KM-004 | Deterministic scoring contracts | PARTIAL | lib/v2/oral-telemetry.ts; lib/sr/p10-scoring.ts | v2/app-oral-telemetry.test.ts; sr/sr-046-p10-primary.test.ts | The app invents no RS thresholds. The repo holds the Blocker-4 readiness spec v1.0 (15 P10 rules and 4 statuses) and metric definitions in the WIP Band-A spec v0.25, but the approved canonical v0.56 package that APP-KM-004 means is not in the repo. Deliberately NOT coded against the superseded draft: RS07 has two evidence pathways, and RS03-RS05 need word tags only the approved package supplies. Next step once the package exists: build a versioned rule table + conformance test against it, reusing the telemetry (alignment, gaps, restarts, thirds via segment100). |
+| APP-KM-004 | Deterministic scoring contracts | PARTIAL | lib/v2/p10-readiness.ts; lib/v2/oral-telemetry.ts | v2/app-kmp10-readiness.test.ts (54 tests) | The app now executes a versioned rule table (BLOCKER4-BANDA-READINESS-V1.0, from the shipped Blocker-4 readiness matrix; rule text asserted verbatim equal to the CSV; every threshold tested at and beyond its boundary; Band-A aggregation with no majority/averaging/compensation) and invents no thresholds. Still PARTIAL: the table is flagged non-canonical because the approved canonical v0.56 package is not in the repo, so conformance to it cannot be confirmed; and the measure-capture layer (tags, silences, thirds, quartiles) is not built. |
 | APP-KM-005 | Attempt validity first | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts; lib/v2/oral-telemetry.ts | v2/app-ready-lifecycle.test.ts; v2/app-oral-telemetry.test.ts | Validity resolved before PASS/FAIL. |
-| APP-KM-006 | Primary/confirmation lifecycle | PARTIAL | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts | Roles and transitions follow v3.0 (PRIMARY, CONFIRMATION, NEW_CYCLE_*, TECHNICAL_REPLACEMENT, REVALIDATION). Exact conformance to the approved canonical contract cannot be checked until it exists. |
+| APP-KM-006 | Primary/confirmation lifecycle | PARTIAL | lib/v2/readiness-lifecycle.ts; lib/v2/p10-readiness.ts | v2/app-ready-lifecycle.test.ts; v2/app-kmp10-readiness.test.ts | Lifecycle roles/transitions per v3.0 and the per-RS outcome mapping into it are implemented and tested. Exact conformance to the approved canonical contract cannot be confirmed until it exists. |
 | APP-KM-007 | P10 primary item | IMPLEMENTED_TESTED | lib/sr/p10-scoring.ts | sr/sr-046-p10-primary.test.ts | Executes supplied rule; fixtures only. |
 | APP-KM-008 | No compensation across independent evidence types | IMPLEMENTED_TESTED | lib/sr/separate-gates.ts; lib/v2/evidence-store.ts | sr/sr-047-separate-gates.test.ts; v2/fr-048-evidence-separation.test.ts |  |
 | APP-KM-009 | Package/version validation | IMPLEMENTED_TESTED | lib/sr/pipeline/version-lock.ts; lib/sr/pipeline-v2/canonical.ts | sr/sr-039-version-hashes.test.ts | Hash/version mismatch fails closed. |
