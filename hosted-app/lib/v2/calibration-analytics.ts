@@ -10,6 +10,7 @@ import type { AttemptRecord } from "./attempt-record";
 import type { LearnerAggregate } from "./learner-aggregate";
 import { GREEN_THRESHOLD } from "./comprehension-threshold";
 import { deriveDecisionLedger } from "./decision-ledger";
+import type { RetentionRecord } from "./retention-check";
 import type { ReadinessStream } from "./readiness-lifecycle";
 import type { ClientClass } from "./client-class";
 
@@ -44,6 +45,36 @@ function groupBy(records: readonly AttemptRecord[], key: (r: AttemptRecord) => s
 
 const DAY = 86_400_000;
 
+type RetentionCuts = {
+  learnersChecked: number;
+  checks: number;
+  rememberedShare: number | null;
+  byCheckNumber: Record<string, { checks: number; rememberedShare: number | null; meanRecall: number | null }>;
+  byDelayBucket: Record<string, { checks: number; rememberedShare: number | null }>;
+  /** Mean (immediate score - delayed recall share): how much is forgotten between reading and the check. */
+  meanDropFromImmediate: number | null;
+};
+
+function retentionCuts(learners: readonly LearnerAggregate[]): RetentionCuts {
+  const logs = learners.map((l) => l.retentionLog ?? []);
+  const all = logs.flat();
+  const share = (rs: readonly RetentionRecord[]) => (rs.length ? round(rs.filter((r) => r.remembered).length / rs.length) : null);
+  const bucket = <T>(key: (r: RetentionRecord) => string | null, f: (rs: RetentionRecord[]) => T): Record<string, T> => {
+    const m = new Map<string, RetentionRecord[]>();
+    for (const r of all) { const k = key(r); if (k !== null) m.set(k, [...(m.get(k) ?? []), r]); }
+    return Object.fromEntries([...m.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => [k, f(v)]));
+  };
+  const drops = all.filter((r) => r.immediateScore !== null).map((r) => (r.immediateScore as number) - r.correct / r.total);
+  return {
+    learnersChecked: logs.filter((l) => l.length > 0).length,
+    checks: all.length,
+    rememberedShare: share(all),
+    byCheckNumber: bucket((r) => String(r.checkNumber), (rs) => ({ checks: rs.length, rememberedShare: share(rs), meanRecall: round(mean(rs.map((r) => r.correct / r.total))) })),
+    byDelayBucket: bucket((r) => r.delayBucket, (rs) => ({ checks: rs.length, rememberedShare: share(rs) })),
+    meanDropFromImmediate: round(mean(drops))
+  };
+}
+
 export type CalibrationAnalytics = {
   informationalOnly: true;
   /** The frozen product threshold in force when the report was produced (never a tunable here). */
@@ -59,6 +90,7 @@ export type CalibrationAnalytics = {
   practice: { practiceEvents: number; per100NewPassages: number | null };
   staminaTransitions: { transitions: number; greenShareAtFirstLongerPassage: number | null; greenShareElsewhere: number | null };
   readiness: { streams: number; confirmed: number; falseReadyIndicators: number; falseNotReadyIndicators: number };
+  retention: RetentionCuts;
   engagement: { learnersActive: number; medianActiveDays: number | null; returnedAfterGapShare: number | null };
 };
 
@@ -159,6 +191,7 @@ export function calibrationAnalytics(input: AnalyticsInput): CalibrationAnalytic
     practice: { practiceEvents, per100NewPassages: scored.length ? round((practiceEvents / scored.length) * 100) : null },
     staminaTransitions: { transitions, greenShareAtFirstLongerPassage: greenShare(atTransition), greenShareElsewhere: greenShare(elsewhere) },
     readiness: { streams: streams.length, confirmed: streams.filter((s) => s.phase === "CONFIRMED").length, falseReadyIndicators: falseReady, falseNotReadyIndicators: falseNotReady },
+    retention: retentionCuts(learners),
     engagement: { learnersActive: activeDays.length, medianActiveDays: round(quantile(activeDays, 0.5)), returnedAfterGapShare: learners.length ? round(returned / learners.length) : null }
   };
 }

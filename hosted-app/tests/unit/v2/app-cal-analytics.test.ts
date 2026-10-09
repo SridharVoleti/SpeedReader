@@ -196,3 +196,23 @@ describe("the ops endpoint exposes the report only to internal callers and captu
     }
   });
 });
+
+describe("calibration analytics: retention cuts (informational, no identifiers)", () => {
+  const rec = (attemptId: string, checkNumber: number, correct: number, delayBucket: string | null, immediateScore: number | null) =>
+    ({ attemptId, passageId: "P1", checkNumber, correct, total: 4, remembered: correct / 4 >= 0.75, delaySeconds: 1, delayBucket, immediateScore, sessionId: "s", at: "2026-10-05T10:00:00Z", policyVersion: "v" });
+  it("reports remembered share by check number and delay bucket, and the drop from the immediate score", () => {
+    const a = { ...newLearnerAggregate("a", 90), retentionLog: [rec("r1", 1, 4, "24h", 1), rec("r2", 2, 2, "7d", 1)] } as LearnerAggregate;
+    const b = { ...newLearnerAggregate("b", 90), retentionLog: [rec("r3", 1, 3, "24h", null)] } as LearnerAggregate;
+    const c = newLearnerAggregate("c", 90);
+    const r = calibrationAnalytics({ learners: [a, b, c] }).retention;
+    expect(r).toMatchObject({ learnersChecked: 2, checks: 3, rememberedShare: 0.667 });
+    expect(r.byCheckNumber["1"]).toEqual({ checks: 2, rememberedShare: 1, meanRecall: 0.875 });
+    expect(r.byCheckNumber["2"]).toEqual({ checks: 1, rememberedShare: 0, meanRecall: 0.5 });
+    expect(r.byDelayBucket["24h"]).toEqual({ checks: 2, rememberedShare: 1 });
+    expect(r.meanDropFromImmediate).toBe(0.25);
+    expect(JSON.stringify(r)).not.toMatch(/"a"|"b"|attemptId|sessionId/);
+  });
+  it("is null-safe with no checks", () => {
+    expect(calibrationAnalytics({ learners: [newLearnerAggregate("c", 90)] }).retention).toEqual({ learnersChecked: 0, checks: 0, rememberedShare: null, byCheckNumber: {}, byDelayBucket: {}, meanDropFromImmediate: null });
+  });
+});
