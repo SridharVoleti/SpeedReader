@@ -44,6 +44,9 @@ Legacy 36-level demo only (diagnostics route `/legacy-demo`): level data lives i
 design — `backend/speed_reading/scoring.py` (source of truth, unit-tested)
 and `lib/scoring.ts` (browser port); keep their weights in sync.
 
+## Local file repository: lock policy (dev/test only)
+`FileLearnerRepository` serialises writers with an exclusive `<learner>.learner.json.lock` file that records `{pid, host, createdAt}`. A lock left behind by a crash is recovered automatically when its owner process on this host no longer exists, or when it is older than 30 s (`lockStaleMs`; covers pid reuse, foreign hosts and a crash between creating and filling the file). A fresh lock held by a live, foreign or unreadable owner is never removed and the commit returns `LOCKED`. The stale file is renamed aside and verified before it is deleted. This is a single-machine policy; production multi-instance concurrency is handled by the Supabase path (versioned compare-and-swap), not by this adapter.
+
 ## Commands
 
 ```bash

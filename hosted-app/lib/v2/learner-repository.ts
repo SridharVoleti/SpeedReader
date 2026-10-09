@@ -8,7 +8,8 @@
 // supabase/migrations/0001_speedreader_learner_state.sql defines the equivalent Supabase schema
 // (APP-DATA-010) for a SupabaseLearnerRepository to implement against this same port.
 
-import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, unlinkSync, writeSync } from "node:fs";
+import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, statSync, unlinkSync, writeSync } from "node:fs";
+import { hostname } from "node:os";
 import { join } from "node:path";
 import type { LearnerAggregate } from "./learner-aggregate";
 import { consistencyErrors } from "./progress-store";
@@ -43,9 +44,61 @@ type Row = { version: number; learner: LearnerAggregate; applied: Record<string,
 /** Test seam: throw inside the commit to prove the previous state survives (rollback by construction). */
 export type WriteFault = (stage: "BEFORE_WRITE" | "AFTER_TEMP_WRITE") => void;
 
+/** Local lock policy (#36). A commit holds its lock for milliseconds, so a lock older than this is treated as abandoned. */
+export const DEFAULT_LOCK_STALE_MS = 30_000;
+
+export type FileRepositoryOptions = { lockStaleMs?: number };
+
+function processAlive(pid: number): boolean {
+  try { process.kill(pid, 0); return true; } catch (e) { return (e as NodeJS.ErrnoException).code === "EPERM"; }
+}
+
 export class FileLearnerRepository implements LearnerRepository {
-  constructor(private readonly root: string, private readonly fault: WriteFault = () => undefined) {
+  private readonly lockStaleMs: number;
+
+  constructor(private readonly root: string, private readonly fault: WriteFault = () => undefined, options: FileRepositoryOptions = {}) {
     mkdirSync(root, { recursive: true });
+    this.lockStaleMs = options.lockStaleMs ?? DEFAULT_LOCK_STALE_MS;
+  }
+
+  /**
+   * Stale-lock policy: the lock file records {pid, host, createdAt}. A lock is stale when (a) its owner is on THIS host and that
+   * process no longer exists, or (b) it is older than `lockStaleMs` (covers pid reuse, foreign hosts, and a crash between creating and
+   * filling the file). A fresh lock whose owner is alive, foreign or unreadable is never touched. Local/dev adapter only: no distributed locking.
+   */
+  private lockIsStale(lock: string, raw: string): boolean {
+    let ageMs = Number.POSITIVE_INFINITY;
+    try { ageMs = Date.now() - statSync(lock).mtimeMs; } catch { return false; }          // vanished: let the retry decide
+    let meta: { pid?: unknown; host?: unknown } | null = null;
+    try { meta = JSON.parse(raw) as { pid?: unknown; host?: unknown }; } catch { /* unreadable: age decides */ }
+    if (meta && typeof meta.pid === "number" && meta.host === hostname() && !processAlive(meta.pid)) return true;
+    return ageMs > this.lockStaleMs;
+  }
+
+  /** Acquire the exclusive lock, recovering at most one stale lock. Returns the fd, or null when a live writer holds it. */
+  private acquire(lock: string): number | null {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        const fd = openSync(lock, "wx");
+        try { writeSync(fd, JSON.stringify({ pid: process.pid, host: hostname(), createdAt: Date.now() })); fsyncSync(fd); } catch { /* metadata is best effort */ }
+        return fd;
+      } catch {
+        let raw: string;
+        try { raw = readFileSync(lock, "utf8"); } catch { continue; }                     // released between our open and read: retry
+        if (attempt === 1 || !this.lockIsStale(lock, raw)) return null;
+        // Move the exact stale file aside (never unlink the live path blindly) and confirm it is the one we judged stale.
+        const aside = `${lock}.stale-${process.pid}-${Date.now()}`;
+        try { renameSync(lock, aside); } catch { continue; }
+        let moved = "";
+        try { moved = readFileSync(aside, "utf8"); } catch { /* gone */ }
+        if (moved !== raw) {                                                                // we grabbed a different (live) lock: put it back
+          try { if (!existsSync(lock)) renameSync(aside, lock); } catch { /* best effort */ }
+          return null;
+        }
+        try { unlinkSync(aside); } catch { /* already removed */ }
+      }
+    }
+    return null;
   }
 
   private path(learnerId: string): string {
@@ -101,12 +154,8 @@ export class FileLearnerRepository implements LearnerRepository {
 
   commit(learnerId: string, next: LearnerAggregate, options: CommitOptions): RepositoryCommit {
     const lock = `${this.path(learnerId)}.lock`;
-    let lockFd: number;
-    try {
-      lockFd = openSync(lock, "wx");
-    } catch {
-      return { ok: false, reason: "LOCKED", error: "another writer holds this learner", snapshot: this.load(learnerId) };
-    }
+    const lockFd = this.acquire(lock);
+    if (lockFd === null) return { ok: false, reason: "LOCKED", error: "another writer holds this learner", snapshot: this.load(learnerId) };
     try {
       const row = this.read(learnerId);
       if (!row) return { ok: false, reason: "UNKNOWN_LEARNER", error: `no learner ${learnerId}`, snapshot: null };
