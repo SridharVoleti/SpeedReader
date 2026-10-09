@@ -99,8 +99,8 @@ function isAttemptAt(inserted: string, target: string): boolean {
   return editDistance(inserted, target) <= Math.max(1, Math.floor(target.length / 2) - 1);
 }
 
-type Op = "MATCH" | "UNASSESSED" | "SUB" | "OMIT" | "INS";
-type Aligned = { op: Op; expectedIdx: number | null; spokenIdx: number | null };
+export type Op = "MATCH" | "UNASSESSED" | "SUB" | "OMIT" | "INS";
+export type Aligned = { op: Op; expectedIdx: number | null; spokenIdx: number | null };
 
 /** Deterministic edit-distance alignment. Tie-break order: match, substitution, omission, insertion. */
 function align(expected: readonly string[], variants: ReadonlyArray<ReadonlySet<string>>, spoken: readonly { w: string; uncertain: boolean }[]): Aligned[] {
@@ -165,6 +165,18 @@ function tally(aligned: readonly Aligned[]) {
   return t;
 }
 
+/** The alignment behind a telemetry result, for the P10 measure-capture layer (p10-capture.ts). Not part of the stored telemetry. */
+export type OralTrace = {
+  tokens: readonly CountToken[];
+  /** One entry per restart-delimited pass over the recording. */
+  passes: { spoken: { w: string; startMs: number; endMs: number; uncertain: boolean }[]; aligned: Aligned[] }[];
+  /** First-pass insertions that are repetitions or accepted self-corrections (not errors). */
+  reclassifiedSpoken: number[];
+  selfCorrections: { expectedIdx: number; latencyMs: number }[];
+};
+
+export type OralDetailed = (OralResult & { status: "ASSESSED"; trace: OralTrace }) | Exclude<OralResult, { status: "ASSESSED" }>;
+
 export function captureOralTelemetry(
   tokens: readonly CountToken[],
   words: readonly SpokenWord[],
@@ -172,6 +184,17 @@ export function captureOralTelemetry(
   tokenizerVersion: string,
   options: OralOptions = {}
 ): OralResult {
+  const r = captureOralDetailed(tokens, words, sample, tokenizerVersion, options);
+  return r.status === "ASSESSED" ? { status: "ASSESSED", telemetry: r.telemetry } : r;
+}
+
+export function captureOralDetailed(
+  tokens: readonly CountToken[],
+  words: readonly SpokenWord[],
+  sample: SampleReport,
+  tokenizerVersion: string,
+  options: OralOptions = {}
+): OralDetailed {
   const cfg = options.config ?? ORAL_CONFIG_V1;
   // 1. sample validity comes first (APP-ORAL-003): an unusable recording is never a child error
   if (!sample.usable) return { status: "UNASSESSABLE", reason: "SAMPLE_UNUSABLE", learnerError: false };
@@ -198,6 +221,7 @@ export function captureOralTelemetry(
   const latencies: number[] = [];
   const reclassifiedSpoken = new Set<number>(); // insertions that are not errors
   const selfCorrectedExpected = new Set<number>();
+  const selfCorrectionDetail: { expectedIdx: number; latencyMs: number }[] = [];
   first.forEach((a, idx) => {
     if (a.op !== "INS" || a.spokenIdx === null) return;
     const w = sp0[a.spokenIdx];
@@ -217,6 +241,7 @@ export function captureOralTelemetry(
         latencies.push(latency);
         reclassifiedSpoken.add(a.spokenIdx);
         selfCorrectedExpected.add(next.expectedIdx);
+        selfCorrectionDetail.push({ expectedIdx: next.expectedIdx, latencyMs: latency });
         return;
       }
     }
@@ -281,6 +306,12 @@ export function captureOralTelemetry(
       challengeWords: { total: challenge.length, recovered: challengeRecovered },
       asr: { meanConfidence: confidences.length ? confidences.reduce((a, b) => a + b, 0) / confidences.length : null, uncertainWords: spoken.filter((w) => w.uncertain).length, unassessedTokens: ft.unassessed },
       accuracy: { firstPass, final }
+    },
+    trace: {
+      tokens,
+      passes: passes.map((spokenPass, k) => ({ spoken: spokenPass.map((w) => ({ w: w.w, startMs: w.startMs, endMs: w.endMs, uncertain: w.uncertain })), aligned: alignedPasses[k] })),
+      reclassifiedSpoken: [...reclassifiedSpoken],
+      selfCorrections: selfCorrectionDetail
     }
   };
 }
