@@ -14,6 +14,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 
 
 
+
 ## Status summary (all 194 requirements evaluated; last updated 2026-10-09)
 
 | Status | Count |
@@ -209,7 +210,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-NFR-002 | Microphone permissions | IMPLEMENTED_TESTED | lib/v2/capabilities.ts (requestMicrophoneFor) | v2/app-nfr-capabilities.test.ts | Requested only for speech activities; denial = capability state with typing fallback. UI wiring pending. |
 | APP-NFR-003 | Capability detection | IMPLEMENTED_TESTED | lib/v2/capabilities.ts (detectCapabilities) | v2/app-nfr-capabilities.test.ts | All five capabilities. UI wiring pending. |
 | APP-NFR-004 | Graceful degradation | IMPLEMENTED_TESTED | lib/v2/capabilities.ts (degradationPlan); lib/v2/learner-service.ts | v2/app-nfr-capabilities.test.ts; v2/app-api-learner-service.test.ts | Missing speech never changes core state; service test shows WPM/pointer untouched on unresolved speech. |
-| APP-NFR-005 | Accessibility QA | BLOCKED | (external Babysteps accessibility QA gate) | none possible here | Needs the platform QA gate and real v3 learner flows to exist. Not self-certifiable. |
+| APP-NFR-005 | Accessibility QA | BLOCKED | ui/learner/*; tests/ui/learner-v3-a11y.spec.ts | tests/ui/learner-v3-a11y.spec.ts (9 runs: mobile, desktop, constrained) | Automated evidence done: axe-core WCAG 2.0/2.1 A and AA across all 13 learner screens (welcome, reader, questions, home, explanation, feedback, explanation reveal, problem, News Reader x3) with zero violations; axe verified to catch a planted image-alt/color-contrast violation; keyboard answering and radio labels checked. Still BLOCKED: the requirement is to pass the Babysteps accessibility QA gate, which is the platform's own process and cannot be self-certified. Manual screen-reader review is also not done. |
 | APP-NFR-006 | Child usability | IMPLEMENTED_TESTED | ui/learner/*; lib/v2/learner-feedback.ts | tests/ui/learner-v3.spec.ts | Every learner screen scanned for developer concepts (rule ids, GREEN/NOT_GREEN, outcomes, ids). |
 | APP-NFR-007 | Diagnostics protection | IMPLEMENTED_TESTED | ui/page.tsx; app.manifest.ts; lib/diagnostics-gate.ts | tests/ui/learner-v3.spec.ts; v2/app-nfr-diagnostics-and-auth.test.ts | Home is the v3 engine; the legacy 36-level demo moved to a diagnostics-gated route. AC-A18 met. |
 | APP-NFR-008 | Fail safe | IMPLEMENTED_TESTED | lib/v2/learner-service.ts; lib/v2/readiness-lifecycle.ts; lib/v2/oral-telemetry.ts | v2/app-api-learner-service.test.ts; v2/app-ready-lifecycle.test.ts; v2/app-oral-telemetry.test.ts | Technical/ambiguous state: no penalty, no fabricated evidence, WPM and history preserved, natural retry. |
