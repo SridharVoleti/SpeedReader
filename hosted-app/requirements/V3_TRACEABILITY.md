@@ -146,10 +146,10 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-DATA-004 | Evidence separation | TODO | | | |
 | APP-DATA-005 | Decision ledger | TODO | | | |
 | APP-DATA-006 | Explainability | TODO | | | |
-| APP-DATA-007 | Transaction safety | TODO | | | |
-| APP-DATA-008 | Idempotency | TODO | | | |
-| APP-DATA-009 | Server persistence | TODO | | | |
-| APP-DATA-010 | Supabase responsibility | TODO | | | |
+| APP-DATA-007 | Transaction safety | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts; ac-c05-transaction-safety.test.ts | Atomic single-file replace; fault-injection tested. |
+| APP-DATA-008 | Idempotency | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts | Idempotency key replay + domain-level attempt idempotency (AC-C04). |
+| APP-DATA-009 | Server persistence | PARTIAL | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts | Server-side durable repository + restart recovery done. Learner UI still uses localStorage-authoritative progression (lib/progression.ts) - open until Phase 5 production reader replaces it. |
+| APP-DATA-010 | Supabase responsibility | PARTIAL | supabase/migrations/0001_speedreader_learner_state.sql | tests/unit/v2/app-data-learner-repository.test.ts | Schema + atomic commit fn written; NOT applied/tested on a live Supabase project (no credentials). SupabaseLearnerRepository adapter not yet written. |
 | APP-DB-001 | Learner app state | TODO | | | |
 | APP-DB-002 | Attempts | TODO | | | |
 | APP-DB-003 | Structured responses | TODO | | | |
