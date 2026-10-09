@@ -89,6 +89,6 @@ describe("FR-047 attempt records", () => {
     expect(validateAttemptRecord({ ...base, attemptType: "FAMILIAR_PRACTICE", levelUpAfter: { wpm: 91, event: "NOT_APPLICABLE" } }).join()).toMatch(/only NEW_PROGRESSION/);
     expect(validateAttemptRecord({ ...base, levelUpAfter: { wpm: 89, event: "NONE" } }).join()).toMatch(/never decrease/);
     expect(validateAttemptRecord({ ...base, classification: null }).join()).toMatch(/both be present or both absent/);
-    expect(ATTEMPT_TYPES).toHaveLength(5);
+    expect(ATTEMPT_TYPES).toHaveLength(7);
   });
 });

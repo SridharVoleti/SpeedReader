@@ -5,8 +5,8 @@ const att = (id: string, attemptType: AttemptType, classification: "GREEN" | "NO
 
 // FR-017 - Architectural rule [FROZEN]
 describe("FR-017 new passages prove progress, earlier passages practise progress", () => {
-  it("defines the five approved attempt types", () => {
-    expect(ATTEMPT_TYPES).toEqual(["NEW_PROGRESSION", "FAMILIAR_PRACTICE", "ASSESSMENT", "REASSESSMENT", "NEWS_READER"]);
+  it("defines the seven approved attempt types", () => {
+    expect(ATTEMPT_TYPES).toEqual(["NEW_PROGRESSION", "FAMILIAR_PRACTICE", "INITIAL_ASSESSMENT", "ASSESSMENT", "REASSESSMENT", "REVALIDATION", "NEWS_READER"]);
   });
 
   it("only NEW_PROGRESSION counts as Level Up evidence", () => {

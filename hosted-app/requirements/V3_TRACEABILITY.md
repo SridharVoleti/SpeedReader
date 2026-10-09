@@ -140,26 +140,26 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-CLOSE-002 | 150 WPM is not required | IMPLEMENTED_TESTED | lib/v2/world1-completion.ts | v2/fr-041-150-not-mandatory.test.ts |  |
 | APP-CLOSE-003 | Level Ups are not readiness certification | IMPLEMENTED_TESTED | lib/v2/world1-completion.ts | v2/fr-042-levelups-not-readiness.test.ts |  |
 | APP-CLOSE-004 | News Reader cannot block core World progression | IMPLEMENTED_TESTED | lib/v2/world1-completion.ts | v2/fr-043-news-reader-no-world-block.test.ts |  |
-| APP-DATA-001 | Explicit attempt type | TODO | | | |
-| APP-DATA-002 | Required attempt fields | TODO | | | |
-| APP-DATA-003 | Immutable evidence | TODO | | | |
-| APP-DATA-004 | Evidence separation | TODO | | | |
-| APP-DATA-005 | Decision ledger | TODO | | | |
-| APP-DATA-006 | Explainability | TODO | | | |
+| APP-DATA-001 | Explicit attempt type | IMPLEMENTED_TESTED | lib/v2/attempt-types.ts | v2/app-data-attempt-and-decisions.test.ts; v2/fr-017-new-prove-progress.test.ts | Added INITIAL_ASSESSMENT and REVALIDATION to the ontology; technical replacement is a readiness role field. |
+| APP-DATA-002 | Required attempt fields | IMPLEMENTED_TESTED | lib/v2/attempt-record.ts | v2/app-data-attempt-and-decisions.test.ts; v2/fr-047-attempt-record.test.ts | Added idempotency key, session, registry/form/role, start/complete times, raw+confirmed transcript, News Reader metrics, readiness outcome, pointer before/after, assistance flags + validation. Only NEW_PROGRESSION builder exists; other attempt-type builders arrive with their features. |
+| APP-DATA-003 | Immutable evidence | IMPLEMENTED_TESTED | lib/v2/attempt-record.ts; lib/v2/evidence-store.ts | v2/fr-048-evidence-separation.test.ts; v2/app-data-attempt-and-decisions.test.ts | Frozen records; corrections add replacement+audit records. DB append-only triggers authored (0001/0002), unapplied. |
+| APP-DATA-004 | Evidence separation | IMPLEMENTED_TESTED | lib/v2/attempt-types.ts; lib/v2/evidence-store.ts; lib/v2/attempt-record.ts | v2/fr-048-evidence-separation.test.ts; v2/app-data-attempt-and-decisions.test.ts | Practice, News Reader, post-BPC, technical and oral-diagnostic separation enforced in domain validation. |
+| APP-DATA-005 | Decision ledger | IMPLEMENTED_TESTED | lib/v2/decision-ledger.ts | v2/app-data-attempt-and-decisions.test.ts | Independent decision records with evidence ids, code, before/after WPM, versions, time. |
+| APP-DATA-006 | Explainability | IMPLEMENTED_TESTED | lib/v2/explainability.ts; lib/v2/decision-ledger.ts | v2/fr-049-explainability.test.ts; v2/app-data-attempt-and-decisions.test.ts | Replay from ledger alone; verifyDecisionLedger detects tampering. |
 | APP-DATA-007 | Transaction safety | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts; ac-c05-transaction-safety.test.ts | Atomic single-file replace; fault-injection tested. |
 | APP-DATA-008 | Idempotency | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts | Idempotency key replay + domain-level attempt idempotency (AC-C04). |
 | APP-DATA-009 | Server persistence | PARTIAL | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts | Server-side durable repository + restart recovery done. Learner UI still uses localStorage-authoritative progression (lib/progression.ts) - open until Phase 5 production reader replaces it. |
 | APP-DATA-010 | Supabase responsibility | PARTIAL | supabase/migrations/0001_speedreader_learner_state.sql | tests/unit/v2/app-data-learner-repository.test.ts | Schema + atomic commit fn written; NOT applied/tested on a live Supabase project (no credentials). SupabaseLearnerRepository adapter not yet written. |
-| APP-DB-001 | Learner app state | TODO | | | |
-| APP-DB-002 | Attempts | TODO | | | |
-| APP-DB-003 | Structured responses | TODO | | | |
-| APP-DB-004 | Spoken evidence | TODO | | | |
-| APP-DB-005 | Progression decisions | TODO | | | |
-| APP-DB-006 | Practice selection/history | TODO | | | |
-| APP-DB-007 | News Reader attempts | TODO | | | |
-| APP-DB-008 | Readiness cycles/forms | TODO | | | |
-| APP-DB-009 | Calibration versions | TODO | | | |
-| APP-DB-010 | Content package identity | TODO | | | |
+| APP-DB-001 | Learner app state | PARTIAL | lib/v2/learner-repository.ts; supabase/migrations/0001 | v2/app-data-learner-repository.test.ts | File adapter tested; Supabase schema authored but not applied/tested; no SupabaseLearnerRepository yet. |
+| APP-DB-002 | Attempts | PARTIAL | supabase/migrations/0001 (sr_attempt) | v2/app-data-attempt-and-decisions.test.ts (domain shape) | Schema authored (immutable trigger); not applied to a live project. |
+| APP-DB-003 | Structured responses | PARTIAL | supabase/migrations/0002 (sr_structured_response) | v2/fr-022-question-alignment.test.ts (domain) | Schema authored; not applied. |
+| APP-DB-004 | Spoken evidence | PARTIAL | supabase/migrations/0002 (sr_spoken_evidence) | sr/sr-008-editable-transcript.test.ts (domain) | Raw/confirmed transcript columns separate with check constraint; not applied. |
+| APP-DB-005 | Progression decisions | PARTIAL | supabase/migrations/0002 (sr_progression_decision); lib/v2/decision-ledger.ts | v2/app-data-attempt-and-decisions.test.ts | Domain verified; schema authored, not applied. |
+| APP-DB-006 | Practice selection/history | PARTIAL | supabase/migrations/0002 (sr_practice_event) | v2/fr-018-familiar-practice.test.ts (domain) | Schema authored; not applied. |
+| APP-DB-007 | News Reader attempts | PARTIAL | supabase/migrations/0002 (sr_news_reader_attempt) | v2/fr-034-news-reader-parallel.test.ts (domain) | Separate table; not applied. |
+| APP-DB-008 | Readiness cycles/forms | PARTIAL | supabase/migrations/0002 (sr_readiness_*) | v2/app-ready-lifecycle.test.ts (domain) | Form-reuse unique constraint authored; not applied. |
+| APP-DB-009 | Calibration versions | PARTIAL | supabase/migrations/0002 (sr_calibration_version) | v2/fr-021-weighting-lifecycle.test.ts (domain) | Schema authored; not applied. |
+| APP-DB-010 | Content package identity | PARTIAL | supabase/migrations/0002 (sr_content_package) | sr/sr-039-version-hashes.test.ts (domain) | Schema authored; not applied. |
 | APP-REPORT-001 | Child vs parent visibility | TODO | | | |
 | APP-REPORT-002 | Personal progress | TODO | | | |
 | APP-REPORT-003 | No peer rank | TODO | | | |

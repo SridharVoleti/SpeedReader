@@ -5,8 +5,8 @@
 import type { Classification } from "./comprehension-threshold";
 import { newCoreWpmState, recordNewPassage, type CoreWpmEvent, type CoreWpmState } from "./core-wpm";
 
-/** FR-047 attempt-type ontology. */
-export const ATTEMPT_TYPES = ["NEW_PROGRESSION", "FAMILIAR_PRACTICE", "ASSESSMENT", "REASSESSMENT", "NEWS_READER"] as const;
+/** FR-047 / APP-DATA-001 attempt-type ontology. A technical-replacement role is a readiness ROLE (readiness-lifecycle.ts), carried in `role`, not a type. */
+export const ATTEMPT_TYPES = ["NEW_PROGRESSION", "FAMILIAR_PRACTICE", "INITIAL_ASSESSMENT", "ASSESSMENT", "REASSESSMENT", "REVALIDATION", "NEWS_READER"] as const;
 export type AttemptType = (typeof ATTEMPT_TYPES)[number];
 
 export type ScoredAttempt = {

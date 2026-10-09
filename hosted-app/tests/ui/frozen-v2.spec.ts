@@ -326,7 +326,7 @@ test("FR-046 threshold lifecycle governance", async ({ page }) => {
 test("FR-047 attempt records carry every required field", async ({ page }) => {
   await page.goto("/frozen-v2-demo");
   await expect(page.getByTestId("result-FR-047")).toHaveText(
-    "5 frozen records; last: NEW_PROGRESSION P005 @90WPM 100w, spoken SCORED, Level-Up 90->91 (LEVEL_UP), 6 rule versions; types 5; News Reader record with comprehension rejected=true"
+    "5 frozen records; last: NEW_PROGRESSION P005 @90WPM 100w, spoken SCORED, Level-Up 90->91 (LEVEL_UP), 6 rule versions; types 7; News Reader record with comprehension rejected=true"
   );
 });
 
