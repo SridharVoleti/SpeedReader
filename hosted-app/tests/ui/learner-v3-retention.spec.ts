@@ -100,7 +100,11 @@ test("a faded memory is treated as normal: gentle message, a refresher, nothing 
   await leak(page);
   await page.getByTestId("rt-done").click();
   await expect(page.getByTestId("start-story")).toBeVisible();
-  await expect(page.getByTestId("retention-line")).toHaveCount(0); // no overclaiming
+  // the check was measured, so the line appears - with positive, non-punitive copy and no claim of remembering (#26)
+  await expect(page.getByTestId("retention-line")).toBeVisible();
+  await expect(page.getByTestId("retention-line")).toHaveText("Memory check done: every story you read again helps you remember it better.");
+  await expect(page.getByTestId("retention-line")).not.toContainText(/remembered \d/);
+  await leak(page);
   await expect(page.getByTestId("book-time-now")).toHaveText(timeBefore);
 });
 

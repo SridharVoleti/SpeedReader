@@ -43,14 +43,15 @@ export default function LearnerApp() {
   const [startSpeed, setStartSpeed] = useState<number | null>(null);
   const [storiesRead, setStoriesRead] = useState(0);
   const [remembered, setRemembered] = useState(0);
+  const [checked, setChecked] = useState(0);
   const [retentionDue, setRetentionDue] = useState(false);
   const [bpcText, setBpcText] = useState<string | null>(null);
   const [launched, setLaunched] = useState(false);
   const booted = useRef(false);
 
   const refreshSpeed = useCallback(async () => {
-    const p = await api<{ currentWpm: number; startingWpm: number; storiesRead: number; storiesRemembered: number; retentionDue: boolean }>("GET", "progress");
-    if (p.ok) { setSpeed(p.data.currentWpm); setStartSpeed(p.data.startingWpm); setStoriesRead(p.data.storiesRead); setRemembered(p.data.storiesRemembered); setRetentionDue(p.data.retentionDue); }
+    const p = await api<{ currentWpm: number; startingWpm: number; storiesRead: number; storiesRemembered: number; storiesChecked: number; retentionDue: boolean }>("GET", "progress");
+    if (p.ok) { setSpeed(p.data.currentWpm); setStartSpeed(p.data.startingWpm); setStoriesRead(p.data.storiesRead); setRemembered(p.data.storiesRemembered); setChecked(p.data.storiesChecked); setRetentionDue(p.data.retentionDue); }
   }, []);
 
   const goHome = useCallback(async () => {
@@ -134,7 +135,7 @@ export default function LearnerApp() {
 
   return (
     <main className={styles.shell}>
-      <OutcomeHeader speed={view.k === "welcome" ? null : speed} startSpeed={view.k === "welcome" ? null : startSpeed} remembered={view.k === "welcome" ? 0 : remembered} />
+      <OutcomeHeader speed={view.k === "welcome" ? null : speed} startSpeed={view.k === "welcome" ? null : startSpeed} remembered={view.k === "welcome" ? 0 : remembered} checked={view.k === "welcome" ? 0 : checked} />
 
       {view.k === "boot" && <section className={styles.card} role="status"><p>Getting your stories ready...</p></section>}
 

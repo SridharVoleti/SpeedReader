@@ -40,7 +40,7 @@ describe("spaced memory checks over HTTP", () => {
     const deps = make();
     const call = mk(deps);
     await readStories(call, 1);
-    expect((await call("GET", "progress")).body).toMatchObject({ storiesRead: 1, storiesRemembered: 0, retentionDue: false });
+    expect((await call("GET", "progress")).body).toMatchObject({ storiesRead: 1, storiesRemembered: 0, storiesChecked: 0, retentionDue: false });
     expect((await call("GET", "retention/next")).status).toBe(409);
   });
 
@@ -65,7 +65,7 @@ describe("spaced memory checks over HTTP", () => {
     expect(r.body.feedback).toEqual({ message: "You remember this story really well - great memory!", remembered: true });
     expect(r.body.refresher).toMatch(/red kite/);
     assertNoInternalLeak({ message: r.body.feedback.message });
-    expect((await call("GET", "progress")).body).toMatchObject({ storiesRemembered: 1, retentionDue: false });
+    expect((await call("GET", "progress")).body).toMatchObject({ storiesRemembered: 1, storiesChecked: 1, retentionDue: false });
   });
 
   it("a faded memory is met with a normal-and-fine message plus a refresher, never a failure", async () => {
@@ -77,7 +77,18 @@ describe("spaced memory checks over HTTP", () => {
     expect(r.body.feedback.message).toMatch(/completely normal/);
     expect(JSON.stringify(r.body.feedback)).not.toMatch(/fail|wrong|score|%|GREEN/i);
     expect(r.body.refresher).toBeTruthy();
-    expect((await call("GET", "progress")).body.storiesRemembered).toBe(0);
+    // measured, but not remembered: the child view must be able to tell this from "never checked" (#26)
+    expect((await call("GET", "progress")).body).toMatchObject({ storiesRemembered: 0, storiesChecked: 1 });
+  });
+
+  it("the child progress summary exposes only the minimum retention counts - no thresholds, rates or labels", async () => {
+    const deps = make(due);
+    const call = mk(deps);
+    await readStories(call, 1);
+    await call("POST", "retention/submit", { attemptId: "r1", passageId: "FX-0001", answers: WRONG });
+    const body = (await call("GET", "progress")).body;
+    expect(Object.keys(body).filter((k) => /retention|remember|check/i.test(k)).sort()).toEqual(["retentionDue", "storiesChecked", "storiesRemembered"]);
+    expect(JSON.stringify(body)).not.toMatch(/threshold|percent|rate|pass|fail|score/i);
   });
 
   it("never touches progression: speed, pointer and ledger are identical before and after, and the next story stays open", async () => {

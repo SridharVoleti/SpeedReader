@@ -8,7 +8,7 @@ import identity from "../../app.identity";
 import { OUTCOME_HEADLINE, bookGoalView } from "../../lib/v2/book-goal";
 import styles from "./learner.module.css";
 
-export default function OutcomeHeader({ speed, startSpeed, remembered = 0 }: { speed: number | null; startSpeed: number | null; remembered?: number }) {
+export default function OutcomeHeader({ speed, startSpeed, remembered = 0, checked = 0 }: { speed: number | null; startSpeed: number | null; remembered?: number; checked?: number }) {
   const goal = speed !== null && startSpeed !== null ? bookGoalView(speed, startSpeed) : null;
   const pct = goal ? Math.round(goal.journey * 100) : 0;
 
@@ -27,9 +27,12 @@ export default function OutcomeHeader({ speed, startSpeed, remembered = 0 }: { s
           <p className={styles.goalLine} data-testid="book-goal-line">
             Goal: {goal.goalText}.{goal.savedText ? ` You have already saved ${goal.savedText}.` : " Every story gets you closer."}
           </p>
-          {remembered > 0 && (
+          {/* shown once a delayed memory check has been MEASURED, not only when something was remembered (#26) */}
+          {checked > 0 && (
             <p className={styles.goalLine} data-testid="retention-line">
-              Memory check: you remembered {remembered} {remembered === 1 ? "story" : "stories"} well after time away.
+              {remembered > 0
+                ? `Memory check: you remembered ${remembered} ${remembered === 1 ? "story" : "stories"} well after time away.`
+                : "Memory check done: every story you read again helps you remember it better."}
             </p>
           )}
         </div>

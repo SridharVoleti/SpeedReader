@@ -508,13 +508,14 @@ export class LearnerService {
   // ---- APP-API-008 progress ----------------------------------------------------------------------------
 
   /** Child-safe progress: the earned WPM and canonical progress, nothing internal. */
-  async progress(ctx: Ctx): Promise<Ok<{ currentWpm: number; startingWpm: number; storiesRead: number; storiesRemembered: number; retentionDue: boolean }> | ServiceError> {
+  async progress(ctx: Ctx): Promise<Ok<{ currentWpm: number; startingWpm: number; storiesRead: number; storiesRemembered: number; storiesChecked: number; retentionDue: boolean }> | ServiceError> {
     const snap = await this.deps.repo.load(ctx.learnerId);
     if (!snap) return fail(409, "initial assessment required");
     const policy = this.deps.retentionPolicy ?? RETENTION_POLICY_V1;
     const view = {
       currentWpm: snap.learner.core.wpm, startingWpm: snap.learner.baselineWpm, storiesRead: snap.learner.canonicalPointer - 1,
       storiesRemembered: retentionSummary(snap.learner).storiesRemembered,
+      storiesChecked: retentionSummary(snap.learner).storiesChecked,
       retentionDue: retentionDue(snap.learner, this.now(), policy) !== null
     };
     assertNoInternalLeak(view);
