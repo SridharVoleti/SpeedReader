@@ -69,10 +69,13 @@ type Ok<T> = { ok: true } & T;
 
 export type Activity =
   | { activity: "INITIAL_ASSESSMENT" }
-  | { activity: "NEW_PROGRESSION"; sequence: number; words: number; wpm: number }
+  | { activity: "NEW_PROGRESSION"; sequence: number; words: number; wpm: number; readinessDue?: ReadinessDue }
   | { activity: "FAMILIAR_PRACTICE"; passageId: string; sequence: number; wpm: number }
   | { activity: "READINESS"; streamId: string; role: string }
   | { activity: "NONE"; reason: string };
+
+/** A due readiness form surfaced beside, never instead of, canonical reading (V3: readiness is diagnostic/parallel). */
+export type ReadinessDue = { streamId: string; role: string };
 
 export const CLIENT_CAPABILITIES = Object.freeze({
   required: ["audio-playback"],
@@ -301,9 +304,10 @@ export class LearnerService {
     if (learner.core.practiceEligible && practice && !learner.practiceServedSinceLastNew) {
       return { activity: "FAMILIAR_PRACTICE", passageId: practice.passageId, sequence: practice.sequence, wpm: learner.core.wpm };
     }
-    if (due) return { activity: "READINESS", streamId: due.streamId, role: due.pendingReplacement ? "TECHNICAL_REPLACEMENT" : due.phase };
+    // in an ordinary learning session readiness is a parallel activity: it is reported, never substituted for canonical reading
+    const readinessDue: ReadinessDue | undefined = due ? { streamId: due.streamId, role: due.pendingReplacement ? "TECHNICAL_REPLACEMENT" : due.phase } : undefined;
     if (learner.canonicalPointer > WORLD1_LAST_PASSAGE) return { activity: "NONE", reason: "WORLD1_SEQUENCE_COMPLETE" };
-    return { activity: "NEW_PROGRESSION", sequence: learner.canonicalPointer, words: passageWords(learner.canonicalPointer), wpm: learner.core.wpm };
+    return { activity: "NEW_PROGRESSION", sequence: learner.canonicalPointer, words: passageWords(learner.canonicalPointer), wpm: learner.core.wpm, ...(readinessDue ? { readinessDue } : {}) };
   }
 
   // ---- APP-API-004 passage completion ------------------------------------------------------------------
