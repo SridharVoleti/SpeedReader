@@ -47,6 +47,13 @@ export function createFakePostgrest(calls: { url: string; method: string; header
       applied.add(key);
       return respond(200, { ok: true, replayed: false, version: row.version });
     }
+    if (path === "rpc/sr_save_sessions" && method === "POST") {
+      const a = body!;
+      const cur = docs.sr_session_state.get(a.p_learner_id);
+      if ((cur?.version ?? 0) !== a.p_expected_version) return respond(200, { ok: false, reason: "VERSION_CONFLICT" });
+      docs.sr_session_state.set(a.p_learner_id, { learner_id: a.p_learner_id, records: a.p_records, version: (cur?.version ?? 0) + 1 });
+      return respond(200, { ok: true, version: (cur?.version ?? 0) + 1 });
+    }
     for (const table of ["sr_assessment_state", "sr_session_state"] as const) {
       if (path !== table) continue;
       if (method === "GET") {

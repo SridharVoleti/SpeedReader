@@ -161,14 +161,35 @@ export function shouldApplyEvent(session: Pick<SessionRecord, "checkpoint">, eve
   return !session.checkpoint.committedEventKeys.includes(eventKey);
 }
 
-/** Durable storage for one learner's session records (APP-PLAT-006..009 across restarts and server instances). */
+/** One learner's session records with the version they were read at (compare-and-swap token; 0 = never written). */
+export type VersionedSessions = { records: SessionRecord[]; version: number };
+
+/**
+ * Durable storage for one learner's session records (APP-PLAT-006..009 across restarts and server instances).
+ * Writes are compare-and-swap: saveIfVersion succeeds only if nothing else wrote since `loadVersioned`, so two
+ * serverless instances can never both start a session from the same stale read (issue #21).
+ */
 export interface SessionPersistence {
   load(learnerId: string): SessionRecord[] | Promise<SessionRecord[]>;
+  /** Unconditional replace. Not for arbitration: use saveIfVersion. */
   save(learnerId: string, records: readonly SessionRecord[]): void | Promise<void>;
+  loadVersioned(learnerId: string): VersionedSessions | Promise<VersionedSessions>;
+  saveIfVersion(learnerId: string, records: readonly SessionRecord[], expectedVersion: number): boolean | Promise<boolean>;
 }
 
 export class MemorySessionPersistence implements SessionPersistence {
-  private readonly map = new Map<string, SessionRecord[]>();
-  load(learnerId: string) { return structuredClone(this.map.get(learnerId) ?? []); }
-  save(learnerId: string, records: readonly SessionRecord[]) { this.map.set(learnerId, structuredClone([...records])); }
+  private readonly map = new Map<string, VersionedSessions>();
+  load(learnerId: string) { return structuredClone(this.map.get(learnerId)?.records ?? []); }
+  save(learnerId: string, records: readonly SessionRecord[]) {
+    this.map.set(learnerId, { records: structuredClone([...records]), version: (this.map.get(learnerId)?.version ?? 0) + 1 });
+  }
+  loadVersioned(learnerId: string): VersionedSessions {
+    const e = this.map.get(learnerId);
+    return { records: structuredClone(e?.records ?? []), version: e?.version ?? 0 };
+  }
+  saveIfVersion(learnerId: string, records: readonly SessionRecord[], expectedVersion: number): boolean {
+    if ((this.map.get(learnerId)?.version ?? 0) !== expectedVersion) return false;
+    this.save(learnerId, records);
+    return true;
+  }
 }

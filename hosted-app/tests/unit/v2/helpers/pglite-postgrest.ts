@@ -55,6 +55,15 @@ export function pgliteFetch(db: PGlite): typeof fetch {
         );
         return respond(200, (r.rows[0] as { r: unknown }).r);
       }
+      if (path === "rpc/sr_save_sessions" && method === "POST") {
+        const a = body!;
+        const r = await db.query("select sr_save_sessions($1,$2,$3::jsonb) as r", [a.p_learner_id, a.p_expected_version, JSON.stringify(a.p_records)]);
+        return respond(200, (r.rows[0] as { r: unknown }).r);
+      }
+      if (path === "sr_session_state" && method === "GET") {
+        const r = await db.query("select records, version from sr_session_state where learner_id = $1", [eq(url, "learner_id")]);
+        return respond(200, r.rows);
+      }
       for (const [table, column] of [["sr_assessment_state", "value"], ["sr_session_state", "records"]] as const) {
         if (path !== table) continue;
         if (method === "GET") {

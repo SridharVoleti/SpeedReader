@@ -9,7 +9,7 @@ import type { LearnerAggregate } from "./learner-aggregate";
 import { consistencyErrors } from "./progress-store";
 import type { CommitOptions, LearnerRepository, RepositoryCommit, StoredSnapshot } from "./learner-repository";
 import type { AssessmentStore, StoredAssessment } from "./learner-service";
-import type { SessionPersistence, SessionRecord } from "./session-envelope";
+import type { SessionPersistence, SessionRecord, VersionedSessions } from "./session-envelope";
 
 export type SupabaseConfig = { url: string; serviceRoleKey: string; fetchImpl?: typeof fetch };
 
@@ -121,10 +121,19 @@ export class SupabaseSessionPersistence implements SessionPersistence {
   private readonly rest: Rest;
   constructor(cfg: SupabaseConfig) { this.rest = new Rest(cfg); }
   async load(learnerId: string): Promise<SessionRecord[]> {
-    const rows = await this.rest.select<{ records: SessionRecord[] }>(`sr_session_state?learner_id=eq.${enc(learnerId)}&select=records`);
-    return rows[0]?.records ?? [];
+    return (await this.loadVersioned(learnerId)).records;
   }
   async save(learnerId: string, records: readonly SessionRecord[]): Promise<void> {
-    await upsertDoc(this.rest, "sr_session_state", learnerId, "records", records);
+    for (let i = 0; i < 8; i += 1) if (await this.saveIfVersion(learnerId, records, (await this.loadVersioned(learnerId)).version)) return;
+    throw new Error("supabase session save lost the race repeatedly");
+  }
+  async loadVersioned(learnerId: string): Promise<VersionedSessions> {
+    const rows = await this.rest.select<{ records: SessionRecord[]; version?: number }>(`sr_session_state?learner_id=eq.${enc(learnerId)}&select=records,version`);
+    return rows[0] ? { records: rows[0].records ?? [], version: rows[0].version ?? 1 } : { records: [], version: 0 };
+  }
+  /** Atomic compare-and-swap in the database (sr_save_sessions): exactly one of two racing writers wins. */
+  async saveIfVersion(learnerId: string, records: readonly SessionRecord[], expectedVersion: number): Promise<boolean> {
+    const r = await this.rest.rpc<{ ok: boolean }>("sr_save_sessions", { p_learner_id: learnerId, p_expected_version: expectedVersion, p_records: records });
+    return r.ok === true;
   }
 }

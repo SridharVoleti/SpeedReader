@@ -140,14 +140,31 @@ export class LearnerService {
     this.newId = deps.newId ?? ((p) => `${p}-${Date.now().toString(36)}-${(this.counter += 1)}`);
   }
 
-  /** Load this learner's persisted sessions into the registry (no-op without a durable store). */
-  private async hydrate(learnerId: string): Promise<void> {
-    if (this.deps.sessionStore) this.deps.sessions.hydrate(learnerId, await this.deps.sessionStore.load(learnerId));
+  /** Load this learner's persisted sessions into the registry (no-op without a durable store). Returns the read version. */
+  private async hydrate(learnerId: string): Promise<number> {
+    if (!this.deps.sessionStore) return 0;
+    const v = await this.deps.sessionStore.loadVersioned(learnerId);
+    this.deps.sessions.hydrate(learnerId, v.records);
+    return v.version;
   }
 
-  /** Persist this learner's sessions after any change. */
-  private async flush(learnerId: string): Promise<void> {
-    if (this.deps.sessionStore) await this.deps.sessionStore.save(learnerId, this.deps.sessions.list(learnerId));
+  /**
+   * Run a session-state mutation as read -> decide -> compare-and-swap. If another instance wrote in between, the
+   * decision is discarded and re-made against the fresh state (so a second concurrent start sees the first and is
+   * refused). A pure refusal writes nothing. Issue #21.
+   */
+  private async mutateSessions<T>(learnerId: string, fn: () => T): Promise<T> {
+    const store = this.deps.sessionStore;
+    if (!store) return fn();
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      const version = await this.hydrate(learnerId);
+      const before = JSON.stringify(this.deps.sessions.list(learnerId));
+      const out = fn();
+      const after = this.deps.sessions.list(learnerId);
+      if (JSON.stringify(after) === before) return out;
+      if (await store.saveIfVersion(learnerId, after, version)) return out;
+    }
+    throw new Error("session state is contended: retry");
   }
 
   private async session(ctx: Ctx): Promise<SessionRecord | ServiceError> {
@@ -159,29 +176,31 @@ export class LearnerService {
   }
 
   private async checkpoint(ctx: Ctx, activity: string, position: number, key: string): Promise<void> {
-    this.deps.sessions.checkpoint(ctx.learnerId, ctx.sessionId, this.now(), { activity, position, committedEventKeys: [key] });
-    await this.flush(ctx.learnerId);
+    await this.mutateSessions(ctx.learnerId, () => this.deps.sessions.checkpoint(ctx.learnerId, ctx.sessionId, this.now(), { activity, position, committedEventKeys: [key] }));
   }
 
   // ---- APP-API-001 bootstrap / APP-API-009 resume ----------------------------------------------------
 
   async bootstrap(ctx: Ctx): Promise<Ok<{ session: Pick<SessionRecord, "sessionId" | "kind" | "endsAt" | "ordinal">; resumed: boolean; state: "ASSESSMENT_REQUIRED" | "READY"; next: Activity; config: Record<string, string>; capabilities: typeof CLIENT_CAPABILITIES; resumeFrom: SessionRecord["checkpoint"] | null }> | ServiceError> {
-    await this.hydrate(ctx.learnerId);
     const now = this.now();
-    let resumed = false;
-    let resumeFrom: SessionRecord["checkpoint"] | null = null;
-    let session = this.deps.sessions.active(ctx.learnerId, now);
-    if (session && (session.sessionId !== ctx.sessionId || session.deviceId !== ctx.deviceId)) return fail(409, "this learner already has an active session on another device");
-    if (!session) {
-      const r = this.deps.sessions.resume({ learnerId: ctx.learnerId, sessionId: ctx.sessionId, deviceId: ctx.deviceId, now });
-      if (r.ok) { session = r.session; resumed = true; resumeFrom = r.resumeFrom; }
-      else {
-        const started = this.deps.sessions.start({ learnerId: ctx.learnerId, deviceId: ctx.deviceId, sessionId: ctx.sessionId, now });
-        if (!started.ok) return fail(started.reason === "WEEKLY_LIMIT_REACHED" ? 429 : 409, started.reason);
-        session = started.session;
+    const decided = await this.mutateSessions(ctx.learnerId, () => {
+      let resumed = false;
+      let resumeFrom: SessionRecord["checkpoint"] | null = null;
+      let session = this.deps.sessions.active(ctx.learnerId, now);
+      if (session && (session.sessionId !== ctx.sessionId || session.deviceId !== ctx.deviceId)) return fail(409, "this learner already has an active session on another device");
+      if (!session) {
+        const r = this.deps.sessions.resume({ learnerId: ctx.learnerId, sessionId: ctx.sessionId, deviceId: ctx.deviceId, now });
+        if (r.ok) { session = r.session; resumed = true; resumeFrom = r.resumeFrom; }
+        else {
+          const started = this.deps.sessions.start({ learnerId: ctx.learnerId, deviceId: ctx.deviceId, sessionId: ctx.sessionId, now });
+          if (!started.ok) return fail(started.reason === "WEEKLY_LIMIT_REACHED" ? 429 : 409, started.reason);
+          session = started.session;
+        }
       }
-      await this.flush(ctx.learnerId);
-    }
+      return { session, resumed, resumeFrom };
+    });
+    if ("ok" in decided) return decided;
+    const { session, resumed, resumeFrom } = decided;
     return await this.bootstrapResult(ctx, session, resumed, resumeFrom);
   }
 
@@ -208,10 +227,8 @@ export class LearnerService {
   }
 
   async resume(ctx: Ctx): Promise<Awaited<ReturnType<LearnerService["bootstrap"]>>> {
-    await this.hydrate(ctx.learnerId);
-    const r = this.deps.sessions.resume({ learnerId: ctx.learnerId, sessionId: ctx.sessionId, deviceId: ctx.deviceId, now: this.now() });
+    const r = await this.mutateSessions(ctx.learnerId, () => this.deps.sessions.resume({ learnerId: ctx.learnerId, sessionId: ctx.sessionId, deviceId: ctx.deviceId, now: this.now() }));
     if (!r.ok) return fail(409, r.reason);
-    await this.flush(ctx.learnerId);
     return this.bootstrapResult(ctx, r.session, true, r.resumeFrom);
   }
 
