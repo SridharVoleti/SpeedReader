@@ -40,3 +40,6 @@ dist/
 .venv/
 .data/
 .sr-e2e/
+
+# canonical authority package (SR_CANONICAL_DIR default; never committed)
+/canonical/

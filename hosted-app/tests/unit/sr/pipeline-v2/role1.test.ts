@@ -9,6 +9,7 @@ import { loadRegistry } from "../../../../lib/sr/pipeline-v2/registry";
 import { buildPassageSpec, verifyPassageSpec } from "../../../../lib/sr/pipeline-v2/role1";
 import { canonicalHash } from "../../../../lib/sr/pipeline/hash";
 import { buildCanonicalFixture } from "./helpers/canonical-fixture";
+import { canonicalGate } from "../../../../lib/sr/canonical-authority";
 
 let dir: string;
 beforeEach(() => { dir = mkdtempSync(join(tmpdir(), "sr-r1-")); buildCanonicalFixture(dir); });
@@ -78,8 +79,11 @@ describe("Role 1 - deterministic passage specification", () => {
 });
 
 describe("Role 1 against the real v0.56 candidate package (skipped when absent)", () => {
-  const real = process.env.SR_CANONICAL_DIR ?? "D:\\Sridhar\\Projects\\SpeedReader_CC\\SpeedReader_W1_BandA_v0.56_FINAL_FREEZE_CANDIDATE_FULL_PACKAGE";
-  it.skipIf(!existsSync(real))("produces a verified spec for RS01-P1 and an RS15-P10 readiness form", () => {
+  const gate = canonicalGate();
+  const real = gate.dir;
+  it.skipIf(gate.skip)("produces a verified spec for RS01-P1 and an RS15-P10 readiness form", () => {
+    gate.assertUsable();
+    console.info(gate.report);
     const pkg = loadCanonicalPackage(real, { requireFrozen: false });
     const reg = loadRegistry(pkg);
     const one = buildPassageSpec(pkg, reg, "W1-0001");

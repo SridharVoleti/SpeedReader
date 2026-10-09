@@ -1,0 +1,71 @@
+name: ci
+
+# Required release gate for the V3 acceptance stack (issue #29). Make the `verify` job a required status check on the
+# protected release branch. The `canonical-authority` job is the fail-closed conformance gate (issue #31).
+on:
+  pull_request:
+  push:
+    branches: [main, feature/app-v3-acceptance]
+  workflow_dispatch:
+    inputs:
+      canonical_dir:
+        description: Directory (on the runner) holding the approved canonical Band A package
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: hosted-app/backend/requirements.txt
+      - name: Install (lockfile verified)
+        run: npm ci
+      - name: Install backend dependencies
+        run: python -m pip install -r hosted-app/backend/requirements.txt pytest
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: Pipeline V2 tests
+        run: npm run test:pipeline-v2
+      - name: Backend tests
+        run: npm run test:backend
+      - name: QA runner (typecheck, unit incl. migrations on Postgres, production build, production V3 Playwright suites)
+        run: npm run qa:sr -- --ui
+      - name: Upload QA evidence for this commit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-evidence-${{ github.sha }}
+          path: |
+            hosted-app/requirements/qa-runs/${{ github.sha }}
+            playwright-report
+            test-results
+          if-no-files-found: error
+
+  canonical-authority:
+    # Fail-closed conformance: requires the approved canonical package; it never silently skips (SR_REQUIRE_CANONICAL=1).
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      SR_REQUIRE_CANONICAL: "1"
+      SR_CANONICAL_DIR: ${{ inputs.canonical_dir }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Canonical conformance (pinned version and package-lock hash verified first)
+        run: npx vitest run hosted-app/tests/unit/sr/pipeline-v2 hosted-app/tests/unit/v2/app-readiness-ruleset-diff.test.ts hosted-app/tests/unit/sr/canonical-authority.test.ts

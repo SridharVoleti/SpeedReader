@@ -7,6 +7,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { COUNT100_VERSION, count100, segment100, validateBandA } from "../../../../lib/sr/pipeline-v2/count100";
 import { parseCsv } from "../../../../lib/sr/pipeline-v2/csv";
+import { canonicalGate } from "../../../../lib/sr/canonical-authority";
 
 const hundred = Array(100).fill("word").join(" ");
 const VECTORS: [string, string, number | null, "VALID_TOKENIZATION" | "INVALID_COUNT_TEXT"][] = [
@@ -103,9 +104,12 @@ describe("COUNT-100 v2.0 tokenizer", () => {
   });
 
   it("replays the locked package's conformance CSV when it is available", () => {
-    const dir = process.env.SR_CANONICAL_DIR ?? "D:\Sridhar\Projects\SpeedReader_CC\SpeedReader_W1_BandA_v0.56_FINAL_FREEZE_CANDIDATE_FULL_PACKAGE";
+    const gate = canonicalGate();
+    const dir = gate.dir;
     const file = join(dir, "SpeedReader_W1_BandA_COUNT100_Conformance_v0.56.csv");
-    if (!existsSync(file)) return; // package not on this machine; the table above carries the vectors
+    if (gate.skip) return; // optional local mode only: the table above carries the vectors; SR_REQUIRE_CANONICAL=1 makes this a failure
+    gate.assertUsable();
+    console.info(gate.report);
     const rows = parseCsv(readFileSync(file, "utf8"));
     expect(rows.length).toBeGreaterThanOrEqual(28);
     for (const row of rows) {

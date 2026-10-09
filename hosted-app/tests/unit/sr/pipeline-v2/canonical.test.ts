@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { CanonicalError, loadCanonicalPackage } from "../../../../lib/sr/pipeline-v2/canonical";
 import { loadRegistry, validateRow } from "../../../../lib/sr/pipeline-v2/registry";
 import { buildCanonicalFixture, fixtureRow, FIXTURE_VERSION, sha, toCsv } from "./helpers/canonical-fixture";
+import { canonicalGate } from "../../../../lib/sr/canonical-authority";
 
 let dir: string;
 let fx: ReturnType<typeof buildCanonicalFixture>;
@@ -125,8 +126,11 @@ describe("registry (15 x 10 matrix, row contracts)", () => {
 });
 
 describe("the real v0.56 candidate package (integration; skipped when absent)", () => {
-  const real = process.env.SR_CANONICAL_DIR ?? "D:\\Sridhar\\Projects\\SpeedReader_CC\\SpeedReader_W1_BandA_v0.56_FINAL_FREEZE_CANDIDATE_FULL_PACKAGE";
-  it.skipIf(!existsSync(real))("verifies its own lock, has 150 valid rows, and is reported as an UNCERTIFIED candidate", () => {
+  const gate = canonicalGate();
+  const real = gate.dir;
+  it.skipIf(gate.skip)("verifies its own lock, has 150 valid rows, and is reported as an UNCERTIFIED candidate", () => {
+    gate.assertUsable();
+    console.info(gate.report);
     const pkg = loadCanonicalPackage(real, { requireFrozen: false });
     expect(pkg.version).toBe("v0.56");
     expect(pkg.freeze.status).toBe("FREEZE_CANDIDATE_UNCERTIFIED");
