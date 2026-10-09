@@ -24,7 +24,10 @@ tests and open items are in `requirements/V3_TRACEABILITY.md`.
 `ui/learner/*` is a thin client over `/api/v3/*` (`api/v3.ts`), which delegates to `lib/v2/learner-service.ts`; every
 rule lives in a tested `lib/v2/*` domain module. State is durable through ports: file adapters locally, Supabase
 adapters when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set (schema in `supabase/migrations`, verified in
-tests against real Postgres via PGlite). Content comes only from approved SR packages; with none approved the journey
+tests against real Postgres via PGlite). **On a Vercel production deployment (`VERCEL_ENV=production`) Supabase is
+required and persistence fails closed**: missing or malformed settings give `/health` 503 `CONFIGURATION_ERROR` and
+`/api/v3` 503 `SERVER_CONFIGURATION`, never a file fallback (production variables are listed in `../.env.local.example`).
+Content comes only from approved SR packages; with none approved the journey
 fails closed with a friendly message. Demo/diagnostic pages (including the old 36-level demo at `/legacy-demo`) are
 mounted only when `SR_ENABLE_DIAGNOSTICS=true` and never on a Vercel production deployment.
 

@@ -6,7 +6,8 @@
 import { join } from "node:path";
 import { FileLearnerRepository, type LearnerRepository } from "../lib/v2/learner-repository";
 import { FileSessionPersistence } from "../lib/v2/file-session-store";
-import { SupabaseAssessmentStore, SupabaseLearnerRepository, SupabaseSessionPersistence, supabaseConfigFromEnv, type SupabaseConfig } from "../lib/v2/supabase-adapters";
+import { persistenceFromEnv, PersistenceConfigError } from "../lib/v2/persistence-config";
+import { SupabaseAssessmentStore, SupabaseLearnerRepository, SupabaseSessionPersistence, type SupabaseConfig } from "../lib/v2/supabase-adapters";
 import { FileAssessmentStore } from "../lib/v2/file-assessment-store";
 import { SessionRegistry } from "../lib/v2/session-envelope";
 import { LearnerService, type Ctx, type PassageCompletionRequest, type ServiceError, type SpeechSubmission } from "../lib/v2/learner-service";
@@ -55,8 +56,13 @@ export function buildDeps(dataDir: string, content: ContentProvider, supabase: S
   return { repo, content, service: new LearnerService({ repo, assessments, sessions: new SessionRegistry(), sessionStore, retentionPolicy, bpcCatalog: bpc }) };
 }
 
+/** Throws PersistenceConfigError on a production deployment without valid Supabase settings: no file fallback there. */
 export function getDeps(env: Record<string, string | undefined> = process.env): Deps {
-  if (!singleton) singleton = buildDeps(env.SR_DATA_DIR ?? join(process.cwd(), ".data"), makeProvider(env), supabaseConfigFromEnv(env), retentionPolicyFromEnv(env));
+  if (!singleton) {
+    const persistence = persistenceFromEnv(env);
+    if (!persistence.ok) throw new PersistenceConfigError(persistence.reason);
+    singleton = buildDeps(env.SR_DATA_DIR ?? join(process.cwd(), ".data"), makeProvider(env), persistence.kind === "supabase" ? persistence.config : null, retentionPolicyFromEnv(env));
+  }
   return singleton;
 }
 
@@ -123,10 +129,12 @@ export function speechFor(passageIdeas: Parameters<typeof evaluateSpokenExpressi
 }
 
 /** `path` is the segments after /api/v3. */
-export async function handleV3(req: Request, path: string[], who: Verified, deps: Deps = getDeps()): Promise<Response> {
+export async function handleV3(req: Request, path: string[], who: Verified, deps?: Deps): Promise<Response> {
   try {
-    return await dispatch(req, path, who, deps);
+    return await dispatch(req, path, who, deps ?? getDeps());
   } catch (e) {
+    // a configuration failure is reported safely and distinctly from missing content; no detail leaks to the learner
+    if (e instanceof PersistenceConfigError) return json({ error: "SERVER_CONFIGURATION", message: "This service is not available right now. Please try again later." }, 503);
     if (e instanceof ContentError) return unavailable(); // bad content is a content problem, not a learner problem
     throw e;
   }
