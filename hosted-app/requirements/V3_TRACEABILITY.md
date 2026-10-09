@@ -111,15 +111,15 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-NR-008 | Read-along highlight | PARTIAL | lib/read-along-voice.ts | read-along-voice.test.ts | Highlight logic only; News Reader screen pending. |
 | APP-NR-009 | Two-read coaching | IMPLEMENTED_TESTED | lib/v2/news-reader-coaching.ts | v2/fr-038-two-read-coaching.test.ts |  |
 | APP-NR-010 | Missing microphone is nonblocking | IMPLEMENTED_TESTED | lib/v2/news-reader.ts | v2/fr-034-news-reader-parallel.test.ts | Mic-unavailable attempt stored unpenalised. |
-| APP-ORAL-001 | Telemetry capture | TODO | | | |
-| APP-ORAL-002 | Deterministic scoring order | TODO | | | |
-| APP-ORAL-003 | Sample validity before specialist score | TODO | | | |
-| APP-ORAL-004 | ASR uncertainty is not child error | TODO | | | |
-| APP-ORAL-005 | Accent fairness | TODO | | | |
-| APP-ORAL-006 | Same-RS personal baseline | TODO | | | |
-| APP-ORAL-007 | No cross-RS raw comparison | TODO | | | |
-| APP-ORAL-008 | Competency timelines | TODO | | | |
-| APP-ORAL-009 | Baseline strength | TODO | | | |
+| APP-ORAL-001 | Telemetry capture | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | All 16 listed telemetry fields. Capture parameters are PROVISIONAL_PILOT config. Live audio capture UI pending (Phase 12/13). |
+| APP-ORAL-002 | Deterministic scoring order | PARTIAL | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | Steps 1-7 implemented+tested. Steps 8-9 (apply supplied RS/P rule, resolve outcome) need the approved canonical scoring contract; not invented. |
+| APP-ORAL-003 | Sample validity before specialist score | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | Unusable/silent/short sample -> UNASSESSABLE, learnerError:false. |
+| APP-ORAL-004 | ASR uncertainty is not child error | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | Low/missing confidence words wildcard-aligned as unassessed. |
+| APP-ORAL-005 | Accent fairness | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | Approved accepted variants per word; accent not detected/penalised. |
+| APP-ORAL-006 | Same-RS personal baseline | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts (rsBaseline) | v2/app-oral-telemetry.test.ts | No global baseline exists in the API. |
+| APP-ORAL-007 | No cross-RS raw comparison | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts (rsProgress) | v2/app-oral-telemetry.test.ts |  |
+| APP-ORAL-008 | Competency timelines | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts (competencyTimelines, roundComposite) | v2/app-oral-telemetry.test.ts | Composite only at complete 15-RS round; parent view wiring under APP-REPORT. |
+| APP-ORAL-009 | Baseline strength | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts | v2/app-oral-telemetry.test.ts | Baseline-strong recognised; no improvement requirement. |
 | APP-READY-001 | Controlled readiness forms | IMPLEMENTED_TESTED | lib/v2/readiness-forms.ts | v2/fr-044-readiness-forms.test.ts | Pre-generated QA-approved equivalent forms only; independent reviewer. |
 | APP-READY-002 | Identity separation | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts | Five separate identifiers required; canonical position consumption refused. DB persistence under APP-DB-008. |
 | APP-READY-003 | Attempt outcome ontology | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts |  |
@@ -192,15 +192,15 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-API-008 | Progress | TODO | | | |
 | APP-API-009 | Resume | TODO | | | |
 | APP-API-010 | Calibration/ops | TODO | | | |
-| APP-KM-001 | Correct delivery coordinate | TODO | | | |
-| APP-KM-002 | Shared canonical tokenizer | TODO | | | |
-| APP-KM-003 | Fixed segment coordinates | TODO | | | |
-| APP-KM-004 | Deterministic scoring contracts | TODO | | | |
-| APP-KM-005 | Attempt validity first | TODO | | | |
-| APP-KM-006 | Primary/confirmation lifecycle | TODO | | | |
-| APP-KM-007 | P10 primary item | TODO | | | |
-| APP-KM-008 | No compensation across independent evidence types | TODO | | | |
-| APP-KM-009 | Package/version validation | TODO | | | |
+| APP-KM-001 | Correct delivery coordinate | PARTIAL | lib/sr/runtime/package-loader.ts; lib/world1-framework.ts | sr/sr-001b-approved-profile.test.ts | Loader fails closed; no approved Knowledge Map package exists yet, so delivery_session path cannot run end-to-end. |
+| APP-KM-002 | Shared canonical tokenizer | PARTIAL | lib/sr/pipeline-v2/count100.ts; lib/v2/oral-telemetry.ts | sr/pipeline-v2 count100 tests | Telemetry consumes canonical tokens; learner renderer not yet built on it (Phase 5). |
+| APP-KM-003 | Fixed segment coordinates | IMPLEMENTED_TESTED | lib/sr/pipeline-v2/count100.ts (segment100) | sr/pipeline-v2 count100 tests | Fixed token-coordinate thirds/quartiles; telemetry never resegments. |
+| APP-KM-004 | Deterministic scoring contracts | PARTIAL | lib/sr/p10-scoring.ts | sr/sr-046-p10-primary.test.ts | App has no local RS thresholds; the canonical scoring contract is not yet available to execute. |
+| APP-KM-005 | Attempt validity first | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts; lib/v2/oral-telemetry.ts | v2/app-ready-lifecycle.test.ts; v2/app-oral-telemetry.test.ts | Validity resolved before PASS/FAIL. |
+| APP-KM-006 | Primary/confirmation lifecycle | PARTIAL | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts | Roles/transitions per v3.0; exact match to the approved canonical contract unverifiable until it exists. |
+| APP-KM-007 | P10 primary item | IMPLEMENTED_TESTED | lib/sr/p10-scoring.ts | sr/sr-046-p10-primary.test.ts | Executes supplied rule; fixtures only. |
+| APP-KM-008 | No compensation across independent evidence types | IMPLEMENTED_TESTED | lib/sr/separate-gates.ts; lib/v2/evidence-store.ts | sr/sr-047-separate-gates.test.ts; v2/fr-048-evidence-separation.test.ts |  |
+| APP-KM-009 | Package/version validation | IMPLEMENTED_TESTED | lib/sr/pipeline/version-lock.ts; lib/sr/pipeline-v2/canonical.ts | sr/sr-039-version-hashes.test.ts | Hash/version mismatch fails closed. |
 | CLAUDE-001 | Read before editing | TODO | | | |
 | CLAUDE-002 | Reuse verified domain logic | TODO | | | |
 | CLAUDE-003 | TDD for every requirement | TODO | | | |
