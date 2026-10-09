@@ -30,7 +30,12 @@ import type { ReadinessStream } from "./readiness-lifecycle";
 
 // ---------------------------------------------------------------------------------------------------- ports
 
-export type StoredAssessment = { state: AssessmentState; assessmentId: string; keys: string[]; record: AssessmentRecord | null };
+/**
+ * Server-side assessment clock (#24). `clock` is when the current passage was first served in the current session;
+ * `lastEventAt` is the last trusted server event (start or answer). All times are the server's own, never the client's.
+ */
+export type AssessmentClock = { attemptIndex: number; sessionId: string; servedAt: string };
+export type StoredAssessment = { state: AssessmentState; assessmentId: string; keys: string[]; record: AssessmentRecord | null; startedAt?: string; clock?: AssessmentClock | null; lastEventAt?: string };
 
 export interface AssessmentStore {
   load(learnerId: string): MaybePromise<StoredAssessment | null>;
@@ -38,9 +43,9 @@ export interface AssessmentStore {
 }
 
 export class MemoryAssessmentStore implements AssessmentStore {
-  private readonly map = new Map<string, { state: AssessmentState; assessmentId: string; keys: string[]; record: AssessmentRecord | null }>();
+  private readonly map = new Map<string, StoredAssessment>();
   load(learnerId: string) { const v = this.map.get(learnerId); return v ? structuredClone(v) : null; }
-  save(learnerId: string, value: { state: AssessmentState; assessmentId: string; keys: string[]; record: AssessmentRecord | null }) { this.map.set(learnerId, structuredClone(value)); }
+  save(learnerId: string, value: StoredAssessment) { this.map.set(learnerId, structuredClone(value)); }
 }
 
 export type ServiceDeps = {
@@ -243,7 +248,8 @@ export class LearnerService {
     if (await this.deps.repo.load(ctx.learnerId)) return fail(409, "assessment already completed");
     let stored = await this.deps.assessments.load(ctx.learnerId);
     if (!stored) {
-      stored = { state: newAssessment(), assessmentId: this.newId("ASSESS"), keys: [], record: null };
+      const startedAt = this.now();
+      stored = { state: newAssessment(), assessmentId: this.newId("ASSESS"), keys: [], record: null, startedAt, lastEventAt: startedAt, clock: null };
       await this.deps.assessments.save(ctx.learnerId, stored);
     }
     return { ok: true, assessmentId: stored.assessmentId, nextWpm: stored.state.currentWpm, status: stored.state.status };
@@ -259,20 +265,45 @@ export class LearnerService {
     return { ok: true, nextWpm: stored.state.currentWpm, attemptsDone: stored.state.attempts.length };
   }
 
-  async submitAssessmentAttempt(ctx: Ctx, req: { key: string; wpm: number; comprehensionScore: number; durationSec: number }): Promise<Ok<{ nextWpm: number | null; status: AssessmentState["status"]; replayed: boolean }> | ServiceError> {
+  /**
+   * Serve the next assessment passage and start its server-side clock. A reload in the same session keeps the original
+   * start (time is not reset by refreshing); a passage served again in a different session restarts it, so time away
+   * from the app is never charged to the ten-minute budget.
+   */
+  async serveAssessmentPassage(ctx: Ctx): Promise<Ok<{ nextWpm: number; attemptsDone: number }> | ServiceError> {
+    const pending = await this.assessmentPending(ctx);
+    if (!pending.ok) return pending;
+    const stored = (await this.deps.assessments.load(ctx.learnerId))!;
+    const c = stored.clock;
+    if (!c || c.attemptIndex !== pending.attemptsDone || c.sessionId !== ctx.sessionId) {
+      stored.clock = { attemptIndex: pending.attemptsDone, sessionId: ctx.sessionId, servedAt: this.now() };
+      await this.deps.assessments.save(ctx.learnerId, stored);
+    }
+    return pending;
+  }
+
+  async submitAssessmentAttempt(ctx: Ctx, req: { key: string; wpm: number; comprehensionScore: number }): Promise<Ok<{ nextWpm: number | null; status: AssessmentState["status"]; replayed: boolean }> | ServiceError> {
     const s = await this.session(ctx); if ("ok" in s) return s;
     const stored = await this.deps.assessments.load(ctx.learnerId);
     if (!stored) return fail(409, "assessment not started");
     if (!req.key) return fail(400, "key is required");
     if (stored.keys.includes(req.key)) return { ok: true, nextWpm: stored.state.status === "COMPLETE" ? null : stored.state.currentWpm, status: stored.state.status, replayed: true };
     if (stored.state.status === "COMPLETE") return fail(409, "assessment is complete");
-    const attempt: AssessmentAttempt = { wpm: req.wpm, comprehensionScore: req.comprehensionScore, durationSec: req.durationSec };
+    // elapsed time is measured here from trusted server timestamps; the request carries no duration
+    const nowIso = this.now();
+    const fromIso = stored.clock && stored.clock.attemptIndex === stored.state.attempts.length && stored.clock.sessionId === ctx.sessionId
+      ? stored.clock.servedAt
+      : (stored.lastEventAt ?? stored.startedAt ?? nowIso);
+    const durationSec = Math.max(0, (Date.parse(nowIso) - Date.parse(fromIso)) / 1000);
+    const attempt: AssessmentAttempt = { wpm: req.wpm, comprehensionScore: req.comprehensionScore, durationSec };
     try {
       stored.state = recordAssessmentAttempt(stored.state, attempt);
     } catch (e) {
       return fail(400, e instanceof Error ? e.message : "invalid attempt");
     }
     stored.keys.push(req.key);
+    stored.clock = null;
+    stored.lastEventAt = nowIso;
     await this.deps.assessments.save(ctx.learnerId, stored);
     await this.checkpoint(ctx, "INITIAL_ASSESSMENT", stored.state.attempts.length, `assess:${req.key}`);
     return { ok: true, nextWpm: stored.state.status === "COMPLETE" ? null : stored.state.currentWpm, status: stored.state.status, replayed: false };

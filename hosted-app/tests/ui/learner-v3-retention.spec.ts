@@ -6,6 +6,8 @@ import { expect, test, type Page } from "@playwright/test";
 // production waits ~24 hours.)
 
 const RIGHT = [1, 0, 2, 0];
+/** After six good assessment answers the learner starts missing: the assessment ends at a realistic baseline (the server measures real elapsed time, so a perfect learner would climb to the 150 ceiling). */
+const WRONG_PICKS = [0, 1, 0, 1];
 const WRONG = [0, 1, 0, 1];
 const FORBIDDEN = /NOT_GREEN|\bGREEN\b|\bPASS(ED)?\b|\bFAIL(ED)?\b|\bscore\b|\bpercent|\d+\s?%|threshold|classification|attemptId|\bwrong\b/i;
 
@@ -18,11 +20,11 @@ async function newLearner(page: Page) {
   await page.clock.install();
 }
 
-async function readAndAnswer(page: Page) {
+async function readAndAnswer(page: Page, picks: number[] = RIGHT) {
   await page.getByTestId("reader-start").click();
   await expect(page.getByTestId("reader-word")).toBeVisible();
   await page.clock.fastForward(200_000);
-  for (let i = 0; i < RIGHT.length; i += 1) await page.locator("fieldset").nth(i).locator("label").nth(RIGHT[i]).click();
+  for (let i = 0; i < picks.length; i += 1) await page.locator("fieldset").nth(i).locator("label").nth(picks[i]).click();
 }
 
 async function homeWithOneStoryRead(page: Page) {
@@ -32,7 +34,7 @@ async function homeWithOneStoryRead(page: Page) {
     const reader = page.getByTestId("reader-start");
     await expect(home.or(reader)).toBeVisible({ timeout: 15_000 });
     if (await home.isVisible()) break;
-    await readAndAnswer(page);
+    await readAndAnswer(page, guard < 6 ? RIGHT : WRONG_PICKS);
     await page.getByTestId("questions-next").click();
   }
   await page.getByTestId("start-story").click();

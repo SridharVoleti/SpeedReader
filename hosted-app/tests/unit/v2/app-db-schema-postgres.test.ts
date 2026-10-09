@@ -224,7 +224,9 @@ describe("the Supabase adapters run against the real schema and the real commit 
     await call("POST", "bootstrap");
     await call("POST", "assessment/start");
     for (let i = 1; ; i += 1) {
-      const a = await call("POST", "assessment/answer", { key: `k${i}`, answers: RIGHT });
+      // a learner who reads well up to 90 WPM and not beyond; the server times each passage itself
+      const served = await call("GET", "assessment/passage");
+      const a = await call("POST", "assessment/answer", { key: `k${i}`, answers: served.body.wpm <= 90 ? RIGHT : [0, 0, 0, 0] });
       expect(a.status).toBe(200);
       if (a.body.status === "COMPLETE") break;
     }

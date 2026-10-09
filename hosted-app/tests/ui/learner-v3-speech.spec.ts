@@ -3,6 +3,8 @@ import { expect, test, type Page } from "@playwright/test";
 // Speech paths and real-time cadence for the v3 learner journey (APP-COMP-010/011, APP-NFR-002/003/004, APP-NFR-009).
 
 const RIGHT = [1, 0, 2, 0];
+/** After six good assessment answers the learner starts missing: the assessment ends at a realistic baseline (the server measures real elapsed time, so a perfect learner would climb to the 150 ceiling). */
+const WRONG_PICKS = [0, 1, 0, 1];
 const FORBIDDEN = /NOT_GREEN|\bGREEN\b|\bPASS(ED)?\b|\bFAIL(ED)?\b|\bscore\b|\bpercent|\d+\s?%|threshold|classification|attemptId|\bwrong\b/i;
 
 async function newLearner(page: Page, fakeClock = true) {
@@ -14,11 +16,11 @@ async function newLearner(page: Page, fakeClock = true) {
   if (fakeClock) await page.clock.install();
 }
 
-async function readAndAnswer(page: Page) {
+async function readAndAnswer(page: Page, picks: number[] = RIGHT) {
   await page.getByTestId("reader-start").click();
   await expect(page.getByTestId("reader-word")).toBeVisible();
   await page.clock.fastForward(200_000);
-  for (let i = 0; i < RIGHT.length; i += 1) await page.locator("fieldset").nth(i).locator("label").nth(RIGHT[i]).click();
+  for (let i = 0; i < picks.length; i += 1) await page.locator("fieldset").nth(i).locator("label").nth(picks[i]).click();
 }
 
 async function reachExplanation(page: Page) {
@@ -28,7 +30,7 @@ async function reachExplanation(page: Page) {
     const reader = page.getByTestId("reader-start");
     await expect(home.or(reader)).toBeVisible({ timeout: 15_000 });
     if (await home.isVisible()) break;
-    await readAndAnswer(page);
+    await readAndAnswer(page, guard < 6 ? RIGHT : WRONG_PICKS);
     await page.getByTestId("questions-next").click();
   }
   await page.getByTestId("start-story").click();
@@ -135,7 +137,7 @@ test("a Level Up reports exactly one structured Babystep to Babysteps and nothin
     const reader = page.getByTestId("reader-start");
     await expect(home.or(reader)).toBeVisible({ timeout: 15_000 });
     if (await home.isVisible()) break;
-    await readAndAnswer(page);
+    await readAndAnswer(page, guard < 6 ? RIGHT : WRONG_PICKS);
     await page.getByTestId("questions-next").click();
   }
   const start = Number(await page.getByTestId("book-time-now").getAttribute("data-wpm"));

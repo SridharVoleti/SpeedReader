@@ -5,6 +5,8 @@ import { expect, test, type Page } from "@playwright/test";
 // ~100 second story can be read in milliseconds without changing any timing logic.
 
 const RIGHT = [1, 0, 2, 0];
+/** After six good assessment answers the learner starts missing: the assessment ends at a realistic baseline (the server measures real elapsed time, so a perfect learner would climb to the 150 ceiling). */
+const WRONG_PICKS = [0, 1, 0, 1];
 const WRONG = [0, 1, 0, 1];
 const FORBIDDEN = /NOT_GREEN|\bGREEN\b|\bPASS(ED)?\b|\bFAIL(ED)?\b|\bscore\b|\bpercent|\d+\s?%|threshold|classification|attemptId|\bwrong\b/i;
 
@@ -40,7 +42,7 @@ async function completeAssessment(page: Page, picks = RIGHT) {
     const reader = page.getByTestId("reader-start");
     await expect(home.or(reader)).toBeVisible({ timeout: 15_000 });
     if (await home.isVisible()) return;
-    await readAndAnswer(page, picks);
+    await readAndAnswer(page, guard < 6 ? picks : WRONG_PICKS);
     await page.getByTestId("questions-next").click();
   }
   throw new Error("assessment did not finish");

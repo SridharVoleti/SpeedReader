@@ -155,7 +155,7 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
     case "POST assessment/start": return respond(await service.startAssessment(ctx));
 
     case "GET assessment/passage": {
-      const pending = await service.assessmentPending(ctx);
+      const pending = await service.serveAssessmentPassage(ctx); // also starts the server-side clock for this passage
       if (!pending.ok) return respond(pending);
       const passage = content.assessment(pending.attemptsDone);
       return passage ? json({ ok: true, wpm: pending.nextWpm, attemptNumber: pending.attemptsDone + 1, passage: learnerView(passage) }) : unavailable();
@@ -169,9 +169,7 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
       if (!passage) return unavailable();
       const scores = scoreItems(passage, b.answers);
       const comprehensionScore = scores.reduce((a, x) => a + x.score, 0) / scores.length;
-      const words = passage.text.trim().split(/\s+/).length;
-      const durationSec = Math.round((words / pending.nextWpm) * 60 + 20); // deterministic reading + answering estimate
-      const r = await service.submitAssessmentAttempt(ctx, { key: b.key, wpm: pending.nextWpm, comprehensionScore, durationSec });
+      const r = await service.submitAssessmentAttempt(ctx, { key: b.key, wpm: pending.nextWpm, comprehensionScore });
       return respond(r);
     }
     case "POST assessment/attempt": {

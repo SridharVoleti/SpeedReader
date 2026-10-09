@@ -234,7 +234,7 @@ describe.each(sessionStores())("durable sessions and assessment progress: %s", (
       const svc = i % 2 ? b : a; // alternate instances every attempt
       const p = await svc.assessmentPending(ctx);
       if (!p.ok) throw new Error(JSON.stringify(p));
-      const r = await svc.submitAssessmentAttempt(ctx, { key: `k${i}`, wpm: p.nextWpm, comprehensionScore: p.nextWpm <= 70 ? 0.9 : 0.3, durationSec: 40 });
+      const r = await svc.submitAssessmentAttempt(ctx, { key: `k${i}`, wpm: p.nextWpm, comprehensionScore: p.nextWpm <= 70 ? 0.9 : 0.3 });
       if (!r.ok) throw new Error(JSON.stringify(r));
       status = r.status;
     }

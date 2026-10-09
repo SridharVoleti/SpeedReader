@@ -39,7 +39,7 @@ async function onboard(limit = 90) {
   let wpm = await svc.startAssessment(ctx) as { ok: true; nextWpm: number };
   let i = 0;
   while (status !== "COMPLETE") {
-    const r = ok(await svc.submitAssessmentAttempt(ctx, { key: `as-${(i += 1)}`, wpm: wpm.nextWpm, comprehensionScore: wpm.nextWpm <= limit ? 0.9 : 0.4, durationSec: 40 }));
+    const r = ok(await svc.submitAssessmentAttempt(ctx, { key: `as-${(i += 1)}`, wpm: wpm.nextWpm, comprehensionScore: wpm.nextWpm <= limit ? 0.9 : 0.4 }));
     status = r.status;
     wpm = { ok: true, nextWpm: r.nextWpm ?? 0 };
   }
@@ -84,8 +84,8 @@ describe("APP-API-002 initial assessment (idempotent) and APP-ASSESS-006", () =>
     ok(await svc.bootstrap(ctx));
     const a = ok(await svc.startAssessment(ctx));
     expect(ok(await svc.startAssessment(ctx)).assessmentId).toBe(a.assessmentId);
-    const first = ok(await svc.submitAssessmentAttempt(ctx, { key: "k1", wpm: a.nextWpm, comprehensionScore: 0.9, durationSec: 40 }));
-    const replay = ok(await svc.submitAssessmentAttempt(ctx, { key: "k1", wpm: a.nextWpm, comprehensionScore: 0.9, durationSec: 40 }));
+    const first = ok(await svc.submitAssessmentAttempt(ctx, { key: "k1", wpm: a.nextWpm, comprehensionScore: 0.9 }));
+    const replay = ok(await svc.submitAssessmentAttempt(ctx, { key: "k1", wpm: a.nextWpm, comprehensionScore: 0.9 }));
     expect(first.replayed).toBe(false);
     expect(replay).toMatchObject({ replayed: true, nextWpm: first.nextWpm });
     expect(await svc.finalizeAssessment(ctx)).toMatchObject({ ok: false, status: 409 }); // not complete yet
@@ -101,8 +101,8 @@ describe("APP-API-002 initial assessment (idempotent) and APP-ASSESS-006", () =>
   it("rejects an out-of-sequence assessment speed without corrupting the assessment", async () => {
     ok(await svc.bootstrap(ctx));
     ok(await svc.startAssessment(ctx));
-    expect(await svc.submitAssessmentAttempt(ctx, { key: "bad", wpm: 140, comprehensionScore: 0.9, durationSec: 40 })).toMatchObject({ ok: false, status: 400 });
-    expect(ok(await svc.submitAssessmentAttempt(ctx, { key: "good", wpm: 60, comprehensionScore: 0.9, durationSec: 40 })).replayed).toBe(false);
+    expect(await svc.submitAssessmentAttempt(ctx, { key: "bad", wpm: 140, comprehensionScore: 0.9 })).toMatchObject({ ok: false, status: 400 });
+    expect(ok(await svc.submitAssessmentAttempt(ctx, { key: "good", wpm: 60, comprehensionScore: 0.9 })).replayed).toBe(false);
   });
 });
 

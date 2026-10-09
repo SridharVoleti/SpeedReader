@@ -5,6 +5,8 @@ import { expect, test, type Page } from "@playwright/test";
 // This is evidence for the Babysteps accessibility QA gate, not a substitute for it.
 
 const RIGHT = [1, 0, 2, 0];
+/** After six good assessment answers the learner starts missing: the assessment ends at a realistic baseline (the server measures real elapsed time, so a perfect learner would climb to the 150 ceiling). */
+const WRONG_PICKS = [0, 1, 0, 1];
 
 async function newLearner(page: Page) {
   const id = `v3a-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -21,11 +23,11 @@ async function audit(page: Page, label: string) {
   expect(summary, `${label}: accessibility violations`).toEqual([]);
 }
 
-async function readAndAnswer(page: Page) {
+async function readAndAnswer(page: Page, picks: number[] = RIGHT) {
   await page.getByTestId("reader-start").click();
   await expect(page.getByTestId("reader-word")).toBeVisible();
   await page.clock.fastForward(200_000);
-  for (let i = 0; i < RIGHT.length; i += 1) await page.locator("fieldset").nth(i).locator("label").nth(RIGHT[i]).click();
+  for (let i = 0; i < picks.length; i += 1) await page.locator("fieldset").nth(i).locator("label").nth(picks[i]).click();
 }
 
 test("every learner screen passes automated WCAG A/AA checks", async ({ page }) => {
@@ -53,7 +55,7 @@ test("every learner screen passes automated WCAG A/AA checks", async ({ page }) 
     const reader = page.getByTestId("reader-start");
     await expect(home.or(reader)).toBeVisible({ timeout: 15_000 });
     if (await home.isVisible()) break;
-    await readAndAnswer(page);
+    await readAndAnswer(page, guard < 6 ? RIGHT : WRONG_PICKS);
     await page.getByTestId("questions-next").click();
   }
   await audit(page, "home");
