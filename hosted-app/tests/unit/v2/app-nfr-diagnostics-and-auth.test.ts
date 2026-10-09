@@ -18,10 +18,10 @@ describe("APP-NFR-007 / APP-PRIV-004 diagnostics protection", () => {
   });
 
   it("every demo/diagnostic page is registered only behind the gate; the learner table holds no demo", () => {
-    const src = readFileSync("hosted-app/app.manifest.ts", "utf8");
+    const src = readFileSync("hosted-app/app.pages.ts", "utf8");
     const learner = src.slice(src.indexOf("const learnerPages"), src.indexOf("const diagnosticPages"));
-    expect(learner).not.toMatch(/-demo/);
-    expect(src).toMatch(/pages: diagnosticsEnabled\(\) \? \{ \.\.\.learnerPages, \.\.\.diagnosticPages \} : learnerPages/);
+    expect(learner).not.toMatch(/-demo|explain/);
+    expect(src).toMatch(/diagnosticsEnabled\(env\) \? \{ \.\.\.learnerPages, \.\.\.diagnosticPages \} : learnerPages/);
     const diagnostic = src.slice(src.indexOf("const diagnosticPages"), src.indexOf("export const DIAGNOSTIC_ROUTES"));
     expect((diagnostic.match(/-demo"/g) ?? []).length).toBe(13);
   });
