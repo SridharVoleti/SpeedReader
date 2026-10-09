@@ -169,7 +169,7 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
       if (!passage) return unavailable();
       const scores = scoreItems(passage, b.answers);
       const comprehensionScore = scores.reduce((a, x) => a + x.score, 0) / scores.length;
-      const r = await service.submitAssessmentAttempt(ctx, { key: b.key, wpm: pending.nextWpm, comprehensionScore });
+      const r = await service.submitAssessmentAttempt(ctx, { key: b.key, wpm: pending.nextWpm, comprehensionScore, content: passage.provenance });
       return respond(r);
     }
     case "POST assessment/attempt": {

@@ -69,7 +69,7 @@ describe("ApprovedPackageProvider fails closed", () => {
     expect(p.byPassageId("W1-0001")).toBeNull();
     expect(p.byPassageId("nonsense")).toBeNull();
     expect(p.bySequence(-3)).toBeNull();
-    expect(p.assessment()).toBeNull();
+    expect(p.assessment(0)).toBeNull();
     expect(p.source).toBe("APPROVED_PACKAGE");
   });
 });

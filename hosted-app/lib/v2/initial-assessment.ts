@@ -143,6 +143,8 @@ export type AssessmentRecord = {
   configSnapshot: AssessmentConfig;
   startingWpm: number;
   completedAt: string;
+  /** Exact approved content (package id/version/hash, and the manifest that selected it) used for each attempt, in order. */
+  content?: readonly { packageId: string; packageVersion: number; contentHash: string; manifest?: { manifestId: string; manifestVersion: number; hash: string } }[];
 };
 
 export function toAssessmentRecord(state: AssessmentState, ids: { assessmentId: string; learnerId: string }, completedAt: string): AssessmentRecord {

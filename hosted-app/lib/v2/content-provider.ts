@@ -1,3 +1,4 @@
+import { join } from "node:path";
 // Content port for the v3 learner journey. The app CONSUMES approved content and never authors it (CLAUDE-005).
 //
 //  * ApprovedPackageProvider - production. Reads only hash-verified approved SR packages; anything missing,
@@ -32,7 +33,11 @@ export type V3Passage = {
   bpc: BpcContent;
   source: "APPROVED_PACKAGE" | "FIXTURE";
   /** Exact identity of the package consumed (id, version, immutable hash): recorded with every attempt (#23). */
-  provenance: { packageId: string; packageVersion: number; contentHash: string };
+  provenance: {
+    packageId: string; packageVersion: number; contentHash: string;
+    /** Assessment passages only: the approved manifest (id, version, hash) that selected this package. */
+    manifest?: { manifestId: string; manifestVersion: number; hash: string };
+  };
 };
 
 export interface ContentProvider {
@@ -81,9 +86,28 @@ export function ideasFromMeaningUnits(units: readonly { muId: string; text: stri
 
 type Store = ReturnType<typeof createStore>;
 
+/** Approved artifact `<approved>/assessment/ASSESSMENT-MANIFEST.json`: the ordered approved packages used as assessment passages. */
+export const ASSESSMENT_MANIFEST_FILE = "ASSESSMENT-MANIFEST.json";
+export type AssessmentManifest = { schemaVersion: "1.0"; manifestId: string; manifestVersion: number; packageIds: string[] };
+
+export function parseAssessmentManifest(text: string): { ok: true; manifest: AssessmentManifest } | { ok: false; error: string } {
+  let v: unknown;
+  try { v = JSON.parse(text); } catch { return { ok: false, error: "manifest is not valid JSON" }; }
+  if (typeof v !== "object" || v === null || Array.isArray(v)) return { ok: false, error: "manifest must be an object" };
+  const m = v as Record<string, unknown>;
+  if (m.schemaVersion !== "1.0") return { ok: false, error: "unsupported manifest schemaVersion" };
+  if (typeof m.manifestId !== "string" || m.manifestId.trim() === "") return { ok: false, error: "manifestId is required" };
+  if (!Number.isInteger(m.manifestVersion) || (m.manifestVersion as number) < 1) return { ok: false, error: "manifestVersion must be a positive integer" };
+  const ids = m.packageIds;
+  if (!Array.isArray(ids) || ids.length === 0) return { ok: false, error: "packageIds must be a non-empty list" };
+  if (!ids.every((i) => typeof i === "string" && /^PKG-W1-[0-9]{4}$/.test(i))) return { ok: false, error: "every package id must look like PKG-W1-NNNN" };
+  if (new Set(ids).size !== ids.length) return { ok: false, error: "package ids must be unique" };
+  return { ok: true, manifest: { schemaVersion: "1.0", manifestId: m.manifestId, manifestVersion: m.manifestVersion as number, packageIds: [...ids] as string[] } };
+}
+
 const pad4 = (n: number) => String(n).padStart(4, "0");
 
-function fromPackage(pkg: LearnerPackage, contentHash: string): V3Passage {
+function fromPackage(pkg: LearnerPackage, contentHash: string, manifest?: { manifestId: string; manifestVersion: number; hash: string }): V3Passage {
   return {
     // delivery order (delivery_session), NOT registry order: the same passage id sits at a different sequence
     sequence: sequenceForPassageId(pkg.passageId),
@@ -94,7 +118,7 @@ function fromPackage(pkg: LearnerPackage, contentHash: string): V3Passage {
     ideas: ideasFromMeaningUnits(pkg.meaningUnits),
     bpc: { passageId: pkg.passageId, text: pkg.bpcText, qaApproved: true, version: `pkg-${pkg.packageVersion}` },
     source: "APPROVED_PACKAGE",
-    provenance: { packageId: pkg.packageId, packageVersion: pkg.packageVersion, contentHash }
+    provenance: { packageId: pkg.packageId, packageVersion: pkg.packageVersion, contentHash, ...(manifest ? { manifest } : {}) }
   };
 }
 
@@ -112,14 +136,25 @@ export class ApprovedPackageProvider implements ContentProvider {
     return /^W1-\d{4}$/.test(passageId) ? this.byRegistryId(passageId) : null;
   }
 
-  private byRegistryId(passageId: string): V3Passage | null {
+  private byRegistryId(passageId: string, manifest?: { manifestId: string; manifestVersion: number; hash: string }): V3Passage | null {
     const r = loadApprovedPackage(this.store, `PKG-${passageId}`);
-    return r.ok && r.hash ? fromPackage(r.pkg, r.hash) : null;
+    return r.ok && r.hash ? fromPackage(r.pkg, r.hash, manifest) : null;
   }
 
-  /** No assessment passages are specified by the content package yet: fail closed. */
-  assessment(): V3Passage | null {
-    return null;
+  /**
+   * The n-th initial-assessment passage (#25). The content authority approves an ordered ASSESSMENT-MANIFEST of approved
+   * package ids; the app serves those packages and authors nothing. No approved manifest, an index past its end, or any
+   * unapproved/tampered artifact yields null, so the journey fails closed with the child-safe message (never a fixture).
+   */
+  assessment(index: number): V3Passage | null {
+    if (!Number.isInteger(index) || index < 0) return null;
+    let read: { content: string; hash: string };
+    try { read = this.store.readAuthoritative(join(this.store.roots.approved, "assessment", ASSESSMENT_MANIFEST_FILE)); } catch { return null; }
+    const m = parseAssessmentManifest(read.content);
+    if (!m.ok) return null;
+    const id = m.manifest.packageIds[index];
+    if (!id) return null;
+    return this.byRegistryId(id.replace(/^PKG-/, ""), { manifestId: m.manifest.manifestId, manifestVersion: m.manifest.manifestVersion, hash: read.hash });
   }
 }
 

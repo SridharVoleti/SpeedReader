@@ -35,7 +35,7 @@ import type { ReadinessStream } from "./readiness-lifecycle";
  * `lastEventAt` is the last trusted server event (start or answer). All times are the server's own, never the client's.
  */
 export type AssessmentClock = { attemptIndex: number; sessionId: string; servedAt: string };
-export type StoredAssessment = { state: AssessmentState; assessmentId: string; keys: string[]; record: AssessmentRecord | null; startedAt?: string; clock?: AssessmentClock | null; lastEventAt?: string };
+export type StoredAssessment = { state: AssessmentState; assessmentId: string; keys: string[]; record: AssessmentRecord | null; /** Content actually used for each answered attempt, in order (#25). */ contentLog?: ContentProvenance[]; startedAt?: string; clock?: AssessmentClock | null; lastEventAt?: string };
 
 export interface AssessmentStore {
   load(learnerId: string): MaybePromise<StoredAssessment | null>;
@@ -66,7 +66,7 @@ export type ServiceDeps = {
   newId?: (prefix: string) => string;
 };
 
-export type ContentProvenance = { packageId: string; packageVersion: number; contentHash: string };
+export type ContentProvenance = { packageId: string; packageVersion: number; contentHash: string; manifest?: { manifestId: string; manifestVersion: number; hash: string } };
 
 export type Ctx = { learnerId: string; sessionId: string; deviceId: string };
 
@@ -282,7 +282,7 @@ export class LearnerService {
     return pending;
   }
 
-  async submitAssessmentAttempt(ctx: Ctx, req: { key: string; wpm: number; comprehensionScore: number }): Promise<Ok<{ nextWpm: number | null; status: AssessmentState["status"]; replayed: boolean }> | ServiceError> {
+  async submitAssessmentAttempt(ctx: Ctx, req: { key: string; wpm: number; comprehensionScore: number; content?: ContentProvenance }): Promise<Ok<{ nextWpm: number | null; status: AssessmentState["status"]; replayed: boolean }> | ServiceError> {
     const s = await this.session(ctx); if ("ok" in s) return s;
     const stored = await this.deps.assessments.load(ctx.learnerId);
     if (!stored) return fail(409, "assessment not started");
@@ -302,6 +302,7 @@ export class LearnerService {
       return fail(400, e instanceof Error ? e.message : "invalid attempt");
     }
     stored.keys.push(req.key);
+    if (req.content) stored.contentLog = [...(stored.contentLog ?? []), req.content];
     stored.clock = null;
     stored.lastEventAt = nowIso;
     await this.deps.assessments.save(ctx.learnerId, stored);
@@ -315,7 +316,7 @@ export class LearnerService {
     if (!stored) return fail(409, "assessment not started");
     if (stored.record) return { ok: true, assessmentId: stored.record.assessmentId, startingWpm: stored.record.startingWpm, replayed: true };
     if (stored.state.status !== "COMPLETE") return fail(409, "assessment is not complete");
-    const record = toAssessmentRecord(stored.state, { assessmentId: stored.assessmentId, learnerId: ctx.learnerId }, this.now());
+    const record = { ...toAssessmentRecord(stored.state, { assessmentId: stored.assessmentId, learnerId: ctx.learnerId }, this.now()), ...(stored.contentLog?.length ? { content: stored.contentLog } : {}) };
     if (!await this.deps.repo.load(ctx.learnerId)) await this.deps.repo.create(newLearnerAggregate(ctx.learnerId, record.startingWpm));
     stored.record = record;
     await this.deps.assessments.save(ctx.learnerId, stored);
