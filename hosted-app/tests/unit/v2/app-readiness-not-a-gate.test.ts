@@ -27,7 +27,7 @@ async function build(streams: ReadinessStream[]) {
   const repo = new FileLearnerRepository(dir);
   await repo.create(newLearnerAggregate("kid", 60));
   const svc = new LearnerService({
-    repo, assessments: new MemoryAssessmentStore(), sessions: new SessionRegistry(SESSION_POLICY_V1), bpcCatalog: [],
+    repo, assessments: new MemoryAssessmentStore(), sessions: new SessionRegistry(SESSION_POLICY_V1), bpcCatalog: [], provenance: () => ({ packageId: "TEST-PKG", packageVersion: 1, contentHash: "test-hash" }),
     readiness: () => streams, now: () => new Date(T0).toISOString()
   });
   return svc;

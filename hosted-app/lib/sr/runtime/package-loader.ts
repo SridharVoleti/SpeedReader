@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 // The learner-runtime CONSUMER of approved SR packages (issues #13, #14).
 // Loads only from the approved root (hash-verified by the store), re-validates the package, passes it through
 // the platform content gate, and runs the runtime's own scorer against it so an unusable package is rejected
@@ -18,7 +19,7 @@ export type LearnerPackage = {
   items: LearnerItem[]; meaningUnits: { muId: string; text: string; factIds: string[] }[];
   bpcText: string; ruleId: string; outcomes: { state: "PASS" | "FAIL"; oralReady: boolean; comprehensionReady: boolean }[];
 };
-export type LoadResult = { ok: true; pkg: LearnerPackage } | { ok: false; errors: string[] };
+export type LoadResult = { ok: true; pkg: LearnerPackage; /** Approval hash of the exact bytes consumed, when the store provides it. */ hash?: string } | { ok: false; errors: string[] };
 
 /** Run the runtime scorer against the package: all-correct first-attempt must pass, a wrong primary must fail. */
 export function consumerContractCheck(pkg: LearnerPackage): string[] {
@@ -75,8 +76,9 @@ export const approvedPackagePath = (store: Store, packageId: string) => join(sto
 export function loadApprovedPackage(store: Store, packageId: string): LoadResult {
   if (!/^PKG-W1-[0-9]{4}$/.test(packageId)) return { ok: false, errors: [`invalid package id ${packageId}`] };
   try {
-    const { content } = store.readAuthoritative(approvedPackagePath(store, packageId));
-    return parseRuntimePackage(new TextEncoder().encode(content), "APPROVED");
+    const { content, hash } = store.readAuthoritative(approvedPackagePath(store, packageId)) as { content: string; hash?: string };
+    const r = parseRuntimePackage(new TextEncoder().encode(content), "APPROVED");
+    return r.ok ? { ...r, hash: hash ?? `sha256:${createHash("sha256").update(content).digest("hex")}` } : r;
   } catch (e) {
     return { ok: false, errors: [(e as Error).message] };
   }

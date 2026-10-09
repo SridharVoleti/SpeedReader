@@ -53,7 +53,7 @@ export function buildDeps(dataDir: string, content: ContentProvider, supabase: S
   const assessments = supabase ? new SupabaseAssessmentStore(supabase) : new FileAssessmentStore(join(dataDir, "assessments"));
   const sessionStore = supabase ? new SupabaseSessionPersistence(supabase) : new FileSessionPersistence(join(dataDir, "sessions"));
   const bpc = (passageId: string): BpcContent | null => content.byPassageId(passageId)?.bpc ?? null;
-  return { repo, content, service: new LearnerService({ repo, assessments, sessions: new SessionRegistry(), sessionStore, retentionPolicy, bpcCatalog: bpc }) };
+  return { repo, content, service: new LearnerService({ repo, assessments, sessions: new SessionRegistry(), sessionStore, retentionPolicy, bpcCatalog: bpc, provenance: (passageId) => content.byPassageId(passageId)?.provenance ?? null }) };
 }
 
 /** Throws PersistenceConfigError on a production deployment without valid Supabase settings: no file fallback there. */

@@ -243,7 +243,7 @@ describe("the Supabase adapters run against the real schema and the real commit 
     expect(row.current_wpm).toBe(row.baseline_wpm + 1);
     expect(row.canonical_pointer).toBe(6);
     // a second server instance (fresh service, same database) sees exactly the same learner
-    const other = new LearnerService({ repo: new SupabaseLearnerRepository(cfg(db)), assessments: new SupabaseAssessmentStore(cfg(db)), sessions: new SessionRegistry(), sessionStore: new SupabaseSessionPersistence(cfg(db)), bpcCatalog: [] });
+    const other = new LearnerService({ repo: new SupabaseLearnerRepository(cfg(db)), assessments: new SupabaseAssessmentStore(cfg(db)), sessions: new SessionRegistry(), sessionStore: new SupabaseSessionPersistence(cfg(db)), bpcCatalog: [], provenance: () => ({ packageId: "TEST-PKG", packageVersion: 1, contentHash: "test-hash" }) });
     const p = await other.progress(who);
     expect(p).toMatchObject({ ok: true, currentWpm: row.current_wpm, storiesRead: 5 });
   });

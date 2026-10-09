@@ -24,7 +24,7 @@ describe.each(await stores())("concurrent session starts: %s", (_name, makeStore
   async function fleet(n: number, clock: { t: number }) {
     const store = await makeStore();
     const repo = new FileLearnerRepository(mkdtempSync(join(tmpdir(), "sr-conc-l-")));
-    const instances = Array.from({ length: n }, () => new LearnerService({ repo, assessments: new MemoryAssessmentStore(), sessions: new SessionRegistry(), sessionStore: store, bpcCatalog: [], now: () => new Date(clock.t).toISOString() }));
+    const instances = Array.from({ length: n }, () => new LearnerService({ repo, assessments: new MemoryAssessmentStore(), sessions: new SessionRegistry(), sessionStore: store, bpcCatalog: [], provenance: () => ({ packageId: "TEST-PKG", packageVersion: 1, contentHash: "test-hash" }), now: () => new Date(clock.t).toISOString() }));
     const ctxOf = (i: number): Ctx => ({ learnerId: "kid", sessionId: `S${i}`, deviceId: `dev${i}` });
     return { store, instances, ctxOf };
   }

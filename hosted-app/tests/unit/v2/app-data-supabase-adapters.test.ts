@@ -178,7 +178,7 @@ describe.each(sessionStores())("durable sessions and assessment progress: %s", (
   function twoInstances(clock: { t: number }) {
     const stores = make();
     const repo = new FileLearnerRepository(mkdtempSync(join(tmpdir(), "sr-sess-l-")));
-    const build = () => new LearnerService({ repo, assessments: stores.assessments, sessions: new SessionRegistry(), sessionStore: stores.sessions, bpcCatalog: [], now: () => new Date(clock.t).toISOString() });
+    const build = () => new LearnerService({ repo, assessments: stores.assessments, sessions: new SessionRegistry(), sessionStore: stores.sessions, bpcCatalog: [], provenance: () => ({ packageId: "TEST-PKG", packageVersion: 1, contentHash: "test-hash" }), now: () => new Date(clock.t).toISOString() });
     return { a: build(), b: build(), stores };
   }
 

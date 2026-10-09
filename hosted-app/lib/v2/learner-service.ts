@@ -55,9 +55,13 @@ export type ServiceDeps = {
   bpcCatalog: readonly BpcContent[] | ((passageId: string) => BpcContent | null);
   referenceAudio?: readonly ReferenceAudio[];
   readiness?: (learnerId: string) => readonly ReadinessStream[];
+  /** Exact identity of the content package behind a passage; an attempt without it is refused, never recorded with a placeholder. */
+  provenance: (passageId: string) => ContentProvenance | null;
   now?: () => string;
   newId?: (prefix: string) => string;
 };
+
+export type ContentProvenance = { packageId: string; packageVersion: number; contentHash: string };
 
 export type Ctx = { learnerId: string; sessionId: string; deviceId: string };
 
@@ -355,6 +359,10 @@ export class LearnerService {
       return fail(400, e instanceof Error ? e.message : "invalid evidence");
     }
 
+    const prov = this.deps.provenance(req.passageId);
+    if (!prov) return fail(503, "content provenance unavailable");
+    const ruleVersions = { ...currentRuleVersions(), content: `${prov.packageId}@${prov.packageVersion}#${prov.contentHash}` };
+
     const now = this.now();
     let out: ReturnType<typeof recordNewProgressionAttempt>;
     try {
@@ -371,6 +379,8 @@ export class LearnerService {
       registry: req.registry ?? null,
       client: req.client ?? null,
       comprehension,
+      ruleVersions,
+      contentPackage: prov,
       spokenReason: speech.status === "UNRESOLVED_TECHNICAL" ? speech.reason : null,
       rawTranscript: speech.rawTranscript,
       confirmedTranscript: speech.confirmedTranscript

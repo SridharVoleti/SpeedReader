@@ -12,6 +12,8 @@ import type { StructuredEvidence, ComprehensionResult } from "./comprehension-sc
 import { applyNewPassage, type LearnerAggregate, type NewPassageEvent } from "./learner-aggregate";
 import type { TechnicalReason } from "./spoken-evidence";
 import { CURRENT_CALIBRATION } from "./calibration";
+import { COUNT100_VERSION } from "../sr/pipeline-v2/count100";
+import { READINESS_RULESET_ID } from "./p10-readiness";
 import { ASR_POLICY } from "./spoken-evidence";
 import { SPOKEN_EXPRESSION_CONFIG } from "./spoken-expression";
 
@@ -76,7 +78,11 @@ export type AttemptRecord = {
   /** Coarse device/browser class only (APP-CAL-003); the raw user agent is never stored. */
   client?: ClientClass | null;
   ruleVersions: RuleVersions;
+  /** Exact content package consumed (id, version, immutable hash), recoverable historically (#23). */
+  contentPackage?: ContentPackageRef | null;
 };
+
+export type ContentPackageRef = { packageId: string; packageVersion: number; contentHash: string };
 
 const REQUIRED_TEXT: (keyof AttemptRecord)[] = ["learnerId", "attemptId", "idempotencyKey", "sessionId", "passageId", "recordedAt", "startedAt", "completedAt"];
 
@@ -124,9 +130,10 @@ export function currentRuleVersions(): RuleVersions {
     calibration: CURRENT_CALIBRATION.version,
     spokenExpression: SPOKEN_EXPRESSION_CONFIG.version,
     asrPolicy: ASR_POLICY.version,
-    tokenizer: "word-count-whitespace-v1",
-    content: "content-unversioned-demo",
-    readiness: "readiness-rs15-v1"
+    tokenizer: COUNT100_VERSION,
+    // no package is bound at this level: production attempts are built by the service from the package actually consumed
+    content: "content-unbound",
+    readiness: READINESS_RULESET_ID
   };
 }
 
@@ -139,6 +146,7 @@ export type NewProgressionInput = {
   comprehension: ComprehensionResult;
   spokenReason?: TechnicalReason | null;
   ruleVersions?: RuleVersions;
+  contentPackage?: ContentPackageRef | null;
   /** Optional v3.0 fields; sensible defaults keep callers that predate them working. */
   idempotencyKey?: string;
   sessionId?: string;
@@ -191,7 +199,8 @@ export function recordNewProgressionAttempt(learner: LearnerAggregate, input: Ne
     client: input.client ?? null,
     assistance: { bpcExposedBeforeEvidence: false, modelAnswerExposedBeforeEvidence: false, technicalRetryUsed: !scored, ...input.assistance },
     technicalState: scored ? "CLEAR" : input.spokenReason ? "ASR_UNCERTAIN" : "TECHNICAL_RETRY",
-    ruleVersions: input.ruleVersions ?? currentRuleVersions()
+    ruleVersions: input.ruleVersions ?? currentRuleVersions(),
+    contentPackage: input.contentPackage ?? null
   } as AttemptRecord);
   const errors = validateAttemptRecord(record);
   if (errors.length) throw new Error(`invalid attempt record: ${errors.join("; ")}`);

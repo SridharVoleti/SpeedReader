@@ -72,4 +72,21 @@ describe("committing an attempt writes the normalized evidence domains in the sa
     expect(await n(db, "sr_applied_event")).toBe(0);
     expect((await db.query("select version, canonical_pointer from sr_learner_state")).rows).toEqual([{ version: 1, canonical_pointer: 1 }]);
   });
+
+  it("the content package consumed by an attempt is recoverable: identity is stored once per version, history never rewritten (#23)", async () => {
+    const db = await migratedDb();
+    let l = newLearnerAggregate("kid", 90);
+    await insertLearner(db, l);
+    const withPkg = (lg: LearnerAggregate, i: number, version: number) => {
+      const out = recordNewProgressionAttempt(lg, { attemptId: `a${i}`, passageId: "W1-0001", displayedWpm: lg.core.wpm, passageWords: 100, recordedAt: "2026-10-03T10:00:00Z", comprehension: scored(0.9), contentPackage: { packageId: "PKG-W1-0001", packageVersion: version, contentHash: `hash-v${version}` } });
+      return out.learner;
+    };
+    l = withPkg(l, 0, 1); await commit(db, 1, "a0", l, l.ledger[0]);
+    l = withPkg(l, 1, 1); await commit(db, 2, "a1", l, l.ledger[1]);
+    l = withPkg(l, 2, 2); await commit(db, 3, "a2", l, l.ledger[2]);
+    expect((await db.query("select package_id, version, sha256 from sr_content_package order by version")).rows).toEqual([
+      { package_id: "PKG-W1-0001", version: "1", sha256: "hash-v1" },
+      { package_id: "PKG-W1-0001", version: "2", sha256: "hash-v2" }
+    ]);
+  });
 });

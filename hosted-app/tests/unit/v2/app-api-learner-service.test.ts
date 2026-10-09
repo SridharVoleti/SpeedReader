@@ -22,7 +22,7 @@ const ctx: Ctx = { learnerId: "kid", sessionId: "S1", deviceId: "phone" };
 
 function make(policy = SESSION_POLICY_V1) {
   sessions = new SessionRegistry(policy);
-  svc = new LearnerService({ repo, assessments: new MemoryAssessmentStore(), sessions, bpcCatalog: bpc, now: () => new Date(clock).toISOString(), newId: (p) => `${p}-${(n += 1)}` });
+  svc = new LearnerService({ repo, assessments: new MemoryAssessmentStore(), sessions, bpcCatalog: bpc, provenance: () => ({ packageId: "TEST-PKG", packageVersion: 1, contentHash: "test-hash" }), now: () => new Date(clock).toISOString(), newId: (p) => `${p}-${(n += 1)}` });
 }
 const good = (score: number): SpeechSubmission => ({ rawTranscript: "she flew a kite", confirmedTranscript: "she flew a red kite", asr: { usable: true, speechDetected: true, confidence: 0.9 }, evaluator: { score, version: "ev-1" } });
 const noSpeech: SpeechSubmission = { rawTranscript: null, confirmedTranscript: null, asr: { usable: true, speechDetected: false, confidence: null }, evaluator: null };

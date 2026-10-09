@@ -31,6 +31,8 @@ export type V3Passage = {
   ideas: AuthoredIdea[];
   bpc: BpcContent;
   source: "APPROVED_PACKAGE" | "FIXTURE";
+  /** Exact identity of the package consumed (id, version, immutable hash): recorded with every attempt (#23). */
+  provenance: { packageId: string; packageVersion: number; contentHash: string };
 };
 
 export interface ContentProvider {
@@ -81,7 +83,7 @@ type Store = ReturnType<typeof createStore>;
 
 const pad4 = (n: number) => String(n).padStart(4, "0");
 
-function fromPackage(pkg: LearnerPackage): V3Passage {
+function fromPackage(pkg: LearnerPackage, contentHash: string): V3Passage {
   return {
     // delivery order (delivery_session), NOT registry order: the same passage id sits at a different sequence
     sequence: sequenceForPassageId(pkg.passageId),
@@ -91,7 +93,8 @@ function fromPackage(pkg: LearnerPackage): V3Passage {
     items: pkg.items.map((i) => ({ itemId: i.itemId, stem: i.stem, options: [...i.options], answerIndex: i.answerIndex })),
     ideas: ideasFromMeaningUnits(pkg.meaningUnits),
     bpc: { passageId: pkg.passageId, text: pkg.bpcText, qaApproved: true, version: `pkg-${pkg.packageVersion}` },
-    source: "APPROVED_PACKAGE"
+    source: "APPROVED_PACKAGE",
+    provenance: { packageId: pkg.packageId, packageVersion: pkg.packageVersion, contentHash }
   };
 }
 
@@ -111,7 +114,7 @@ export class ApprovedPackageProvider implements ContentProvider {
 
   private byRegistryId(passageId: string): V3Passage | null {
     const r = loadApprovedPackage(this.store, `PKG-${passageId}`);
-    return r.ok ? fromPackage(r.pkg) : null;
+    return r.ok && r.hash ? fromPackage(r.pkg, r.hash) : null;
   }
 
   /** No assessment passages are specified by the content package yet: fail closed. */
@@ -150,7 +153,8 @@ export class FixtureContentProvider implements ContentProvider {
       items: FIXTURE_ITEMS.map((i) => ({ ...i, options: [...i.options] })),
       ideas: ideasFromMeaningUnits(FIXTURE_UNITS),
       bpc: { passageId, text: "Mia loved flying her red kite on the big hill. When the wind pulled it away she was sad, but Ravi found it and brought it back, so a sad day became a happy one because of a kind friend.", qaApproved: true, version: "fixture-1" },
-      source: "FIXTURE"
+      source: "FIXTURE",
+      provenance: { packageId: `FIXTURE-${passageId}`, packageVersion: 1, contentHash: "fixture" }
     };
   }
   bySequence(sequence: number): V3Passage | null {
