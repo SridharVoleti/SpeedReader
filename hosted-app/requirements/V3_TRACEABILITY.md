@@ -128,14 +128,14 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-READY-006 | No retry lottery | TODO | | | |
 | APP-READY-007 | Technical replacement preserves lifecycle phase | TODO | | | |
 | APP-READY-008 | Core progression precedence | TODO | | | |
-| APP-RECENCY-001 | Current evidence principle | TODO | | | |
-| APP-RECENCY-002 | Versioned configurable clocks | TODO | | | |
-| APP-RECENCY-003 | Current pilot defaults | TODO | | | |
-| APP-RECENCY-004 | Independent evidence streams | TODO | | | |
-| APP-RECENCY-005 | First trigger wins | TODO | | | |
-| APP-RECENCY-006 | Version invalidation has precedence | TODO | | | |
-| APP-RECENCY-007 | Revalidation pass/fail | TODO | | | |
-| APP-RECENCY-008 | Audit | TODO | | | |
+| APP-RECENCY-001 | Current evidence principle | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
+| APP-RECENCY-002 | Versioned configurable clocks | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
+| APP-RECENCY-003 | Current pilot defaults | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
+| APP-RECENCY-004 | Independent evidence streams | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
+| APP-RECENCY-005 | First trigger wins | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
+| APP-RECENCY-006 | Version invalidation has precedence | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
+| APP-RECENCY-007 | Revalidation pass/fail | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
+| APP-RECENCY-008 | Audit | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
 | APP-CLOSE-001 | P1500 alone is not mastery | TODO | | | |
 | APP-CLOSE-002 | 150 WPM is not required | TODO | | | |
 | APP-CLOSE-003 | Level Ups are not readiness certification | TODO | | | |
