@@ -47,8 +47,8 @@ function readLaunchedLearner(): LaunchedLearner | null {
 
 // Best-effort push of a passed level to BabySteps' central progress store (see
 // container/docs/app-launch-integration.md). Fire-and-forget: a standalone visit (no `learner`) or any
-// failure here is silently a no-op - localStorage (recordResult, above) is already the source
-// of truth for gameplay by the time this is called.
+// failure here is silently a no-op. LEGACY pre-V3 demo (diagnostics-only): its localStorage record is
+// historical and not the V3 production source of truth, which is server-authoritative.
 function syncLevelPassToBabySteps(level: ProgressionLevel, score: number, learner: LaunchedLearner | null) {
   if (!learner || score < level.passThreshold) return;
 

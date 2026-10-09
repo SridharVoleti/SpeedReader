@@ -1,8 +1,8 @@
 // Starts "our own session for the child" after a verified BabySteps launch (the final step of
-// docs/app-launch-integration.md). Unlike ChessMaster, SpeedReader has no backend database -
-// progress lives in the browser's localStorage - so there is no student/booking table to
-// write to. Instead we mint a self-contained, signed session token and hand it back as a
-// cookie; nothing server-side needs to be persisted to trust it on the next request.
+// docs/app-launch-integration.md). The launch itself needs no student/booking table: we mint a
+// self-contained, signed session token and hand it back as a cookie, so nothing has to be looked
+// up to trust it on the next request. (Learner reading state is a separate, server-authoritative
+// store - Supabase in production - keyed by the learner id in this token.)
 //
 // Signed with its own SESSION_SECRET, deliberately NOT the APP_LAUNCH_BOOTSTRAP_SECRET:
 // that secret is shared with BabySteps for verifying *their* tokens, and must never also be
@@ -10,7 +10,7 @@
 //
 // The same cookie also carries the BabySteps "platform API" grant (see platform-api.ts) once
 // one exists: the rotating access token, and our own running progressVersion/
-// checkpointSequence counters. There's no database to keep that state in either, so it rides
+// checkpointSequence counters. That platform-sync bookkeeping is small and per-session, so it rides
 // along in this same signed, httpOnly cookie and gets re-signed (see reissueSessionToken)
 // every time a progress call changes it.
 
@@ -22,7 +22,7 @@ import type { PlatformGrant } from "./platform-api";
 
 export const SESSION_COOKIE = `${identity.cookiePrefix}_session`;
 /** Non-httpOnly, display-only fields the client reads to greet the learner and namespace
- *  their localStorage progress. Never put anything sensitive in this one. */
+ *  their name/avatar. Never put anything sensitive in this one. */
 export const LEARNER_COOKIE = `${identity.cookiePrefix}_learner`;
 
 const DEFAULT_SESSION_HOURS = 6;

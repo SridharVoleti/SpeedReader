@@ -1,6 +1,6 @@
 // Calls BabySteps' internal "platform API" - the contract that lets an embedded app persist
-// a learner's progress centrally, so it survives a lost device or a cleared browser (not just
-// localStorage). Reverse-engineered directly from the BabySteps source
+// a learner's progress summary centrally on the Babysteps side (separate from SpeedReader's own
+// server-authoritative learner state). Reverse-engineered directly from the BabySteps source
 // (src/lib/authorization/platform-api-contracts.ts, src/lib/app-authorization/service.ts,
 // src/lib/app-progress/service.ts) - no app (ChessMasters included) had implemented this
 // before SpeedReader, so there is no reference handler to copy.
@@ -15,7 +15,7 @@
 //
 // Every function here throws on failure. Callers (see app/api/babysteps-progress/route.ts and
 // handle-app-launch.ts) always treat that as "sync skipped this time", never as a reason to
-// block gameplay - localStorage remains the source of truth regardless of what BabySteps says.
+// block gameplay - SpeedReader's own learner state is unaffected by what BabySteps says.
 
 import { randomUUID } from "crypto";
 import { AppLaunchError } from "./errors";
