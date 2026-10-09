@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { diffReadinessRuleset } from "../../../lib/v2/readiness-ruleset-diff";
 import { READINESS_RULES, RS_KEYS } from "../../../lib/v2/p10-readiness";
@@ -40,5 +40,15 @@ describe("readiness rule table conformance diff (the tool to run against the app
         "RS12",
       ]
     `);
+  });
+
+  const V056 = "D:/Sridhar/Projects/SpeedReader_CC/SpeedReader_W1_BandA_v0.56_FINAL_FREEZE_CANDIDATE_FULL_PACKAGE/SpeedReader_W1_BandA_RS_Model_v0.56.csv";
+  it.skipIf(!existsSync(V056))("the v0.56 freeze-candidate package does not conform: 8 identical, 7 differ (see requirements/P10_READINESS_V056_DIFF.md)", () => {
+    const d = diffReadinessRuleset(readFileSync(V056, "utf8"));
+    expect(d.candidateVersions).toEqual(["v0.56"]);
+    expect(d.identical).toEqual(["RS01", "RS02", "RS06", "RS08", "RS11", "RS13", "RS14", "RS15"]);
+    expect(d.different.map((x) => x.rs)).toEqual(["RS03", "RS04", "RS05", "RS07", "RS09", "RS10", "RS12"]);
+    expect(d.missingInCandidate).toEqual([]);
+    expect(d.conforms).toBe(false);
   });
 });
