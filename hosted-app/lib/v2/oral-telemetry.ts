@@ -346,3 +346,19 @@ export function roundComposite(history: OralHistory, learnerId: string, round: n
   const deltas = Object.values(perRs).filter((d): d is number => d !== null);
   return { round, meanAccuracyDelta: deltas.length ? deltas.reduce((a, b) => a + b, 0) / deltas.length : null, perRs };
 }
+
+/**
+ * APP-REPORT-004: a 15-RS composite for P level `p` exists only once EVERY RS has an entry at that same P level.
+ * Mean of each RS's accuracy delta against its own baseline; unlike raw RS metrics are never averaged.
+ */
+export function pLevelComposite(history: OralHistory, learnerId: string, p: number): { p: number; meanAccuracyDelta: number | null; perRs: Record<RsId, number | null> } | null {
+  const perRs = {} as Record<RsId, number | null>;
+  for (const rs of RS_IDS) {
+    const entry = history.filter((e) => e.learnerId === learnerId && e.rsId === rs && e.p === p).sort((a, b) => b.round - a.round)[0];
+    if (!entry) return null;
+    const base = rsBaseline(history, learnerId, rs);
+    perRs[rs] = base && base.finalAccuracy !== null && entry.finalAccuracy !== null ? entry.finalAccuracy - base.finalAccuracy : null;
+  }
+  const deltas = Object.values(perRs).filter((d): d is number => d !== null);
+  return { p, meanAccuracyDelta: deltas.length ? deltas.reduce((a, b) => a + b, 0) / deltas.length : null, perRs };
+}

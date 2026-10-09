@@ -93,7 +93,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-BPC-004 | Not an answer-key dump | IMPLEMENTED_TESTED | lib/v2/bpc-style.ts | v2/fr-026-bpc-story-style.test.ts |  |
 | APP-BPC-005 | Fidelity | IMPLEMENTED_TESTED | lib/v2/bpc-fidelity.ts | v2/fr-027-bpc-fidelity.test.ts |  |
 | APP-BPC-006 | Cross-World capability | IMPLEMENTED_TESTED | lib/v2/expression-by-world.ts | v2/fr-028-permanent-features.test.ts |  |
-| APP-BPC-007 | Controlled production | TODO | | | |
+| APP-BPC-007 | Controlled production | IMPLEMENTED_TESTED | lib/v2/best-comprehension.ts | v2/fr-025-bpc-after-scoring.test.ts | Missing/unapproved BPC is a content error; no runtime generation path exists; locked evidence immutable. |
 | APP-UX-001 | Scores are private | PARTIAL | lib/v2/learner-feedback.ts | v2/fr-029-numeric-private.test.ts | Domain tested; learner UI pending. |
 | APP-UX-002 | GREEN feedback | PARTIAL | lib/v2/learner-feedback.ts | v2/fr-030-green-celebration.test.ts | Domain tested; learner UI pending. |
 | APP-UX-003 | NOT_GREEN feedback | PARTIAL | lib/v2/learner-feedback.ts | v2/fr-031-below-75-positive.test.ts | Domain tested; learner UI pending. |
@@ -160,15 +160,15 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-DB-008 | Readiness cycles/forms | PARTIAL | supabase/migrations/0002 (sr_readiness_*) | v2/app-ready-lifecycle.test.ts (domain) | Form-reuse unique constraint authored; not applied. |
 | APP-DB-009 | Calibration versions | PARTIAL | supabase/migrations/0002 (sr_calibration_version) | v2/fr-021-weighting-lifecycle.test.ts (domain) | Schema authored; not applied. |
 | APP-DB-010 | Content package identity | PARTIAL | supabase/migrations/0002 (sr_content_package) | sr/sr-039-version-hashes.test.ts (domain) | Schema authored; not applied. |
-| APP-REPORT-001 | Child vs parent visibility | TODO | | | |
-| APP-REPORT-002 | Personal progress | TODO | | | |
-| APP-REPORT-003 | No peer rank | TODO | | | |
-| APP-REPORT-004 | Complete-round composites only | TODO | | | |
-| APP-CAL-001 | Versioned pilot parameters | TODO | | | |
-| APP-CAL-002 | Frozen 75% rule | TODO | | | |
-| APP-CAL-003 | Post-launch calibration evidence | TODO | | | |
-| APP-CAL-004 | No automatic threshold mutation | TODO | | | |
-| APP-CAL-005 | Historical replay | TODO | | | |
+| APP-REPORT-001 | Child vs parent visibility | IMPLEMENTED_TESTED | lib/v2/parent-report.ts | v2/app-report-parent.test.ts | Report model + parent copy scanned; parent-facing page/route not built yet. |
+| APP-REPORT-002 | Personal progress | IMPLEMENTED_TESTED | lib/v2/parent-report.ts | v2/app-report-parent.test.ts | All seven listed content areas present; News Reader separate. |
+| APP-REPORT-003 | No peer rank | IMPLEMENTED_TESTED | lib/v2/parent-report.ts; lib/v2/personal-trajectory.ts | v2/app-report-parent.test.ts | assertPersonalOnly on every report + no comparative field in the shape. |
+| APP-REPORT-004 | Complete-round composites only | IMPLEMENTED_TESTED | lib/v2/oral-telemetry.ts (pLevelComposite); lib/v2/parent-report.ts | v2/app-report-parent.test.ts; v2/app-oral-telemetry.test.ts | Composite only when all 15 RS share the P level. |
+| APP-CAL-001 | Versioned pilot parameters | IMPLEMENTED_TESTED | lib/v2/threshold-lifecycle.ts; calibration.ts; evidence-recency.ts; initial-assessment.ts; oral-telemetry.ts | v2/fr-046-threshold-lifecycle.test.ts; v2/fr-045-evidence-recency.test.ts | Registry catalogs every pilot parameter with a version+state. Oral-telemetry pilot values are versioned in their own config but not yet listed in THRESHOLD_REGISTRY. |
+| APP-CAL-002 | Frozen 75% rule | IMPLEMENTED_TESTED | lib/v2/comprehension-threshold.ts; calibration-lifecycle.ts | v2/fr-021-weighting-lifecycle.test.ts; v2/fr-046-threshold-lifecycle.test.ts | Frozen; calibration cannot redefine it. |
+| APP-CAL-003 | Post-launch calibration evidence | PARTIAL | lib/sr/calibration-report.ts | sr/sr-007-calibration-report.test.ts | Covers cohort, distribution, passage and RS splits. Missing device/browser, ASR-uncertainty, time-to-Level-Up, practice frequency, false-ready and stamina-transition cuts. |
+| APP-CAL-004 | No automatic threshold mutation | IMPLEMENTED_TESTED | lib/sr/pilot-threshold.ts; lib/v2/threshold-lifecycle.ts | sr/sr-006-pilot-threshold.test.ts; v2/fr-046-threshold-lifecycle.test.ts | Report is informational; changes need audited approval. |
+| APP-CAL-005 | Historical replay | IMPLEMENTED_TESTED | lib/v2/calibration.ts; lib/v2/attempt-record.ts; lib/v2/explainability.ts | v2/fr-021-weighting-lifecycle.test.ts; v2/fr-049-explainability.test.ts; v2/app-data-attempt-and-decisions.test.ts | Versions stored per attempt; decisions replay deterministically. Replay under non-current recency/ASR policy versions relies on version resolvers for those policies (only calibration has history today). |
 | APP-NFR-001 | Responsive learner journey | TODO | | | |
 | APP-NFR-002 | Microphone permissions | TODO | | | |
 | APP-NFR-003 | Capability detection | TODO | | | |
