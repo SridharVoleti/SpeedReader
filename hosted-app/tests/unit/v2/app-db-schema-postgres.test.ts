@@ -135,7 +135,7 @@ describe("evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002.
     const db = await migratedDb();
     await insertLearner(db, afterFour());
     const next = step(afterFour(), 4);
-    await commit(db, "kid", 1, "a4", next, next.ledger[4]);
+    await commit(db, "kid", 1, "a4", next, { attemptId: "a4", attemptType: "NEW_PROGRESSION" }); // bare record: nothing projected, so the constraint is exercised directly
     const ins = (raw: string | null, confirmed: string | null) =>
       db.query("insert into sr_spoken_evidence(learner_id, attempt_id, status, raw_transcript, confirmed_transcript) values ('kid','a4','SCORED',$1,$2)", [raw, confirmed]);
     await expect(ins(null, "the red kite")).rejects.toThrow();
@@ -169,7 +169,7 @@ describe("evidence is append-only and constrained (APP-DATA-003/004, APP-DB-002.
     const db = await migratedDb();
     await insertLearner(db, afterFour());
     const next = step(afterFour(), 4);
-    await commit(db, "kid", 1, "a4", next, next.ledger[4]);
+    await commit(db, "kid", 1, "a4", next, { attemptId: "a4", attemptType: "NEW_PROGRESSION" }); // bare record: nothing projected
     await expect(db.query("insert into sr_structured_response(learner_id, attempt_id, item_id, p_level, score) values ('kid','a4','q1',11,0.5)")).rejects.toThrow();
     await expect(db.query("insert into sr_structured_response(learner_id, attempt_id, item_id, p_level, score) values ('kid','a4','q1',3,1.5)")).rejects.toThrow();
     await db.query("insert into sr_structured_response(learner_id, attempt_id, item_id, p_level, score) values ('kid','a4','q1',3,0.5)");
