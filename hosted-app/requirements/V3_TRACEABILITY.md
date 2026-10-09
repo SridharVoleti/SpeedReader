@@ -20,15 +20,15 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-NORTH-001 | Three outcomes | TODO | | | |
 | APP-NORTH-002 | Confidence-first | TODO | | | |
 | APP-NORTH-003 | Personal trajectory | TODO | | | |
-| APP-PLAT-001 | Consumer App Container is the mandatory host | TODO | | | |
-| APP-PLAT-002 | Typed manifest contract | TODO | | | |
-| APP-PLAT-003 | Standard launch protocol | TODO | | | |
-| APP-PLAT-004 | No duplicate authentication system | TODO | | | |
-| APP-PLAT-005 | No duplicate billing | TODO | | | |
-| APP-PLAT-006 | Single active learner/device rule | TODO | | | |
-| APP-PLAT-007 | Platform session envelope | TODO | | | |
-| APP-PLAT-008 | Review-session integration | TODO | | | |
-| APP-PLAT-009 | Accidental-close resume | TODO | | | |
+| APP-PLAT-001 | Consumer App Container is the mandatory host | IMPLEMENTED_TESTED | container/app-contract.ts; hosted-app/app.identity.ts; app.manifest.ts | container/tests/app-launch.spec.ts (18/18 pass) | Container has no SpeedReader logic; hosted-app declares identity+manifest. |
+| APP-PLAT-002 | Typed manifest contract | IMPLEMENTED_TESTED | hosted-app/app.manifest.ts; app.identity.ts | container/tests/app-launch.spec.ts (18/18 pass) | All required fields present. Manifest still lists legacy demo pages - tracked under APP-NFR-007/APP-WORLD stale routes. |
+| APP-PLAT-003 | Standard launch protocol | PARTIAL | container/routes/{health,launch,return,progress-sync}.ts; container/launch/* | container/tests/app-launch.spec.ts (18/18 pass) | health/launch/return/bootstrap/progress sync present+tested. /identity is a reserved 501 stub. |
+| APP-PLAT-004 | No duplicate authentication system | IMPLEMENTED_TESTED | container/launch/* | container/tests/app-launch.spec.ts (18/18 pass); grep: no login/signup code | Trusted learner context from signed launch exchange only. |
+| APP-PLAT-005 | No duplicate billing | IMPLEMENTED_TESTED | (absence) | grep: no billing/checkout/payment code in app/container/lib/ui | Entitlement is platform-side. |
+| APP-PLAT-006 | Single active learner/device rule | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | Domain registry enforces one live session per learner. Needs wiring to launch/session cookie + durable store (in-memory now). |
+| APP-PLAT-007 | Platform session envelope | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | 45min/2 per week/every-6th configured+tested; platform remains authoritative. Not yet wired into launch route. |
+| APP-PLAT-008 | Review-session integration | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | attemptRulesForSession domain rule tested; practice selection wiring is APP-PRAC/Phase 9. |
+| APP-PLAT-009 | Accidental-close resume | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | Resume window/idempotent-replay domain logic tested; not yet wired to routes/persistence. |
 | APP-PLAT-010 | Return to Babysteps | TODO | | | |
 | APP-INFRA-001 | Web-first, mobile-required | TODO | | | |
 | APP-INFRA-002 | Reference browser | TODO | | | |

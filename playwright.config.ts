@@ -16,6 +16,10 @@ export default defineConfig({
   webServer: {
     command: "npm run start -- -p 3001",
     env: {
+      // Hermetic: a developer's .env.local must never leak real BabySteps launch config into the tests.
+      APP_LAUNCH_CLIENT_ID: "", APP_LAUNCH_APP_ID: "", APP_LAUNCH_ENVIRONMENT: "", APP_LAUNCH_DEPLOYMENT_ID: "",
+      APP_LAUNCH_APP_KEY: "", APP_LAUNCH_EXCHANGE_URL: "", APP_LAUNCH_RETURN_URL: "",
+      APP_LAUNCH_SIGNING_PRIVATE_KEY: "", APP_LAUNCH_BOOTSTRAP_SECRET: "",
       SR_APPROVED_ROOT: resolve(SR_E2E, "approved"),
       SR_WIP_ROOT: resolve(SR_E2E, "wip"),
       SR_DATA_DIR: resolve(SR_E2E, "data")
