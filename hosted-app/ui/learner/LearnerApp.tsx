@@ -10,6 +10,7 @@ import { api, friendlyProblem, type Feedback, type StoryView } from "./api";
 import { levelUpSyncPayload } from "../../lib/v2/babysteps-sync";
 import Story, { type StoryMode, type StoryResult } from "./Story";
 import NewsReader from "./NewsReader";
+import Retention from "./Retention";
 import styles from "./learner.module.css";
 
 type Next =
@@ -25,6 +26,7 @@ type View =
   | { k: "welcome" }
   | { k: "home"; next: Next }
   | { k: "news" }
+  | { k: "retention" }
   | { k: "story"; mode: StoryMode; wpm: number; story: StoryView; key: string }
   | { k: "feedback"; feedback: Feedback; attemptId: string; mode: "progress" | "practice" };
 
@@ -40,13 +42,15 @@ export default function LearnerApp() {
   const [speed, setSpeed] = useState<number | null>(null);
   const [startSpeed, setStartSpeed] = useState<number | null>(null);
   const [storiesRead, setStoriesRead] = useState(0);
+  const [remembered, setRemembered] = useState(0);
+  const [retentionDue, setRetentionDue] = useState(false);
   const [bpcText, setBpcText] = useState<string | null>(null);
   const [launched, setLaunched] = useState(false);
   const booted = useRef(false);
 
   const refreshSpeed = useCallback(async () => {
-    const p = await api<{ currentWpm: number; startingWpm: number; storiesRead: number }>("GET", "progress");
-    if (p.ok) { setSpeed(p.data.currentWpm); setStartSpeed(p.data.startingWpm); setStoriesRead(p.data.storiesRead); }
+    const p = await api<{ currentWpm: number; startingWpm: number; storiesRead: number; storiesRemembered: number; retentionDue: boolean }>("GET", "progress");
+    if (p.ok) { setSpeed(p.data.currentWpm); setStartSpeed(p.data.startingWpm); setStoriesRead(p.data.storiesRead); setRemembered(p.data.storiesRemembered); setRetentionDue(p.data.retentionDue); }
   }, []);
 
   const goHome = useCallback(async () => {
@@ -130,7 +134,7 @@ export default function LearnerApp() {
 
   return (
     <main className={styles.shell}>
-      <OutcomeHeader speed={view.k === "welcome" ? null : speed} startSpeed={view.k === "welcome" ? null : startSpeed} />
+      <OutcomeHeader speed={view.k === "welcome" ? null : speed} startSpeed={view.k === "welcome" ? null : startSpeed} remembered={view.k === "welcome" ? 0 : remembered} />
 
       {view.k === "boot" && <section className={styles.card} role="status"><p>Getting your stories ready...</p></section>}
 
@@ -163,10 +167,13 @@ export default function LearnerApp() {
           )}
           {view.next.activity === "READINESS" && <p>Your reading check-in is coming up soon.</p>}
           {view.next.activity === "NONE" && <p>{WAITING_COPY[view.next.reason] ?? "Nothing to read right now. Come back soon!"}</p>}
+          {retentionDue && <div className={styles.row}><button type="button" className={styles.secondary} onClick={() => setView({ k: "retention" })} data-testid="open-retention">Remember a story you read</button></div>}
           {storiesRead > 0 && <div className={styles.row}><button type="button" className={styles.secondary} onClick={() => setView({ k: "news" })} data-testid="open-news-reader">Practise reading aloud</button></div>}
           {launched && <div className={styles.row}><a href="/return" className={styles.secondary} data-testid="return-to-babysteps">Back to Babysteps</a></div>}
         </section>
       )}
+
+      {view.k === "retention" && <Retention onExit={() => void goHome()} onProblem={(message) => setView({ k: "problem", message })} />}
 
       {view.k === "news" && <NewsReader onExit={() => void goHome()} onProblem={(message) => setView({ k: "problem", message })} />}
 

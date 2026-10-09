@@ -20,6 +20,7 @@ import { COUNT100_VERSION, count100 } from "../lib/sr/pipeline-v2/count100";
 import { classifyClient } from "../lib/v2/client-class";
 import { registryCoordinateFor } from "../lib/v2/delivery-order";
 import { calibrationAnalytics } from "../lib/v2/calibration-analytics";
+import { RETENTION_POLICY_V1, type RetentionPolicy } from "../lib/v2/retention-check";
 import type { NewsReaderAttempt } from "../lib/v2/news-reader";
 
 export type Verified = { learnerId: string; sessionId: string; deviceId: string; entitlement?: { active: boolean; scopes: string[] } | null };
@@ -46,17 +47,30 @@ export function makeProvider(env: Record<string, string | undefined> = process.e
  * Wire the service. With Supabase credentials every port (learner state, assessment, sessions) is Supabase-backed and
  * durable on serverless hosting; otherwise the file adapters under `dataDir` are used (local/dev/tests).
  */
-export function buildDeps(dataDir: string, content: ContentProvider, supabase: SupabaseConfig | null = null): Deps {
+export function buildDeps(dataDir: string, content: ContentProvider, supabase: SupabaseConfig | null = null, retentionPolicy: RetentionPolicy = RETENTION_POLICY_V1): Deps {
   const repo: LearnerRepository = supabase ? new SupabaseLearnerRepository(supabase) : new FileLearnerRepository(join(dataDir, "learners"));
   const assessments = supabase ? new SupabaseAssessmentStore(supabase) : new FileAssessmentStore(join(dataDir, "assessments"));
   const sessionStore = supabase ? new SupabaseSessionPersistence(supabase) : new FileSessionPersistence(join(dataDir, "sessions"));
   const bpc = (passageId: string): BpcContent | null => content.byPassageId(passageId)?.bpc ?? null;
-  return { repo, content, service: new LearnerService({ repo, assessments, sessions: new SessionRegistry(), sessionStore, bpcCatalog: bpc }) };
+  return { repo, content, service: new LearnerService({ repo, assessments, sessions: new SessionRegistry(), sessionStore, retentionPolicy, bpcCatalog: bpc }) };
 }
 
 export function getDeps(env: Record<string, string | undefined> = process.env): Deps {
-  if (!singleton) singleton = buildDeps(env.SR_DATA_DIR ?? join(process.cwd(), ".data"), makeProvider(env), supabaseConfigFromEnv(env));
+  if (!singleton) singleton = buildDeps(env.SR_DATA_DIR ?? join(process.cwd(), ".data"), makeProvider(env), supabaseConfigFromEnv(env), retentionPolicyFromEnv(env));
   return singleton;
+}
+
+/**
+ * Production always uses the pilot schedule. Only where diagnostics are enabled (tests/previews) may the first check be
+ * brought forward, so the memory-check journey can be exercised without waiting a day.
+ */
+export function retentionPolicyFromEnv(env: Record<string, string | undefined> = process.env): RetentionPolicy {
+  const raw = env.SR_RETENTION_FIRST_CHECK_HOURS;
+  if (!diagnosticsEnabled(env) || raw === undefined || raw === "") return RETENTION_POLICY_V1;
+  const first = Number(raw);
+  if (!Number.isFinite(first) || first < 0) return RETENTION_POLICY_V1;
+  const [, ...rest] = RETENTION_POLICY_V1.intervalsHours;
+  return { ...RETENTION_POLICY_V1, version: `${RETENTION_POLICY_V1.version}+test-first-${first}h`, intervalsHours: [first, ...rest] };
 }
 
 export function resetServiceForTests(): void { singleton = null; }
@@ -212,6 +226,25 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
       return respond(await service.completePractice(ctx, { attemptId: b.attemptId, passageId: b.passageId, displayedWpm: snap.learner.core.wpm }));
     }
 
+    case "GET retention/next": {
+      const r = await service.retentionNext(ctx);
+      if (isError(r)) return respond(r);
+      if (!r.due) return json({ ok: false, error: "nothing to remember right now" }, 409);
+      const passage = content.byPassageId(r.due.passageId);
+      if (!passage) return unavailable();
+      // the story text is deliberately NOT sent: recall must come from memory, so only the questions are returned
+      return json({ ok: true, due: { passageId: r.due.passageId, checkNumber: r.due.checkNumber }, items: learnerView(passage).items });
+    }
+    case "POST retention/submit": {
+      const b = await body<{ attemptId: string; passageId: string; answers: (number | null)[] }>(req);
+      if (!b?.attemptId || !b.passageId || !Array.isArray(b.answers)) return json({ error: "attemptId, passageId and answers are required" }, 400);
+      const passage = content.byPassageId(b.passageId);
+      if (!passage) return unavailable();
+      const scores = scoreItems(passage, b.answers);
+      const r = await service.completeRetention(ctx, { attemptId: b.attemptId, passageId: b.passageId, correct: scores.filter((x) => x.score === 1).length, total: scores.length });
+      // retrieval first, then feedback: the refresher is shown only after the learner has answered from memory
+      return isError(r) ? respond(r) : json({ ...r, refresher: passage.bpc.qaApproved ? passage.bpc.text : null });
+    }
     case "GET bpc": return respond(await service.bpc(ctx, url.searchParams.get("attemptId") ?? ""));
     case "GET news-reader/passages": {
       const snap = await repo.load(ctx.learnerId);

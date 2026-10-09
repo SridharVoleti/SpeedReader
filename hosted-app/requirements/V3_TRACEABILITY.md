@@ -17,6 +17,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 
 
 
+
 ## Status summary (all 194 requirements evaluated; last updated 2026-10-09)
 
 | Status | Count |
@@ -25,7 +26,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | PARTIAL | 5 |
 | BLOCKED | 1 |
 
-**Verification (2026-10-09):** `vitest` 1546 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright 477 pass / 6 fail: all v3 learner specs pass on mobile, desktop and constrained-browser projects; the only failing specs are `progression.spec.ts` (legacy 36-level demo, now at `/legacy-demo`; confirmed failing identically at the pre-work baseline commit 730af66). Playwright runs the last `npm run build`: rebuild before e2e.
+**Verification (2026-10-09):** `vitest` 1580 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright 513 pass / 6 fail: all v3 learner specs pass on mobile, desktop and constrained-browser projects; the only failing specs are `progression.spec.ts` (legacy 36-level demo, now at `/legacy-demo`; confirmed failing identically at the pre-work baseline commit 730af66). Playwright runs the last `npm run build`: rebuild before e2e.
 
 ### What is real vs. assumed
 - The learner journey (`/`) runs on the v3 engine through `/api/v3/*`: assessment, one-word reader, questions, explanation (typed or spoken), feedback/Level Up, BPC, familiar practice, News Reader. Scoring and evidence are server-side only.
@@ -55,7 +56,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-GOV-003 | Requirement states | IMPLEMENTED_TESTED | lib/v2/threshold-lifecycle.ts | v2/fr-046-threshold-lifecycle.test.ts | Lifecycle states + frozen/pilot registry. |
 | APP-GOV-004 | No silent product redesign | IMPLEMENTED_TESTED | lib/v2/stale-rules.ts; supersession.ts | v2/ac-c01-stale-rules.test.ts; v2/fr-039-oral-gate-superseded.test.ts | Superseded rules guarded from restoration. |
 | APP-GOV-005 | Historical outcomes remain historical | IMPLEMENTED_TESTED | lib/v2/calibration.ts; attempt-record.ts | v2/fr-021-weighting-lifecycle.test.ts; v2/fr-047-attempt-record.test.ts | Versions stored with every attempt; history never rewritten. |
-| APP-NORTH-001 | Three outcomes | IMPLEMENTED_TESTED | ui/learner/OutcomeHeader.tsx; lib/v2/book-goal.ts | v2/app-ui-book-goal.test.ts; tests/ui/learner-v3-outcome.spec.ts | The learner header now states the outcome - 'Read a 200-page book in under 3 hours - with understanding and retention.' - on every screen, instead of a speed figure. |
+| APP-NORTH-001 | Three outcomes | IMPLEMENTED_TESTED | ui/learner/OutcomeHeader.tsx; ui/learner/Retention.tsx; lib/v2/book-goal.ts; lib/v2/retention-check.ts; api/v3.ts (retention/*) | v2/app-ui-book-goal.test.ts; v2/app-retention-check.test.ts; v2/app-api-v3-retention.test.ts; tests/ui/learner-v3-outcome.spec.ts; tests/ui/learner-v3-retention.spec.ts | Header leads with the outcome ('Read a 200-page book in under 3 hours - with understanding and retention.'): book time today vs goal, journey bar, time saved, and a 'Memory check' line that appears only once retention has actually been measured. Retention = spaced recall checks (24h / 7d / 30d, PROVISIONAL_PILOT, 75% remembered) answered from memory without re-reading, then a refresher; separate evidence namespace, never progression. Retention log lives inside learner state (no dedicated table yet); parent report has a retention section. |
 | APP-NORTH-002 | Confidence-first | IMPLEMENTED_TESTED | ui/learner/*; lib/v2/learner-language.ts | tests/ui/learner-v3.spec.ts | Rendered learner screens scanned on every step: encouraging copy, no internal or negative labels. |
 | APP-NORTH-003 | Personal trajectory | IMPLEMENTED_TESTED | lib/v2/personal-trajectory.ts | v2/fr-009-personal-trajectory.test.ts | Peer/age/universal-rate comparison rejected. |
 | APP-PLAT-001 | Consumer App Container is the mandatory host | IMPLEMENTED_TESTED | container/app-contract.ts; hosted-app/app.identity.ts; app.manifest.ts | container/tests/app-launch.spec.ts (18/18 pass) | Container has no SpeedReader logic; hosted-app declares identity+manifest. |

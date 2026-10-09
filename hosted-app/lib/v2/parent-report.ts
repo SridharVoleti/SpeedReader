@@ -15,6 +15,7 @@ import type { ReadinessPhase, ReadinessStream } from "./readiness-lifecycle";
 import { twoReadCoaching } from "./news-reader-coaching";
 import { passageWords, WORLD1_LAST_PASSAGE } from "./stamina";
 import { learnerLanguageViolations } from "./learner-language";
+import { retentionSummary } from "./retention-check";
 
 export const READINESS_PARENT_COPY: Readonly<Record<ReadinessPhase, string>> = Object.freeze({
   PRIMARY_DUE: "A reading check-in is coming up.",
@@ -39,6 +40,8 @@ export type ParentReport = {
   composite: { p: number; meanAccuracyDelta: number | null } | { pending: string };
   readiness: { streamId: string; status: string }[];
   /** News Reader improvement is reported on its own and never folded into any other figure. */
+  /** Spaced memory checks, reported on their own: how many stories were still remembered after time away. */
+  retention: { checks: number; storiesChecked: number; storiesRemembered: number; summary: string | null };
   newsReader: { passages: { passageId: string; improved: boolean | null; coaching: string | null }[] };
 };
 
@@ -84,6 +87,10 @@ export function buildParentReport(input: ParentReportInput): ParentReport {
     competencies,
     composite,
     readiness: (input.readiness ?? []).map((s) => ({ streamId: s.streamId, status: READINESS_PARENT_COPY[s.phase] })),
+    retention: (() => {
+      const r = retentionSummary(learner);
+      return { ...r, summary: r.storiesChecked ? `Your child still remembered ${r.storiesRemembered} of ${r.storiesChecked} ${r.storiesChecked === 1 ? "story" : "stories"} when asked after time away.` : null };
+    })(),
     newsReader: {
       passages: passageIds.map((passageId) => {
         const r = twoReadCoaching(learner.newsReader, passageId);
@@ -101,6 +108,7 @@ export function parentCopy(report: ParentReport): string[] {
   if (report.practice.status) out.push(report.practice.status);
   if ("pending" in report.composite) out.push(report.composite.pending);
   for (const r of report.readiness) out.push(r.status);
+  if (report.retention.summary) out.push(report.retention.summary);
   for (const p of report.newsReader.passages) if (p.coaching) out.push(p.coaching);
   return out;
 }

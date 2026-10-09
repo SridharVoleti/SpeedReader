@@ -8,7 +8,7 @@ import identity from "../../app.identity";
 import { OUTCOME_HEADLINE, bookGoalView } from "../../lib/v2/book-goal";
 import styles from "./learner.module.css";
 
-export default function OutcomeHeader({ speed, startSpeed }: { speed: number | null; startSpeed: number | null }) {
+export default function OutcomeHeader({ speed, startSpeed, remembered = 0 }: { speed: number | null; startSpeed: number | null; remembered?: number }) {
   const goal = speed !== null && startSpeed !== null ? bookGoalView(speed, startSpeed) : null;
   const pct = goal ? Math.round(goal.journey * 100) : 0;
 
@@ -27,6 +27,11 @@ export default function OutcomeHeader({ speed, startSpeed }: { speed: number | n
           <p className={styles.goalLine} data-testid="book-goal-line">
             Goal: {goal.goalText}.{goal.savedText ? ` You have already saved ${goal.savedText}.` : " Every story gets you closer."}
           </p>
+          {remembered > 0 && (
+            <p className={styles.goalLine} data-testid="retention-line">
+              Memory check: you remembered {remembered} {remembered === 1 ? "story" : "stories"} well after time away.
+            </p>
+          )}
         </div>
       )}
     </header>

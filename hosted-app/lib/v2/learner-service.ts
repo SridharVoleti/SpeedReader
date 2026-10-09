@@ -25,6 +25,7 @@ import { GREEN_THRESHOLD } from "./comprehension-threshold";
 import { RECENCY_POLICY_V1 } from "./evidence-recency";
 import { ORAL_CONFIG_V1 } from "./oral-telemetry";
 import type { LearnerRepository, MaybePromise, StoredSnapshot } from "./learner-repository";
+import { RETENTION_POLICY_V1, recordRetentionCheck, retentionDue, retentionSummary, type RetentionDue, type RetentionPolicy } from "./retention-check";
 import type { ReadinessStream } from "./readiness-lifecycle";
 
 // ---------------------------------------------------------------------------------------------------- ports
@@ -48,6 +49,8 @@ export type ServiceDeps = {
   sessions: SessionRegistry;
   /** Optional durable session storage. Without it sessions live only in this process. */
   sessionStore?: SessionPersistence;
+  /** Spaced memory-check schedule. Defaults to the pilot policy. */
+  retentionPolicy?: RetentionPolicy;
   /** Approved BPC content: a fixed list, or a per-passage lookup backed by the content provider. */
   bpcCatalog: readonly BpcContent[] | ((passageId: string) => BpcContent | null);
   referenceAudio?: readonly ReferenceAudio[];
@@ -442,12 +445,46 @@ export class LearnerService {
   // ---- APP-API-008 progress ----------------------------------------------------------------------------
 
   /** Child-safe progress: the earned WPM and canonical progress, nothing internal. */
-  async progress(ctx: Ctx): Promise<Ok<{ currentWpm: number; startingWpm: number; storiesRead: number }> | ServiceError> {
+  async progress(ctx: Ctx): Promise<Ok<{ currentWpm: number; startingWpm: number; storiesRead: number; storiesRemembered: number; retentionDue: boolean }> | ServiceError> {
     const snap = await this.deps.repo.load(ctx.learnerId);
     if (!snap) return fail(409, "initial assessment required");
-    const view = { currentWpm: snap.learner.core.wpm, startingWpm: snap.learner.baselineWpm, storiesRead: snap.learner.canonicalPointer - 1 };
+    const policy = this.deps.retentionPolicy ?? RETENTION_POLICY_V1;
+    const view = {
+      currentWpm: snap.learner.core.wpm, startingWpm: snap.learner.baselineWpm, storiesRead: snap.learner.canonicalPointer - 1,
+      storiesRemembered: retentionSummary(snap.learner).storiesRemembered,
+      retentionDue: retentionDue(snap.learner, this.now(), policy) !== null
+    };
     assertNoInternalLeak(view);
     return { ok: true, ...view };
+  }
+
+  // ---- spaced memory checks (retention): their own evidence namespace, never progression ----------------
+
+  async retentionNext(ctx: Ctx): Promise<Ok<{ due: RetentionDue | null }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    const snap = await this.deps.repo.load(ctx.learnerId);
+    if (!snap) return fail(409, "initial assessment required");
+    return { ok: true, due: retentionDue(snap.learner, this.now(), this.deps.retentionPolicy ?? RETENTION_POLICY_V1) };
+  }
+
+  async completeRetention(ctx: Ctx, req: { attemptId: string; passageId: string; correct: number; total: number }): Promise<Ok<{ feedback: { message: string; remembered: boolean }; replayed: boolean }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    const snap = await this.deps.repo.load(ctx.learnerId);
+    if (!snap) return fail(409, "initial assessment required");
+    const policy = this.deps.retentionPolicy ?? RETENTION_POLICY_V1;
+    const r = recordRetentionCheck(snap.learner, { ...req, sessionId: ctx.sessionId, at: this.now() }, policy);
+    if (!r.ok) return fail(/not due/.test(r.error) ? 409 : 400, r.error);
+    if (!r.replayed) {
+      const committed = await this.deps.repo.commit(ctx.learnerId, r.learner, { expectedVersion: snap.version, idempotencyKey: `retention:${req.attemptId}` });
+      if (!committed.ok) return fail(committed.reason === "VERSION_CONFLICT" ? 409 : 500, committed.reason);
+      await this.checkpoint(ctx, "RETENTION_CHECK", (r.learner.retentionLog ?? []).length, `retention:${req.attemptId}`);
+    }
+    const message = r.record.remembered
+      ? "You remember this story really well - great memory!"
+      : "Some of this story has faded, and that is completely normal. Here is a quick refresher so it sticks.";
+    const feedback = { message, remembered: r.record.remembered };
+    assertNoInternalLeak({ message });
+    return { ok: true, feedback, replayed: r.replayed };
   }
 
   /** Parent/internal detail: only when the caller has been separately authorized by the transport layer. */

@@ -89,3 +89,20 @@ describe("APP-REPORT-004 complete-round composites only", () => {
     expect(r.competencies.RS03.sinceBaseline).toEqual({ state: "NO_BASELINE" });
   });
 });
+
+describe("retention in the parent report", () => {
+  it("reports memory checks on their own, in parent language, and says nothing before any check", async () => {
+    const { recordRetentionCheck } = await import("../../../lib/v2/retention-check");
+    const base = play([0.9, 0.9]);
+    expect(buildParentReport({ learner: base }).retention).toEqual({ checks: 0, storiesChecked: 0, storiesRemembered: 0, summary: null });
+    const later = (h: number) => new Date(Date.parse(base.ledger[0].completedAt) + h * 3_600_000).toISOString();
+    const a = recordRetentionCheck(base, { attemptId: "r1", passageId: "P1", correct: 4, total: 4, sessionId: "S", at: later(30) });
+    if (!a.ok) throw new Error(a.error);
+    const b = recordRetentionCheck(a.learner, { attemptId: "r2", passageId: "P2", correct: 1, total: 4, sessionId: "S", at: later(31) });
+    if (!b.ok) throw new Error(b.error);
+    const r = buildParentReport({ learner: b.learner });
+    expect(r.retention).toMatchObject({ checks: 2, storiesChecked: 2, storiesRemembered: 1, summary: "Your child still remembered 1 of 2 stories when asked after time away." });
+    expect(parentCopyViolations(r)).toEqual([]);
+    expect(r.personal).toEqual(buildParentReport({ learner: base }).personal); // memory checks never change progress figures
+  });
+});

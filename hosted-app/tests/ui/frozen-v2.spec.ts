@@ -319,7 +319,7 @@ test("FR-045 readiness evidence recency", async ({ page }) => {
 test("FR-046 threshold lifecycle governance", async ({ page }) => {
   await page.goto("/frozen-v2-demo");
   await expect(page.getByTestId("result-FR-046")).toHaveText(
-    "4 states; 6 frozen + 11 calibratable thresholds; change ASR confidence: allowed; change 75% GREEN threshold: blocked; PROVISIONAL->APPROVED directly: blocked"
+    "4 states; 6 frozen + 13 calibratable thresholds; change ASR confidence: allowed; change 75% GREEN threshold: blocked; PROVISIONAL->APPROVED directly: blocked"
   );
 });
 

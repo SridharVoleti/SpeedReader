@@ -29,6 +29,8 @@ export type LearnerAggregate = {
   practiceLog?: readonly PracticeLogEntry[];
   /** True once a familiar passage has been served since the last new canonical passage (scheduler alternation). */
   practiceServedSinceLastNew?: boolean;
+  /** Spaced memory checks on stories already read: their own evidence namespace, never progression (retention-check.ts). */
+  retentionLog?: readonly import("./retention-check").RetentionRecord[];
 };
 
 export type PracticeLogEntry = { attemptId: string; passageId: string; wpm: number; attemptType: "FAMILIAR_PRACTICE"; sessionId: string; recordedAt: string };

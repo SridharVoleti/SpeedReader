@@ -14,6 +14,7 @@ import { ASSESSMENT_CONFIG } from "./initial-assessment";
 import { REFERENCE_BOOK_WORDS } from "./book-time";
 import { FIRST_FIVE_GREENS_REQUIRED, FIRST_FIVE_WINDOW } from "./first-five";
 import { POST_FIVE_STREAK_REQUIRED } from "./core-wpm";
+import { RETENTION_POLICY_V1 } from "./retention-check";
 
 export const LIFECYCLE_STATES = ["PROVISIONAL_PILOT", "CALIBRATION_REVIEW", "PRODUCTION_APPROVED", "SUSPENDED_RECALIBRATE"] as const;
 export type LifecycleState = (typeof LIFECYCLE_STATES)[number];
@@ -41,6 +42,8 @@ export const THRESHOLD_REGISTRY: readonly ThresholdEntry[] = Object.freeze([
   { key: "recency-max-age-days", value: RECENCY_POLICY_V1.maxAgeDays, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "recency-max-sessions", value: RECENCY_POLICY_V1.maxSessionsSince, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "recency-inactive-days", value: RECENCY_POLICY_V1.inactiveDays, frozen: false, state: "PROVISIONAL_PILOT" },
+  { key: "retention-first-check-hours", value: RETENTION_POLICY_V1.intervalsHours[0], frozen: false, state: "PROVISIONAL_PILOT" },
+  { key: "retention-remembered-share", value: RETENTION_POLICY_V1.rememberedShare, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "asr-min-confidence", value: ASR_POLICY.minConfidence, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "asr-max-retries", value: ASR_POLICY.maxRetries, frozen: false, state: "PROVISIONAL_PILOT" },
   { key: "assessment-start-wpm", value: ASSESSMENT_CONFIG.startWpm, frozen: false, state: "PROVISIONAL_PILOT" },
