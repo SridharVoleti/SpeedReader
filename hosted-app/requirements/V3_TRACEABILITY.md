@@ -20,11 +20,11 @@ Branch: `feature/app-v3-acceptance`
 
 | Status | Count |
 |---|---:|
-| IMPLEMENTED_TESTED | 155 |
-| PARTIAL | 33 |
+| IMPLEMENTED_TESTED | 158 |
+| PARTIAL | 30 |
 | BLOCKED_EXTERNAL | 6 |
 
-Previous (pre-audit, domain-level) counting: 188 IMPLEMENTED_TESTED / 5 PARTIAL / 1 BLOCKED. The difference is the stricter evidence rule above, not a regression: 33 rows were reclassified (domain-only or unwired), and several rows were upgraded by the wiring work in issues #17-#26.
+Previous (pre-audit, domain-level) counting: 188 IMPLEMENTED_TESTED / 5 PARTIAL / 1 BLOCKED. The difference is the stricter evidence rule above, not a regression: 30 rows were reclassified (domain-only or unwired), and several rows were upgraded by the wiring work in issues #17-#26.
 
 **Verification (2026-10-09):** `vitest` 1664 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`). `tsc --noEmit` clean. Playwright: all v3 learner specs pass on mobile, desktop and constrained-browser projects; the only consistently failing specs are `progression.spec.ts` (legacy 36-level demo at `/legacy-demo`, failing identically at baseline 730af66). One speech spec (`learner-v3-speech` transcript test) is intermittently flaky under parallel load. Playwright runs the last `npm run build`: rebuild before e2e.
 
@@ -36,10 +36,10 @@ Previous (pre-audit, domain-level) counting: 188 IMPLEMENTED_TESTED / 5 PARTIAL 
 - There is no production readiness runtime: readiness lifecycle, forms, recency and the P10 executor are domain code (see PARTIAL rows).
 
 ### Open items (why each non-complete row is not done)
-1. **Readiness runtime absent** (APP-READY-001..007, APP-RECENCY-001..008, APP-KM-007/008, APP-DB-008, APP-API-003): the lifecycle is verified at domain level; nothing creates, serves or persists readiness streams in production. Needs an approved canonical rule table (below) before it is worth wiring.
+1. **Readiness forms are not served** (APP-READY-001..007, APP-RECENCY-001..008, APP-KM-007/008): a service writer persists streams/attempts (#20), but no route serves controlled forms or executes the scoring rules, so the lifecycle is exercised only through that writer and domain tests. Needs an approved canonical rule table (below) before it is worth wiring.
 2. **No approved canonical readiness rules** (APP-KM-004/006, BLOCKED_EXTERNAL): `lib/v2/p10-readiness.ts` runs the repo's Blocker-4 v1.0 table, flagged non-canonical; the v0.56 freeze-candidate differs in 7 of 15 rows.
 3. **Production semantic evaluator not wired** (APP-COMP-008): only the deterministic derived-idea evaluator runs.
-4. **Calibration publication not wired** (APP-DB-009) and **domain-only validators** (BPC style/fidelity, World 2-5 registry, level semantics, question alignment, free-explanation prompt, stamina validation, requirement-state registry).
+4. **Domain-only validators** (BPC style/fidelity, World 2-5 registry, level semantics, question alignment, free-explanation prompt, stamina validation, requirement-state registry).
 5. **Platform/infra dependencies** (BLOCKED_EXTERNAL): `/identity` contract (PLAT-003), Android shell (INFRA-001), hosted Supabase/Vercel (INFRA-003), BabySteps accessibility QA gate (NFR-005); parent authorization scope (API-008, PARTIAL).
 6. **Content authority**: must supply and approve the ASSESSMENT-MANIFEST (`<approved>/assessment/ASSESSMENT-MANIFEST.json`) and the packages it lists.
 
@@ -74,10 +74,7 @@ Previous (pre-audit, domain-level) counting: 188 IMPLEMENTED_TESTED / 5 PARTIAL 
 - APP-RECENCY-006 Version invalidation has precedence (PARTIAL)
 - APP-RECENCY-007 Revalidation pass/fail (PARTIAL)
 - APP-RECENCY-008 Audit (PARTIAL)
-- APP-DB-008 Readiness cycles/forms (PARTIAL)
-- APP-DB-009 Calibration versions (PARTIAL)
 - APP-NFR-005 Accessibility QA (BLOCKED_EXTERNAL)
-- APP-API-003 Next activity (PARTIAL)
 - APP-API-008 Progress (PARTIAL)
 - APP-KM-004 Deterministic scoring contracts (BLOCKED_EXTERNAL)
 - APP-KM-006 Primary/confirmation lifecycle (BLOCKED_EXTERNAL)
@@ -232,8 +229,8 @@ Previous (pre-audit, domain-level) counting: 188 IMPLEMENTED_TESTED / 5 PARTIAL 
 | APP-DB-005 | Progression decisions | IMPLEMENTED_TESTED | migrations 0002 + 0006 (sr_progression_decision); lib/v2/decision-ledger.ts | v2/app-db-schema-postgres.test.ts; v2/app-db-evidence-projection.test.ts | Wired (#20): LEVEL_UP / HOLD / LEVEL_UP_DEFERRED are persisted with the input attempt id, WPM before/after and rule versions; WPM can never decrease; append-only. |
 | APP-DB-006 | Practice selection/history | IMPLEMENTED_TESTED | migrations 0002 + 0006 (sr_practice_event); learner state practiceLog | v2/app-db-schema-postgres.test.ts; v2/app-db-evidence-projection.test.ts | Wired (#20): familiar practice is projected into its own table from the committed state; never progression evidence. |
 | APP-DB-007 | News Reader attempts | IMPLEMENTED_TESTED | migrations 0002 + 0006 (sr_news_reader_attempt) | v2/app-db-schema-postgres.test.ts; v2/app-db-evidence-projection.test.ts; v2/app-api-v3-news-reader.test.ts | Wired (#20): separate namespace, reads 1/2 only, append-only. |
-| APP-DB-008 | Readiness cycles/forms | PARTIAL | migrations 0002 (sr_readiness_*); lib/v2/readiness-lifecycle.ts | v2/app-db-schema-postgres.test.ts; v2/app-ready-lifecycle.test.ts | Schema authored and verified on real Postgres (no form reuse, constrained roles/outcomes, append-only) but no production writer: there is no readiness runtime to create streams/attempts. |
-| APP-DB-009 | Calibration versions | PARTIAL | migrations 0002 (sr_calibration_version) | v2/app-db-schema-postgres.test.ts | Schema authored and verified on real Postgres (immutable versions, constrained statuses) but calibration publication is domain-only (calibration-lifecycle.ts) and no runtime writes sr_calibration_version. |
+| APP-DB-008 | Readiness cycles/forms | IMPLEMENTED_TESTED | migrations 0002 + 0009 (sr_readiness_stream, sr_readiness_attempt); lib/v2/learner-service.ts (recordReadinessAttempt); lib/v2/readiness-lifecycle.ts | v2/app-readiness-persistence.test.ts; v2/app-db-schema-postgres.test.ts | Wired (#20): the service applies the lifecycle and commits the stream with the learner state; stream and immutable attempt rows are projected in the same transaction; form reuse is blocked in the domain and the database. Forms are not yet served to learners (see READY rows). |
+| APP-DB-009 | Calibration versions | IMPLEMENTED_TESTED | migrations 0002 + 0009 (sr_calibration_version); lib/v2/attempt-record.ts (calibration snapshot) | v2/app-readiness-persistence.test.ts; v2/app-db-schema-postgres.test.ts | Wired (#20): the calibration version, status and parameters an attempt used are published once, immutably, in the attempt's transaction; historical attempts keep resolving their version. |
 | APP-DB-010 | Content package identity | IMPLEMENTED_TESTED | migrations 0002 + 0008 (sr_content_package); lib/v2/learner-service.ts (provenance) | v2/app-db-evidence-projection.test.ts; v2/app-attempt-provenance.test.ts | Wired (#23): package id/version/sha256/tokenizer stored once per version, append-only; each attempt record carries the exact package reference. |
 | APP-REPORT-001 | Child vs parent visibility | IMPLEMENTED_TESTED | lib/v2/parent-report.ts | v2/app-report-parent.test.ts | The parent report model is served by GET progress/parent (internal-key authorized) and kept apart from the child view; the parent-facing page belongs to the parent app/platform (see APP-API-008). |
 | APP-REPORT-002 | Personal progress | IMPLEMENTED_TESTED | lib/v2/parent-report.ts | v2/app-report-parent.test.ts | All seven listed content areas present; News Reader separate. |
@@ -259,7 +256,7 @@ Previous (pre-audit, domain-level) counting: 188 IMPLEMENTED_TESTED / 5 PARTIAL 
 | APP-PRIV-004 | No public debug evidence | IMPLEMENTED_TESTED | app/api/sr/authorize.ts; hosted-app/api/sr-explain.ts; diagnostics-gate.ts | v2/app-nfr-diagnostics-and-auth.test.ts | Found+fixed: /api/sr/package and /api/sr/attempt trusted a caller-supplied learnerId with no session. Learner now comes only from the signed session; mismatch -> 403; anonymous -> 401 unless non-production opt-in. The legacy /explain route (which showed question counts and readiness states) is no longer production-routable (#18). Tables are server-only: RLS with no client policies (#19). |
 | APP-API-001 | Bootstrap | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (bootstrap); api/v3.ts; app/api/sr/authorize.ts (entitlement); app/api/v3/[...path]/route.ts | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts; v2/app-nfr-diagnostics-and-auth.test.ts; tests/ui/api-v3.spec.ts | Returns learner/session/state/next activity/config version ids/client capability requirements and the platform entitlement context (grant active + scopes, never the token). A revoked grant is refused with 403. Assumption: active:false means the platform withdrew entitlement. |
 | APP-API-002 | Initial assessment | IMPLEMENTED_TESTED | lib/v2/learner-service.ts; lib/v2/file-assessment-store.ts | v2/app-api-learner-service.test.ts; tests/ui/api-v3.spec.ts | Start/submit/finalize idempotent; durable file store. |
-| APP-API-003 | Next activity | PARTIAL | lib/v2/learner-service.ts (nextActivity) | v2/app-api-learner-service.test.ts | Deterministic across assessment/new/practice/review/readiness. Readiness provider is an injected port (no stream persistence yet); News Reader is a parallel path, never chosen over core. Production gap: the readiness provider is an injected port that api/v3 does not wire, so the READINESS activity is unreachable in production. Core precedence is proven (readiness never replaces NEW_PROGRESSION in learning sessions). |
+| APP-API-003 | Next activity | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (nextActivity, recordReadinessAttempt) | v2/app-readiness-not-a-gate.test.ts; v2/app-readiness-persistence.test.ts; v2/app-api-learner-service.test.ts | Deterministic across assessment/new/practice/review/readiness. Readiness streams now come from persisted learner state, so a due state is surfaced alongside NEW_PROGRESSION (and as READINESS in review sessions); News Reader stays a parallel path. |
 | APP-API-004 | Passage completion | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (completePassage) | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts | Validates, stores immutable attempt, scores, decides, returns child-safe feedback; idempotent; engine-owned WPM enforced; review sessions refused. |
 | APP-API-005 | Speech evidence | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (resolveSpeechSubmission) | v2/app-api-learner-service.test.ts | Raw+confirmed transcripts, ASR state, evaluator output+version and rule version are recorded. The evaluator in use is the deterministic derived-idea evaluator; a defensible semantic judge is tracked under APP-COMP-008. |
 | APP-API-006 | BPC retrieval | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (bpc) | v2/app-api-learner-service.test.ts | Only after the attempt is committed; GREEN, NOT_GREEN and technical alike. Production BPC catalog is empty until approved content exists (fails closed with CONTENT_MISSING). |

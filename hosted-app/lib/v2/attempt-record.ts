@@ -80,6 +80,8 @@ export type AttemptRecord = {
   ruleVersions: RuleVersions;
   /** Exact content package consumed (id, version, immutable hash), recoverable historically (#23). */
   contentPackage?: ContentPackageRef | null;
+  /** The calibration published for this attempt (version, status, parameters): history is never rewritten. */
+  calibration?: { version: string; status: string; parameters: unknown } | null;
 };
 
 export type ContentPackageRef = { packageId: string; packageVersion: number; contentHash: string };
@@ -200,7 +202,8 @@ export function recordNewProgressionAttempt(learner: LearnerAggregate, input: Ne
     assistance: { bpcExposedBeforeEvidence: false, modelAnswerExposedBeforeEvidence: false, technicalRetryUsed: !scored, ...input.assistance },
     technicalState: scored ? "CLEAR" : input.spokenReason ? "ASR_UNCERTAIN" : "TECHNICAL_RETRY",
     ruleVersions: input.ruleVersions ?? currentRuleVersions(),
-    contentPackage: input.contentPackage ?? null
+    contentPackage: input.contentPackage ?? null,
+    calibration: scored ? { version: CURRENT_CALIBRATION.version, status: CURRENT_CALIBRATION.status, parameters: { comprehensionWeights: CURRENT_CALIBRATION.comprehensionWeights } } : null
   } as AttemptRecord);
   const errors = validateAttemptRecord(record);
   if (errors.length) throw new Error(`invalid attempt record: ${errors.join("; ")}`);

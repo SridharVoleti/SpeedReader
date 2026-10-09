@@ -26,7 +26,7 @@ import { RECENCY_POLICY_V1 } from "./evidence-recency";
 import { ORAL_CONFIG_V1 } from "./oral-telemetry";
 import type { LearnerRepository, MaybePromise, StoredSnapshot } from "./learner-repository";
 import { RETENTION_POLICY_V1, recordRetentionCheck, retentionDue, retentionSummary, type RetentionDue, type RetentionPolicy } from "./retention-check";
-import type { ReadinessStream } from "./readiness-lifecycle";
+import { applyReadinessAttempt, newReadinessStream, type ReadinessAttempt, type ReadinessPhase, type ReadinessStream } from "./readiness-lifecycle";
 
 // ---------------------------------------------------------------------------------------------------- ports
 
@@ -343,7 +343,7 @@ export class LearnerService {
     const kind = session?.kind ?? "LEARNING";
 
     // approved readiness / revalidation forms take precedence when due (APP-PLAT-008)
-    const due = (this.deps.readiness?.(ctx.learnerId) ?? []).find((st) => ["PRIMARY_DUE", "CONFIRMATION_DUE", "NEW_CYCLE_PRIMARY_DUE", "NEW_CYCLE_CONFIRMATION_DUE", "REVALIDATION_DUE"].includes(st.phase) || st.pendingReplacement);
+    const due = (this.deps.readiness?.(ctx.learnerId) ?? (learner.readinessStreams as readonly ReadinessStream[] | undefined) ?? []).find((st) => ["PRIMARY_DUE", "CONFIRMATION_DUE", "NEW_CYCLE_PRIMARY_DUE", "NEW_CYCLE_CONFIRMATION_DUE", "REVALIDATION_DUE"].includes(st.phase) || st.pendingReplacement);
     if (due && kind === "REVIEW") return { activity: "READINESS", streamId: due.streamId, role: due.pendingReplacement ? "TECHNICAL_REPLACEMENT" : due.phase };
 
     const completed = this.completedPassages(learner);
@@ -439,6 +439,30 @@ export class LearnerService {
     }
     assertNoInternalLeak(feedback);
     return feedback;
+  }
+
+  // ---- readiness lifecycle writer (APP-READY-*, APP-DB-008) ---------------------------------------------------
+
+  /**
+   * Apply one controlled-form readiness attempt to its stream and commit it atomically with the learner state. Lifecycle
+   * rules (roles, no form reuse, replacement) are the domain's; a rejected attempt changes nothing. Readiness never
+   * touches WPM, the canonical pointer or the reading ledger.
+   */
+  async recordReadinessAttempt(ctx: Ctx, streamId: string, attempt: ReadinessAttempt): Promise<Ok<{ phase: ReadinessPhase; replayed: boolean }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    const snap = await this.deps.repo.load(ctx.learnerId);
+    if (!snap) return fail(409, "initial assessment required");
+    if (!streamId) return fail(400, "streamId is required");
+    const streams = (snap.learner.readinessStreams ?? []) as readonly ReadinessStream[];
+    const existing = streams.find((x) => x.streamId === streamId) ?? newReadinessStream(ctx.learnerId, streamId);
+    if (existing.history.some((h) => h.attemptId === attempt.attemptId)) return { ok: true, phase: existing.phase, replayed: true };
+    const r = applyReadinessAttempt(existing, attempt);
+    if (!r.ok) return fail(409, r.error);
+    const next: LearnerAggregate = { ...snap.learner, readinessStreams: [...streams.filter((x) => x.streamId !== streamId), r.stream] };
+    const committed = await this.deps.repo.commit(ctx.learnerId, next, { expectedVersion: snap.version, idempotencyKey: `readiness:${attempt.attemptId}` });
+    if (!committed.ok) return fail(committed.reason === "VERSION_CONFLICT" ? 409 : 500, committed.reason);
+    await this.checkpoint(ctx, "READINESS_ATTEMPT", r.stream.history.length, `readiness:${attempt.attemptId}`);
+    return { ok: true, phase: r.stream.phase, replayed: committed.replayed };
   }
 
   // ---- familiar practice (APP-PRAC) -------------------------------------------------------------------
@@ -556,7 +580,7 @@ export class LearnerService {
     if (!authorized) return fail(403, "parent detail requires separate authorization");
     const snap = await this.deps.repo.load(learnerId);
     if (!snap) return fail(404, "unknown learner");
-    return { ok: true, report: buildParentReport({ learner: snap.learner, readiness: this.deps.readiness?.(learnerId) }) };
+    return { ok: true, report: buildParentReport({ learner: snap.learner, readiness: this.deps.readiness?.(learnerId) ?? (snap.learner.readinessStreams as readonly ReadinessStream[] | undefined) }) };
   }
 
   // ---- APP-API-010 calibration / ops -------------------------------------------------------------------

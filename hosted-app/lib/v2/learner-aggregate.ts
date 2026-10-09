@@ -31,6 +31,9 @@ export type LearnerAggregate = {
   practiceServedSinceLastNew?: boolean;
   /** Spaced memory checks on stories already read: their own evidence namespace, never progression (retention-check.ts). */
   retentionLog?: readonly import("./retention-check").RetentionRecord[];
+  /** Readiness streams (their own namespace; never core progression evidence, APP-READY-008). */
+  /** Opaque to the core engine on purpose: only the readiness lifecycle (via the service) reads or writes it. */
+  readinessStreams?: readonly unknown[];
 };
 
 export type PracticeLogEntry = { attemptId: string; passageId: string; wpm: number; attemptType: "FAMILIAR_PRACTICE"; sessionId: string; recordedAt: string };

@@ -40,10 +40,10 @@ describe("V3 traceability ledger (#27)", () => {
 
   it("domain-only rows are never counted complete: the known unwired areas are PARTIAL or BLOCKED_EXTERNAL", () => {
     const status = (id: string) => rows.find((r) => r.id === id)!.status;
-    for (const id of ["APP-COMP-008", "APP-READY-002", "APP-RECENCY-001", "APP-DB-008", "APP-DB-009", "APP-API-003"]) expect(status(id), id).toBe("PARTIAL");
+    for (const id of ["APP-COMP-008", "APP-READY-002", "APP-RECENCY-001"]) expect(status(id), id).toBe("PARTIAL");
     for (const id of ["APP-KM-004", "APP-KM-006", "APP-INFRA-003", "APP-NFR-005", "APP-PLAT-003"]) expect(status(id), id).toBe("BLOCKED_EXTERNAL");
     // and the wired evidence domains are complete (#20, #23)
-    for (const id of ["APP-DB-003", "APP-DB-004", "APP-DB-005", "APP-DB-006", "APP-DB-007", "APP-DB-010"]) expect(status(id), id).toBe("IMPLEMENTED_TESTED");
+    for (const id of ["APP-DB-003", "APP-DB-004", "APP-DB-005", "APP-DB-006", "APP-DB-007", "APP-DB-008", "APP-DB-009", "APP-DB-010", "APP-API-003"]) expect(status(id), id).toBe("IMPLEMENTED_TESTED");
   });
 });
 
