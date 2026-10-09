@@ -53,14 +53,14 @@ describe("News Reader over HTTP (APP-API-007, APP-NR-001..010)", () => {
 
   it("two reads are stored separately, the second is framed as practice, and core state is untouched", async () => {
     await onboardAndRead(1);
-    const before = deps.repo.load("kid")!.learner;
+    const before = (await deps.repo.load("kid"))!.learner;
     const half = FIXTURE_STORY.split(" ").map((w, i) => (i % 2 ? "zzz" : w)).join(" ");
     const r1 = await call("POST", "news-reader/read", { passageId: "FX-0001", readNumber: 1, key: "a", micState: "OK", transcript: half, confidence: 0.9 });
     expect(r1.body).toMatchObject({ ok: true, technicalState: "OK", coaching: { status: "INCOMPLETE" } });
     const r2 = await call("POST", "news-reader/read", { passageId: "FX-0001", readNumber: 2, key: "b", micState: "OK", transcript: FIXTURE_STORY, confidence: 0.9 });
     expect(r2.body.coaching).toMatchObject({ status: "COMPLETE", improved: true });
     expect(r2.body.coaching.coaching).toMatch(/second read/i);
-    const after = deps.repo.load("kid")!.learner;
+    const after = (await deps.repo.load("kid"))!.learner;
     expect(after.newsReader.attempts).toHaveLength(2);
     expect(after.core).toEqual(before.core);
     expect(after.canonicalPointer).toBe(before.canonicalPointer);
@@ -72,7 +72,7 @@ describe("News Reader over HTTP (APP-API-007, APP-NR-001..010)", () => {
     const body = { passageId: "FX-0001", readNumber: 1, key: "same", micState: "OK", transcript: FIXTURE_STORY, confidence: 0.9 };
     await call("POST", "news-reader/read", body);
     await call("POST", "news-reader/read", body);
-    expect(deps.repo.load("kid")!.learner.newsReader.attempts).toHaveLength(1);
+    expect((await deps.repo.load("kid"))!.learner.newsReader.attempts).toHaveLength(1);
   });
 
   it("missing microphone, failed capture or low confidence are technical: stored unscored and never block anything", async () => {
@@ -81,7 +81,7 @@ describe("News Reader over HTTP (APP-API-007, APP-NR-001..010)", () => {
     expect(mic.body).toMatchObject({ ok: true, technicalState: "MIC_UNAVAILABLE" });
     const low = await call("POST", "news-reader/read", { passageId: "FX-0001", readNumber: 2, key: "l", micState: "OK", transcript: FIXTURE_STORY, confidence: 0.2 });
     expect(low.body).toMatchObject({ technicalState: "CAPTURE_FAILED", coaching: { status: "UNSCORED" } });
-    const l = deps.repo.load("kid")!.learner;
+    const l = (await deps.repo.load("kid"))!.learner;
     expect(l.core.wpm).toBeGreaterThan(0);
     expect((await call("GET", "passage/next")).body.ok).toBe(true); // the next canonical story is still open
   });

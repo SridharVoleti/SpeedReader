@@ -69,7 +69,7 @@ describe("v3 transport: content-backed learner journey with server-side scoring"
     await onboard(70);
     const sneaky = await call("POST", "passage/submit", { attemptId: "x", passageId: "FX-0001", answers: ALL_WRONG, items: [{ itemId: "i1", score: 1 }], ...story("I like cricket.") });
     expect(sneaky.status).toBe(200);
-    const learner = deps.repo.load("kid")!.learner;
+    const learner = (await deps.repo.load("kid"))!.learner;
     expect(learner.ledger[0].structured!.items.map((i) => i.score)).toEqual([0, 0, 0, 0]);
     expect(learner.ledger[0].classification).toBe("NOT_GREEN");
     expect(learner.core.wpm).toBe(70); // NOT_GREEN never lowers earned WPM
@@ -97,7 +97,7 @@ describe("v3 transport: content-backed learner journey with server-side scoring"
     await call("POST", "passage/submit", { attemptId: "a1", passageId: "FX-0001", answers: ALL_RIGHT, ...story(GOOD_RETELLING) });
     const again = await call("POST", "passage/submit", { attemptId: "a1", passageId: "FX-0001", answers: ALL_RIGHT, ...story(GOOD_RETELLING) });
     expect(again.body.replayed).toBe(true);
-    expect(deps.repo.load("kid")!.learner.ledger).toHaveLength(1);
+    expect((await deps.repo.load("kid"))!.learner.ledger).toHaveLength(1);
   });
 
   it("while holding, a familiar story is offered at the current WPM and completing it moves nothing", async () => {
@@ -105,10 +105,10 @@ describe("v3 transport: content-backed learner journey with server-side scoring"
     for (let i = 1; i <= 5; i += 1) await call("POST", "passage/submit", { attemptId: `s${i}`, passageId: `FX-${String(i).padStart(4, "0")}`, answers: ALL_WRONG, ...story("cricket") });
     const prac = await call("GET", "practice/next");
     expect(prac.body).toMatchObject({ ok: true, wpm: 70 });
-    const before = deps.repo.load("kid")!.learner;
+    const before = (await deps.repo.load("kid"))!.learner;
     const done = await call("POST", "practice/submit", { attemptId: "p1", passageId: prac.body.passage.passageId });
     expect(done.body.feedback.celebration).toBe("NONE");
-    const after = deps.repo.load("kid")!.learner;
+    const after = (await deps.repo.load("kid"))!.learner;
     expect([after.core, after.canonicalPointer]).toEqual([before.core, before.canonicalPointer]);
     expect((await call("GET", "passage/next")).body.sequence).toBe(6);
   });
@@ -180,7 +180,7 @@ describe("client clocks are never trusted", () => {
     await onboard(70);
     const r = await call("POST", "passage/submit", { attemptId: "skew", passageId: "FX-0001", answers: ALL_RIGHT, startedAt: "2099-01-01T00:00:00Z", ...story(GOOD_RETELLING) });
     expect(r.status).toBe(200);
-    const rec = deps.repo.load("kid")!.learner.ledger[0];
+    const rec = (await deps.repo.load("kid"))!.learner.ledger[0];
     expect(Date.parse(rec.startedAt)).toBeLessThanOrEqual(Date.parse(rec.completedAt));
   });
 });

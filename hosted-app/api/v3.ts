@@ -4,7 +4,9 @@
 // server scores them against keys that never leave the server.
 
 import { join } from "node:path";
-import { FileLearnerRepository } from "../lib/v2/learner-repository";
+import { FileLearnerRepository, type LearnerRepository } from "../lib/v2/learner-repository";
+import { FileSessionPersistence } from "../lib/v2/file-session-store";
+import { SupabaseAssessmentStore, SupabaseLearnerRepository, SupabaseSessionPersistence, supabaseConfigFromEnv, type SupabaseConfig } from "../lib/v2/supabase-adapters";
 import { FileAssessmentStore } from "../lib/v2/file-assessment-store";
 import { SessionRegistry } from "../lib/v2/session-envelope";
 import { LearnerService, type Ctx, type PassageCompletionRequest, type ServiceError, type SpeechSubmission } from "../lib/v2/learner-service";
@@ -22,7 +24,7 @@ export type Verified = { learnerId: string; sessionId: string; deviceId: string 
 export const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
 
-type Deps = { service: LearnerService; repo: FileLearnerRepository; content: ContentProvider };
+export type Deps = { service: LearnerService; repo: LearnerRepository; content: ContentProvider };
 let singleton: Deps | null = null;
 
 export function makeProvider(env: Record<string, string | undefined> = process.env): ContentProvider {
@@ -37,14 +39,20 @@ export function makeProvider(env: Record<string, string | undefined> = process.e
   return new ApprovedPackageProvider(store);
 }
 
-export function buildDeps(dataDir: string, content: ContentProvider): Deps {
-  const repo = new FileLearnerRepository(join(dataDir, "learners"));
+/**
+ * Wire the service. With Supabase credentials every port (learner state, assessment, sessions) is Supabase-backed and
+ * durable on serverless hosting; otherwise the file adapters under `dataDir` are used (local/dev/tests).
+ */
+export function buildDeps(dataDir: string, content: ContentProvider, supabase: SupabaseConfig | null = null): Deps {
+  const repo: LearnerRepository = supabase ? new SupabaseLearnerRepository(supabase) : new FileLearnerRepository(join(dataDir, "learners"));
+  const assessments = supabase ? new SupabaseAssessmentStore(supabase) : new FileAssessmentStore(join(dataDir, "assessments"));
+  const sessionStore = supabase ? new SupabaseSessionPersistence(supabase) : new FileSessionPersistence(join(dataDir, "sessions"));
   const bpc = (passageId: string): BpcContent | null => content.byPassageId(passageId)?.bpc ?? null;
-  return { repo, content, service: new LearnerService({ repo, assessments: new FileAssessmentStore(join(dataDir, "assessments")), sessions: new SessionRegistry(), bpcCatalog: bpc }) };
+  return { repo, content, service: new LearnerService({ repo, assessments, sessions: new SessionRegistry(), sessionStore, bpcCatalog: bpc }) };
 }
 
 export function getDeps(env: Record<string, string | undefined> = process.env): Deps {
-  if (!singleton) singleton = buildDeps(env.SR_DATA_DIR ?? join(process.cwd(), ".data"), makeProvider(env));
+  if (!singleton) singleton = buildDeps(env.SR_DATA_DIR ?? join(process.cwd(), ".data"), makeProvider(env), supabaseConfigFromEnv(env));
   return singleton;
 }
 
@@ -114,12 +122,12 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
   const url = new URL(req.url);
 
   switch (route) {
-    case "POST bootstrap": return respond(service.bootstrap(ctx));
-    case "POST resume": return respond(service.resume(ctx));
-    case "POST assessment/start": return respond(service.startAssessment(ctx));
+    case "POST bootstrap": return respond(await service.bootstrap(ctx));
+    case "POST resume": return respond(await service.resume(ctx));
+    case "POST assessment/start": return respond(await service.startAssessment(ctx));
 
     case "GET assessment/passage": {
-      const pending = service.assessmentPending(ctx);
+      const pending = await service.assessmentPending(ctx);
       if (!pending.ok) return respond(pending);
       const passage = content.assessment(pending.attemptsDone);
       return passage ? json({ ok: true, wpm: pending.nextWpm, attemptNumber: pending.attemptsDone + 1, passage: learnerView(passage) }) : unavailable();
@@ -127,7 +135,7 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
     case "POST assessment/answer": {
       const b = await body<{ key: string; answers: (number | null)[] }>(req);
       if (!b || !Array.isArray(b.answers)) return json({ error: "invalid JSON body" }, 400);
-      const pending = service.assessmentPending(ctx);
+      const pending = await service.assessmentPending(ctx);
       if (!pending.ok) return respond(pending);
       const passage = content.assessment(pending.attemptsDone);
       if (!passage) return unavailable();
@@ -135,22 +143,22 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
       const comprehensionScore = scores.reduce((a, x) => a + x.score, 0) / scores.length;
       const words = passage.text.trim().split(/\s+/).length;
       const durationSec = Math.round((words / pending.nextWpm) * 60 + 20); // deterministic reading + answering estimate
-      const r = service.submitAssessmentAttempt(ctx, { key: b.key, wpm: pending.nextWpm, comprehensionScore, durationSec });
+      const r = await service.submitAssessmentAttempt(ctx, { key: b.key, wpm: pending.nextWpm, comprehensionScore, durationSec });
       return respond(r);
     }
     case "POST assessment/attempt": {
       // direct (already-scored) submission is not exposed over HTTP: scoring is the server's job
       return json({ error: "use assessment/answer" }, 404);
     }
-    case "POST assessment/finalize": return respond(service.finalizeAssessment(ctx));
+    case "POST assessment/finalize": return respond(await service.finalizeAssessment(ctx));
 
     case "GET next": {
-      const n = service.nextActivity(ctx);
+      const n = await service.nextActivity(ctx);
       return respond(isError(n) ? n : { ok: true, next: n });
     }
 
     case "GET passage/next": {
-      const n = service.nextActivity(ctx);
+      const n = await service.nextActivity(ctx);
       if (isError(n)) return respond(n);
       if (n.activity !== "NEW_PROGRESSION") return json({ ok: false, error: "not a new-progression moment", next: n }, 409);
       const passage = content.bySequence(n.sequence);
@@ -161,14 +169,14 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
       if (!b || !b.attemptId || !b.passageId || !Array.isArray(b.answers)) return json({ error: "attemptId, passageId and answers are required" }, 400);
       const passage = content.byPassageId(b.passageId);
       if (!passage) return unavailable();
-      const prog = service.progress(ctx);
+      const prog = await service.progress(ctx);
       if (!prog.ok) return respond(prog);
       if (passage.sequence !== prog.storiesRead + 1) {
         // a replay of an already-committed attempt is answered from the ledger; anything else off-sequence is refused
-        const known = repo.load(ctx.learnerId)?.learner.ledger.some((r) => r.attemptId === b.attemptId);
+        const known = (await repo.load(ctx.learnerId))?.learner.ledger.some((r) => r.attemptId === b.attemptId);
         if (!known) return json({ error: "this is not your current story" }, 409);
       }
-      const snap = repo.load(ctx.learnerId)!;
+      const snap = (await repo.load(ctx.learnerId))!;
       const completion: PassageCompletionRequest = {
         attemptId: b.attemptId,
         passageId: b.passageId,
@@ -177,11 +185,11 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
         speech: speechFor({ passageId: passage.passageId, ideas: passage.ideas }, b.explanation),
         startedAt: sanitizeStartedAt(b.startedAt, Date.now())
       };
-      return respond(service.completePassage(ctx, completion));
+      return respond(await service.completePassage(ctx, completion));
     }
 
     case "GET practice/next": {
-      const n = service.nextActivity(ctx);
+      const n = await service.nextActivity(ctx);
       if (isError(n)) return respond(n);
       if (n.activity !== "FAMILIAR_PRACTICE") return json({ ok: false, error: "no practice due", next: n }, 409);
       const passage = content.byPassageId(n.passageId);
@@ -190,33 +198,33 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
     case "POST practice/submit": {
       const b = await body<{ attemptId: string; passageId: string }>(req);
       if (!b?.attemptId || !b.passageId) return json({ error: "attemptId and passageId are required" }, 400);
-      const snap = repo.load(ctx.learnerId);
+      const snap = await repo.load(ctx.learnerId);
       if (!snap) return json({ error: "initial assessment required" }, 409);
-      return respond(service.completePractice(ctx, { attemptId: b.attemptId, passageId: b.passageId, displayedWpm: snap.learner.core.wpm }));
+      return respond(await service.completePractice(ctx, { attemptId: b.attemptId, passageId: b.passageId, displayedWpm: snap.learner.core.wpm }));
     }
 
-    case "GET bpc": return respond(service.bpc(ctx, url.searchParams.get("attemptId") ?? ""));
+    case "GET bpc": return respond(await service.bpc(ctx, url.searchParams.get("attemptId") ?? ""));
     case "GET news-reader/passages": {
-      const snap = repo.load(ctx.learnerId);
+      const snap = await repo.load(ctx.learnerId);
       if (!snap) return json({ error: "initial assessment required" }, 409);
       return json({ ok: true, passages: completedPassageIds(snap.learner).slice(-10).map((passageId) => ({ passageId })) });
     }
     case "POST news-reader/start": {
       const b = await body<{ passageId: string; platform?: "ios" | "android" | "web" | "desktop" }>(req);
       if (!b?.passageId) return json({ error: "passageId required" }, 400);
-      const snap = repo.load(ctx.learnerId);
+      const snap = await repo.load(ctx.learnerId);
       if (!snap) return json({ error: "initial assessment required" }, 409);
       // News Reader may share a canonical passage, but only one the learner has already completed: never a spoiler
       if (!completedPassageIds(snap.learner).includes(b.passageId)) return json({ error: "choose a story you have already read" }, 400);
       const passage = content.byPassageId(b.passageId);
       if (!passage) return unavailable();
-      const started = service.newsReaderStart(ctx, b.passageId, b.platform);
+      const started = await service.newsReaderStart(ctx, b.passageId, b.platform);
       return isError(started) ? respond(started) : json({ ...started, passage: { passageId: passage.passageId, tokens: learnerView(passage).tokens } });
     }
     case "POST news-reader/read": {
       const b = await body<{ passageId: string; readNumber: 1 | 2; key: string } & ReadCapture>(req);
       if (!b?.passageId || !b.key || (b.readNumber !== 1 && b.readNumber !== 2)) return json({ error: "passageId, readNumber (1 or 2) and key are required" }, 400);
-      const snap = repo.load(ctx.learnerId);
+      const snap = await repo.load(ctx.learnerId);
       if (!snap) return json({ error: "initial assessment required" }, 409);
       if (!completedPassageIds(snap.learner).includes(b.passageId)) return json({ error: "choose a story you have already read" }, 400);
       const passage = content.byPassageId(b.passageId);
@@ -226,13 +234,13 @@ async function dispatch(req: Request, path: string[], who: Verified, deps: Deps)
         attemptId: `nr-${b.passageId}-${b.readNumber}-${b.key}`, passageId: b.passageId, readNumber: b.readNumber,
         metrics: m.metrics, technicalState: m.technicalState, recordedAt: new Date().toISOString()
       };
-      const r = service.newsReaderSubmit(ctx, attempt);
+      const r = await service.newsReaderSubmit(ctx, attempt);
       return isError(r) ? respond(r) : json({ ok: true, technicalState: m.technicalState, coaching: r.coaching });
     }
     case "POST news-reader/submit": return json({ error: "use news-reader/read" }, 404);
-    case "GET progress": return respond(service.progress(ctx));
-    case "GET progress/parent": return respond(service.parentProgress(who.learnerId, internalAuthorized(req)));
-    case "GET ops/summary": return respond(service.opsSummary(repo.list(), internalAuthorized(req)));
+    case "GET progress": return respond(await service.progress(ctx));
+    case "GET progress/parent": return respond(await service.parentProgress(who.learnerId, internalAuthorized(req)));
+    case "GET ops/summary": return respond(await service.opsSummary(await repo.list(), internalAuthorized(req)));
     default: return json({ error: "not found" }, 404);
   }
 }

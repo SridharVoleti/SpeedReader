@@ -26,11 +26,16 @@ export type RepositoryCommit =
   | { ok: true; snapshot: StoredSnapshot; replayed: boolean }
   | { ok: false; reason: "UNKNOWN_LEARNER" | "VERSION_CONFLICT" | "INVARIANT_VIOLATION" | "LOCKED" | "WRITE_FAILED"; error: string; snapshot: StoredSnapshot | null };
 
+/** Ports may be synchronous (file adapter) or asynchronous (Supabase adapter); callers always `await`. */
+export type MaybePromise<T> = T | Promise<T>;
+
 export interface LearnerRepository {
-  load(learnerId: string): StoredSnapshot | null;
+  load(learnerId: string): MaybePromise<StoredSnapshot | null>;
   /** Create a learner's initial state (version 1). An existing learner is never overwritten. */
-  create(learner: LearnerAggregate): StoredSnapshot;
-  commit(learnerId: string, next: LearnerAggregate, options: CommitOptions): RepositoryCommit;
+  create(learner: LearnerAggregate): MaybePromise<StoredSnapshot>;
+  commit(learnerId: string, next: LearnerAggregate, options: CommitOptions): MaybePromise<RepositoryCommit>;
+  /** Every stored learner (aggregate operational metrics only). */
+  list(): MaybePromise<StoredSnapshot[]>;
 }
 
 type Row = { version: number; learner: LearnerAggregate; applied: Record<string, number> };

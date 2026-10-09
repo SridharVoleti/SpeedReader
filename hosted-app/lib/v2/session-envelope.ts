@@ -77,6 +77,12 @@ export class SessionRegistry {
   private readonly sessions: SessionRecord[] = [];
   constructor(private readonly policy: SessionPolicy = SESSION_POLICY_V1) {}
 
+  /** Replace this learner's records with the persisted ones (durable, multi-instance safe). */
+  hydrate(learnerId: string, records: readonly SessionRecord[]): void {
+    for (let i = this.sessions.length - 1; i >= 0; i -= 1) if (this.sessions[i].learnerId === learnerId) this.sessions.splice(i, 1);
+    this.sessions.push(...records.map((r) => ({ ...r, checkpoint: { ...r.checkpoint, committedEventKeys: [...r.checkpoint.committedEventKeys] } })));
+  }
+
   list(learnerId: string): readonly SessionRecord[] {
     return this.sessions.filter((s) => s.learnerId === learnerId);
   }
@@ -153,4 +159,16 @@ export class SessionRegistry {
 /** Idempotent replay guard for resumed sessions: an event key already committed is never re-applied. */
 export function shouldApplyEvent(session: Pick<SessionRecord, "checkpoint">, eventKey: string): boolean {
   return !session.checkpoint.committedEventKeys.includes(eventKey);
+}
+
+/** Durable storage for one learner's session records (APP-PLAT-006..009 across restarts and server instances). */
+export interface SessionPersistence {
+  load(learnerId: string): SessionRecord[] | Promise<SessionRecord[]>;
+  save(learnerId: string, records: readonly SessionRecord[]): void | Promise<void>;
+}
+
+export class MemorySessionPersistence implements SessionPersistence {
+  private readonly map = new Map<string, SessionRecord[]>();
+  load(learnerId: string) { return structuredClone(this.map.get(learnerId) ?? []); }
+  save(learnerId: string, records: readonly SessionRecord[]) { this.map.set(learnerId, structuredClone([...records])); }
 }

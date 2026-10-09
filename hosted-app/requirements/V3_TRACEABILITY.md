@@ -10,52 +10,35 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 - `tsc --noEmit`: clean.
 
 
+
 ## Status summary (all 194 requirements evaluated; last updated 2026-10-09)
 
 | Status | Count |
 |---|---:|
-| IMPLEMENTED_TESTED | 146 |
-| PARTIAL | 47 |
+| IMPLEMENTED_TESTED | 172 |
+| PARTIAL | 21 |
 | BLOCKED | 1 |
 
-**Verification (2026-10-09):** `vitest` 1352 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright 426 pass / 6 fail; the 6 are `progression.spec.ts` (legacy 36-level demo, 2 tests x 3 projects) and were confirmed failing identically at the pre-work baseline commit 730af66.
+**Verification (2026-10-09):** `vitest` 1431 pass / 70 fail (all 70 = content `pipeline-v2`, needs Node 22 `node:sqlite`; out of scope per CLAUDE-005). `tsc --noEmit` clean. Playwright: all v3 learner specs pass on mobile, desktop and constrained-browser projects; the only failing specs are `progression.spec.ts` (legacy 36-level demo, now at `/legacy-demo`; confirmed failing identically at the pre-work baseline commit 730af66). Playwright runs the last `npm run build`: rebuild before e2e.
+
+### What is real vs. assumed
+- The learner journey (`/`) runs on the v3 engine through `/api/v3/*`: assessment, one-word reader, questions, explanation (typed or spoken), feedback/Level Up, BPC, familiar practice, News Reader. Scoring and evidence are server-side only.
+- Production content comes only from approved SR packages. With none approved the journey fails closed with a friendly "being prepared" message. A labelled fixture story exists only when diagnostics are enabled (tests).
+- Durable state: file adapters locally; Supabase adapters (learner, assessment, sessions) when `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` are set. The Supabase path is verified against a fake PostgREST that mirrors the SQL semantics. It has NOT been run against a live Supabase project, and migrations 0001-0003 have never been applied.
 
 ### Open items (why each PARTIAL/BLOCKED is not done)
-1. **No production v3 learner UI.** `/` is still the legacy 36-level localStorage demo (APP-DATA-009, APP-NFR-007, AC-A18). Needed for: ASSESS-001, READ-001/002/005/006, UX-001..005, NFR-001/006/009, INFRA-001, COMP-010/011, NR-007/008, NORTH-002, PLAT-010 (sync payload). This is the Phase 5/7/11/12 UI build.
-2. **Supabase not provisioned.** Schema authored in `supabase/migrations/0001-0002` but never applied/tested; no `SupabaseLearnerRepository` adapter. Affects DATA-009/010, DB-001..010, INFRA-003.
-3. **Session registry is in-memory** (per server instance). Needs the platform session API or a shared store: PLAT-006..009, API-001/009.
-4. **No approved Knowledge Map / canonical scoring contract / BPC content.** KM-001/002/004/006, ORAL-002 steps 8-9 cannot run end to end; production BPC catalog is empty (fails closed).
-5. **Production semantic evaluator not wired** (fixtures only): COMP-008, API-005 input.
-6. **Platform dependencies:** parent authorization scope (internal key used as assumption), entitlement from launch grant, `/identity` route (501 stub): PLAT-003, API-008.
-7. **APP-NFR-005** needs the Babysteps accessibility QA gate (BLOCKED, not self-certifiable).
-8. CAL-003 analytics cuts missing (device/browser, ASR uncertainty, time-to-Level-Up, practice frequency, false-ready, stamina transitions).
+1. **Live Supabase unverified.** Apply migrations 0001-0003 to a project and run the adapters (APP-DATA-010, APP-DB-001..010, APP-INFRA-003).
+2. **No approved Knowledge Map / canonical scoring contract / BPC / assessment content.** KM-001/002/004/006 and ORAL-002 steps 8-9 cannot run end to end; production assessment and story passages are absent (journey fails closed).
+3. **Production semantic evaluator not wired** (derived-idea evaluator only): COMP-008.
+4. **Platform dependencies:** parent authorization scope (internal API key used as an assumption), entitlement context from the launch grant, `/identity` route (501 stub): PLAT-003, API-001, API-008.
+5. **APP-NFR-005** needs the Babysteps accessibility QA gate (BLOCKED, not self-certifiable). Babysteps Android shell cannot be tested here (INFRA-001).
+6. CAL-003 analytics cuts missing (device/browser, ASR uncertainty, time-to-Level-Up, practice frequency, false-ready, stamina transitions).
 
 ### Partial / blocked rows
-- APP-NORTH-002 Confidence-first
 - APP-PLAT-003 Standard launch protocol
-- APP-PLAT-006 Single active learner/device rule
-- APP-PLAT-007 Platform session envelope
-- APP-PLAT-008 Review-session integration
-- APP-PLAT-009 Accidental-close resume
-- APP-PLAT-010 Return to Babysteps
 - APP-INFRA-001 Web-first, mobile-required
 - APP-INFRA-003 Deployment
-- APP-ASSESS-001 Mandatory new-learner baseline
-- APP-READ-001 Canonical token stream
-- APP-READ-002 WPM-driven display
-- APP-READ-005 Technical interruption
-- APP-READ-006 Session boundary
-- APP-COMP-010 Editable transcript
-- APP-COMP-011 Browser-native STT
-- APP-UX-001 Scores are private
-- APP-UX-002 GREEN feedback
-- APP-UX-003 NOT_GREEN feedback
-- APP-UX-004 Level-Up celebration
-- APP-UX-005 Book-time impact
-- APP-NR-007 Browser TTS
-- APP-NR-008 Read-along highlight
 - APP-ORAL-002 Deterministic scoring order
-- APP-DATA-009 Server persistence
 - APP-DATA-010 Supabase responsibility
 - APP-DB-001 Learner app state
 - APP-DB-002 Attempts
@@ -68,12 +51,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 - APP-DB-009 Calibration versions
 - APP-DB-010 Content package identity
 - APP-CAL-003 Post-launch calibration evidence
-- APP-NFR-001 Responsive learner journey
-- APP-NFR-006 Child usability
-- APP-NFR-007 Diagnostics protection
-- APP-NFR-009 Performance
 - APP-API-001 Bootstrap
-- APP-API-009 Resume
 - APP-KM-001 Correct delivery coordinate
 - APP-KM-002 Shared canonical tokenizer
 - APP-KM-004 Deterministic scoring contracts
@@ -96,10 +74,10 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-PLAT-003 | Standard launch protocol | PARTIAL | container/routes/{health,launch,return,progress-sync}.ts; container/launch/* | container/tests/app-launch.spec.ts (18/18 pass) | health/launch/return/bootstrap/progress sync present+tested. /identity is a reserved 501 stub. |
 | APP-PLAT-004 | No duplicate authentication system | IMPLEMENTED_TESTED | container/launch/* | container/tests/app-launch.spec.ts (18/18 pass); grep: no login/signup code | Trusted learner context from signed launch exchange only. |
 | APP-PLAT-005 | No duplicate billing | IMPLEMENTED_TESTED | (absence) | grep: no billing/checkout/payment code in app/container/lib/ui | Entitlement is platform-side. |
-| APP-PLAT-006 | Single active learner/device rule | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | Domain registry enforces one live session per learner. Needs wiring to launch/session cookie + durable store (in-memory now). |
-| APP-PLAT-007 | Platform session envelope | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | 45min/2 per week/every-6th configured+tested; platform remains authoritative. Not yet wired into launch route. |
-| APP-PLAT-008 | Review-session integration | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | attemptRulesForSession domain rule tested; practice selection wiring is APP-PRAC/Phase 9. |
-| APP-PLAT-009 | Accidental-close resume | PARTIAL | lib/v2/session-envelope.ts | tests/unit/v2/app-plat-session-envelope.test.ts (18 tests) | Resume window/idempotent-replay domain logic tested; not yet wired to routes/persistence. |
+| APP-PLAT-006 | Single active learner/device rule | IMPLEMENTED_TESTED | lib/v2/session-envelope.ts; lib/v2/learner-service.ts; file/supabase session persistence | v2/app-plat-session-envelope.test.ts; v2/app-data-supabase-adapters.test.ts; tests/ui/api-v3.spec.ts | One live session per learner, enforced across server instances through durable session records. |
+| APP-PLAT-007 | Platform session envelope | IMPLEMENTED_TESTED | lib/v2/session-envelope.ts; lib/v2/learner-service.ts | v2/app-plat-session-envelope.test.ts; v2/app-data-supabase-adapters.test.ts | 45 min / 2 per week / every 6th review, enforced at bootstrap and held across instances. The platform remains the entitlement authority. |
+| APP-PLAT-008 | Review-session integration | IMPLEMENTED_TESTED | lib/v2/session-envelope.ts; lib/v2/learner-service.ts | v2/app-plat-session-envelope.test.ts; v2/app-api-learner-service.test.ts | Review sessions serve FAMILIAR_PRACTICE only; new-progression evidence is refused; no pointer advance. |
+| APP-PLAT-009 | Accidental-close resume | IMPLEMENTED_TESTED | lib/v2/session-envelope.ts; lib/v2/learner-service.ts | v2/app-data-supabase-adapters.test.ts; v2/app-api-learner-service.test.ts | 15-minute accidental-close resume works on a different server instance and restores committed event keys without duplicating evidence. |
 | APP-PLAT-010 | Return to Babysteps | IMPLEMENTED_TESTED | lib/v2/babysteps-sync.ts; ui/learner/LearnerApp.tsx; container/routes/return.ts | v2/app-v3-content-and-sync.test.ts; tests/ui/learner-v3-speech.spec.ts; container/tests/app-launch.spec.ts | Each Level Up reports one structured Babystep (+1 WPM); return redirect tested. Not exercised against the real platform API. |
 | APP-INFRA-001 | Web-first, mobile-required | PARTIAL | playwright.config.ts (mobile/desktop/30%-browser projects) | v2/app-infra-constraints.test.ts | E2E matrix covers phone+desktop on Chromium. Babysteps Android shell is not testable here. The v3 learner UI itself does not exist yet (legacy demo only). |
 | APP-INFRA-002 | Reference browser | IMPLEMENTED_TESTED | playwright.config.ts; lib/v2/capabilities.ts | v2/app-infra-constraints.test.ts; v2/app-nfr-capabilities.test.ts | Chromium-only matrix; speech capability detected explicitly. |
@@ -219,7 +197,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-DATA-006 | Explainability | IMPLEMENTED_TESTED | lib/v2/explainability.ts; lib/v2/decision-ledger.ts | v2/fr-049-explainability.test.ts; v2/app-data-attempt-and-decisions.test.ts | Replay from ledger alone; verifyDecisionLedger detects tampering. |
 | APP-DATA-007 | Transaction safety | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts; ac-c05-transaction-safety.test.ts | Atomic single-file replace; fault-injection tested. |
 | APP-DATA-008 | Idempotency | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/progress-store.ts | tests/unit/v2/app-data-learner-repository.test.ts | Idempotency key replay + domain-level attempt idempotency (AC-C04). |
-| APP-DATA-009 | Server persistence | PARTIAL | lib/v2/learner-repository.ts; ui/learner/* | v2/app-data-learner-repository.test.ts; tests/ui/learner-v3.spec.ts | The production learner path is server-persisted; localStorage holds only a device id. The file adapter is not durable on serverless hosting - needs the Supabase adapter. |
+| APP-DATA-009 | Server persistence | IMPLEMENTED_TESTED | lib/v2/learner-repository.ts; lib/v2/supabase-adapters.ts; lib/v2/file-session-store.ts; api/v3.ts (buildDeps) | v2/app-data-supabase-adapters.test.ts; v2/app-data-learner-repository.test.ts; tests/ui/learner-v3.spec.ts | All production learner state (progress, assessment, sessions) goes through durable ports; Supabase adapters are selected by SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY. Verified against a fake PostgREST only - live Supabase unverified (see APP-DATA-010). |
 | APP-DATA-010 | Supabase responsibility | PARTIAL | supabase/migrations/0001_speedreader_learner_state.sql | tests/unit/v2/app-data-learner-repository.test.ts | Schema + atomic commit fn written; NOT applied/tested on a live Supabase project (no credentials). SupabaseLearnerRepository adapter not yet written. |
 | APP-DB-001 | Learner app state | PARTIAL | lib/v2/learner-repository.ts; supabase/migrations/0001 | v2/app-data-learner-repository.test.ts | File adapter tested; Supabase schema authored but not applied/tested; no SupabaseLearnerRepository yet. |
 | APP-DB-002 | Attempts | PARTIAL | supabase/migrations/0001 (sr_attempt) | v2/app-data-attempt-and-decisions.test.ts (domain shape) | Schema authored (immutable trigger); not applied to a live project. |
@@ -253,7 +231,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-PRIV-002 | Container identity | IMPLEMENTED_TESTED | container/launch/session.ts; app/api/sr/authorize.ts | v2/app-nfr-diagnostics-and-auth.test.ts; container/tests/app-launch.spec.ts | Platform learner id + signed session claims only; no parent credentials stored. |
 | APP-PRIV-003 | Structured cross-app progress only | IMPLEMENTED_TESTED | container/launch/platform-api.ts (ProgressSummary) | container/tests/app-launch.spec.ts | Sync type is structured scalars only (no transcript/audio fields). |
 | APP-PRIV-004 | No public debug evidence | IMPLEMENTED_TESTED | app/api/sr/authorize.ts; hosted-app/api/sr-explain.ts; diagnostics-gate.ts | v2/app-nfr-diagnostics-and-auth.test.ts | Found+fixed: /api/sr/package and /api/sr/attempt trusted a caller-supplied learnerId with no session. Learner now comes only from the signed session; mismatch -> 403; anonymous -> 401 unless non-production opt-in. |
-| APP-API-001 | Bootstrap | PARTIAL | lib/v2/learner-service.ts (bootstrap); hosted-app/api/v3.ts; app/api/v3/[...path]/route.ts | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts; tests/ui/api-v3.spec.ts | Returns learner/session/state/next/config ids/capabilities. Session registry is in-memory per server instance; durable session state is the platform's (needs the platform session API or a shared store). Entitlement context not yet read from the launch grant. |
+| APP-API-001 | Bootstrap | PARTIAL | lib/v2/learner-service.ts (bootstrap); api/v3.ts; app/api/v3/[...path]/route.ts | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts; tests/ui/api-v3.spec.ts | Returns learner/session/state/next/config ids/capabilities, durably. Entitlement context from the launch grant is not yet read. |
 | APP-API-002 | Initial assessment | IMPLEMENTED_TESTED | lib/v2/learner-service.ts; lib/v2/file-assessment-store.ts | v2/app-api-learner-service.test.ts; tests/ui/api-v3.spec.ts | Start/submit/finalize idempotent; durable file store. |
 | APP-API-003 | Next activity | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (nextActivity) | v2/app-api-learner-service.test.ts | Deterministic across assessment/new/practice/review/readiness. Readiness provider is an injected port (no stream persistence yet); News Reader is a parallel path, never chosen over core. |
 | APP-API-004 | Passage completion | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (completePassage) | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts | Validates, stores immutable attempt, scores, decides, returns child-safe feedback; idempotent; engine-owned WPM enforced; review sessions refused. |
@@ -261,7 +239,7 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-API-006 | BPC retrieval | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (bpc) | v2/app-api-learner-service.test.ts | Only after the attempt is committed; GREEN, NOT_GREEN and technical alike. Production BPC catalog is empty until approved content exists (fails closed with CONTENT_MISSING). |
 | APP-API-007 | News Reader | IMPLEMENTED_TESTED | api/v3.ts; ui/learner/NewsReader.tsx | v2/app-api-v3-news-reader.test.ts; tests/ui/learner-v3-news-reader.spec.ts | Separate passages/start/read path with its own state. Only completed stories are offered (no canonical spoilers). |
 | APP-API-008 | Progress | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (progress, parentProgress) | v2/app-api-learner-service.test.ts; v2/app-api-v3-routes.test.ts; tests/ui/api-v3.spec.ts | Child-safe vs internal-key-authorized parent detail. The parent authorization model (internal key) is an assumption pending a platform parent scope. |
-| APP-API-009 | Resume | PARTIAL | lib/v2/learner-service.ts (resume); lib/v2/session-envelope.ts | v2/app-api-learner-service.test.ts | Resume within 15 min with no duplicated events is tested; same in-memory session-registry caveat as API-001. |
+| APP-API-009 | Resume | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (resume); session persistence | v2/app-api-learner-service.test.ts; v2/app-data-supabase-adapters.test.ts | Resume across instances with no duplicated events. |
 | APP-API-010 | Calibration/ops | IMPLEMENTED_TESTED | lib/v2/learner-service.ts (opsSummary) | v2/app-api-learner-service.test.ts; tests/ui/api-v3.spec.ts | Aggregate-only, internal-key-gated; fails closed when no key configured. |
 | APP-KM-001 | Correct delivery coordinate | PARTIAL | lib/sr/runtime/package-loader.ts; lib/world1-framework.ts | sr/sr-001b-approved-profile.test.ts | Loader fails closed; no approved Knowledge Map package exists yet, so delivery_session path cannot run end-to-end. |
 | APP-KM-002 | Shared canonical tokenizer | PARTIAL | lib/sr/pipeline-v2/count100.ts; lib/v2/oral-telemetry.ts | sr/pipeline-v2 count100 tests | Telemetry consumes canonical tokens; learner renderer not yet built on it (Phase 5). |

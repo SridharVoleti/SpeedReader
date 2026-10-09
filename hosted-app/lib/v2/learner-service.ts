@@ -13,7 +13,7 @@ import { ASR_POLICY, type AsrPolicy, type TechnicalReason } from "./spoken-evide
 import { assertNoInternalLeak, buildLearnerFeedback, buildLevelUpFeedback, type LearnerFeedback } from "./learner-feedback";
 import { bookTimeImpact, type BookTimeImpact } from "./book-time";
 import { bestComprehensionFor, lockScoring, newBpcAttempt, submitAttempt, type BpcContent } from "./best-comprehension";
-import { attemptRulesForSession, SESSION_POLICY_V1, type SessionRecord, type SessionRegistry } from "./session-envelope";
+import { attemptRulesForSession, SESSION_POLICY_V1, type SessionPersistence, type SessionRecord, type SessionRegistry } from "./session-envelope";
 import { selectFamiliarPassage, type CompletedPassage } from "./familiar-practice";
 import { recordNewsReaderAttempt, type NewsReaderAttempt } from "./news-reader";
 import { twoReadCoaching } from "./news-reader-coaching";
@@ -24,14 +24,16 @@ import { CURRENT_CALIBRATION } from "./calibration";
 import { GREEN_THRESHOLD } from "./comprehension-threshold";
 import { RECENCY_POLICY_V1 } from "./evidence-recency";
 import { ORAL_CONFIG_V1 } from "./oral-telemetry";
-import type { LearnerRepository, StoredSnapshot } from "./learner-repository";
+import type { LearnerRepository, MaybePromise, StoredSnapshot } from "./learner-repository";
 import type { ReadinessStream } from "./readiness-lifecycle";
 
 // ---------------------------------------------------------------------------------------------------- ports
 
+export type StoredAssessment = { state: AssessmentState; assessmentId: string; keys: string[]; record: AssessmentRecord | null };
+
 export interface AssessmentStore {
-  load(learnerId: string): { state: AssessmentState; assessmentId: string; keys: string[]; record: AssessmentRecord | null } | null;
-  save(learnerId: string, value: { state: AssessmentState; assessmentId: string; keys: string[]; record: AssessmentRecord | null }): void;
+  load(learnerId: string): MaybePromise<StoredAssessment | null>;
+  save(learnerId: string, value: StoredAssessment): MaybePromise<void>;
 }
 
 export class MemoryAssessmentStore implements AssessmentStore {
@@ -44,6 +46,8 @@ export type ServiceDeps = {
   repo: LearnerRepository;
   assessments: AssessmentStore;
   sessions: SessionRegistry;
+  /** Optional durable session storage. Without it sessions live only in this process. */
+  sessionStore?: SessionPersistence;
   /** Approved BPC content: a fixed list, or a per-passage lookup backed by the content provider. */
   bpcCatalog: readonly BpcContent[] | ((passageId: string) => BpcContent | null);
   referenceAudio?: readonly ReferenceAudio[];
@@ -129,20 +133,33 @@ export class LearnerService {
     this.newId = deps.newId ?? ((p) => `${p}-${Date.now().toString(36)}-${(this.counter += 1)}`);
   }
 
-  private session(ctx: Ctx): SessionRecord | ServiceError {
+  /** Load this learner's persisted sessions into the registry (no-op without a durable store). */
+  private async hydrate(learnerId: string): Promise<void> {
+    if (this.deps.sessionStore) this.deps.sessions.hydrate(learnerId, await this.deps.sessionStore.load(learnerId));
+  }
+
+  /** Persist this learner's sessions after any change. */
+  private async flush(learnerId: string): Promise<void> {
+    if (this.deps.sessionStore) await this.deps.sessionStore.save(learnerId, this.deps.sessions.list(learnerId));
+  }
+
+  private async session(ctx: Ctx): Promise<SessionRecord | ServiceError> {
+    await this.hydrate(ctx.learnerId);
     const s = this.deps.sessions.active(ctx.learnerId, this.now());
     if (!s || s.sessionId !== ctx.sessionId) return fail(409, "no active session: bootstrap again");
     if (s.deviceId !== ctx.deviceId) return fail(409, "session is active on another device");
     return s;
   }
 
-  private checkpoint(ctx: Ctx, activity: string, position: number, key: string): void {
+  private async checkpoint(ctx: Ctx, activity: string, position: number, key: string): Promise<void> {
     this.deps.sessions.checkpoint(ctx.learnerId, ctx.sessionId, this.now(), { activity, position, committedEventKeys: [key] });
+    await this.flush(ctx.learnerId);
   }
 
   // ---- APP-API-001 bootstrap / APP-API-009 resume ----------------------------------------------------
 
-  bootstrap(ctx: Ctx): Ok<{ session: Pick<SessionRecord, "sessionId" | "kind" | "endsAt" | "ordinal">; resumed: boolean; state: "ASSESSMENT_REQUIRED" | "READY"; next: Activity; config: Record<string, string>; capabilities: typeof CLIENT_CAPABILITIES; resumeFrom: SessionRecord["checkpoint"] | null }> | ServiceError {
+  async bootstrap(ctx: Ctx): Promise<Ok<{ session: Pick<SessionRecord, "sessionId" | "kind" | "endsAt" | "ordinal">; resumed: boolean; state: "ASSESSMENT_REQUIRED" | "READY"; next: Activity; config: Record<string, string>; capabilities: typeof CLIENT_CAPABILITIES; resumeFrom: SessionRecord["checkpoint"] | null }> | ServiceError> {
+    await this.hydrate(ctx.learnerId);
     const now = this.now();
     let resumed = false;
     let resumeFrom: SessionRecord["checkpoint"] | null = null;
@@ -156,18 +173,19 @@ export class LearnerService {
         if (!started.ok) return fail(started.reason === "WEEKLY_LIMIT_REACHED" ? 429 : 409, started.reason);
         session = started.session;
       }
+      await this.flush(ctx.learnerId);
     }
-    return this.bootstrapResult(ctx, session, resumed, resumeFrom);
+    return await this.bootstrapResult(ctx, session, resumed, resumeFrom);
   }
 
-  private bootstrapResult(ctx: Ctx, session: SessionRecord, resumed: boolean, resumeFrom: SessionRecord["checkpoint"] | null) {
-    const next = this.nextActivity(ctx);
+  private async bootstrapResult(ctx: Ctx, session: SessionRecord, resumed: boolean, resumeFrom: SessionRecord["checkpoint"] | null) {
+    const next = await this.nextActivity(ctx);
     return {
       ok: true as const,
       session: { sessionId: session.sessionId, kind: session.kind, endsAt: session.endsAt, ordinal: session.ordinal },
       resumed,
       resumeFrom,
-      state: (this.deps.repo.load(ctx.learnerId) ? "READY" : "ASSESSMENT_REQUIRED") as "ASSESSMENT_REQUIRED" | "READY",
+      state: (await this.deps.repo.load(ctx.learnerId) ? "READY" : "ASSESSMENT_REQUIRED") as "ASSESSMENT_REQUIRED" | "READY",
       next: "ok" in next ? ({ activity: "NONE", reason: next.error } as Activity) : next,
       config: {
         calibration: CURRENT_CALIBRATION.version,
@@ -182,38 +200,40 @@ export class LearnerService {
     };
   }
 
-  resume(ctx: Ctx): ReturnType<LearnerService["bootstrap"]> {
+  async resume(ctx: Ctx): Promise<Awaited<ReturnType<LearnerService["bootstrap"]>>> {
+    await this.hydrate(ctx.learnerId);
     const r = this.deps.sessions.resume({ learnerId: ctx.learnerId, sessionId: ctx.sessionId, deviceId: ctx.deviceId, now: this.now() });
     if (!r.ok) return fail(409, r.reason);
+    await this.flush(ctx.learnerId);
     return this.bootstrapResult(ctx, r.session, true, r.resumeFrom);
   }
 
   // ---- APP-API-002 initial assessment ------------------------------------------------------------------
 
-  startAssessment(ctx: Ctx): Ok<{ assessmentId: string; nextWpm: number; status: AssessmentState["status"] }> | ServiceError {
-    const s = this.session(ctx); if ("ok" in s) return s;
-    if (this.deps.repo.load(ctx.learnerId)) return fail(409, "assessment already completed");
-    let stored = this.deps.assessments.load(ctx.learnerId);
+  async startAssessment(ctx: Ctx): Promise<Ok<{ assessmentId: string; nextWpm: number; status: AssessmentState["status"] }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    if (await this.deps.repo.load(ctx.learnerId)) return fail(409, "assessment already completed");
+    let stored = await this.deps.assessments.load(ctx.learnerId);
     if (!stored) {
       stored = { state: newAssessment(), assessmentId: this.newId("ASSESS"), keys: [], record: null };
-      this.deps.assessments.save(ctx.learnerId, stored);
+      await this.deps.assessments.save(ctx.learnerId, stored);
     }
     return { ok: true, assessmentId: stored.assessmentId, nextWpm: stored.state.currentWpm, status: stored.state.status };
   }
 
   /** Where the in-progress assessment stands: the next speed to read at and how many attempts are done. */
-  assessmentPending(ctx: Ctx): Ok<{ nextWpm: number; attemptsDone: number }> | ServiceError {
-    const s = this.session(ctx); if ("ok" in s) return s;
-    if (this.deps.repo.load(ctx.learnerId)) return fail(409, "assessment already completed");
-    const stored = this.deps.assessments.load(ctx.learnerId);
+  async assessmentPending(ctx: Ctx): Promise<Ok<{ nextWpm: number; attemptsDone: number }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    if (await this.deps.repo.load(ctx.learnerId)) return fail(409, "assessment already completed");
+    const stored = await this.deps.assessments.load(ctx.learnerId);
     if (!stored) return fail(409, "assessment not started");
     if (stored.state.status === "COMPLETE") return fail(409, "assessment is complete: finalize it");
     return { ok: true, nextWpm: stored.state.currentWpm, attemptsDone: stored.state.attempts.length };
   }
 
-  submitAssessmentAttempt(ctx: Ctx, req: { key: string; wpm: number; comprehensionScore: number; durationSec: number }): Ok<{ nextWpm: number | null; status: AssessmentState["status"]; replayed: boolean }> | ServiceError {
-    const s = this.session(ctx); if ("ok" in s) return s;
-    const stored = this.deps.assessments.load(ctx.learnerId);
+  async submitAssessmentAttempt(ctx: Ctx, req: { key: string; wpm: number; comprehensionScore: number; durationSec: number }): Promise<Ok<{ nextWpm: number | null; status: AssessmentState["status"]; replayed: boolean }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    const stored = await this.deps.assessments.load(ctx.learnerId);
     if (!stored) return fail(409, "assessment not started");
     if (!req.key) return fail(400, "key is required");
     if (stored.keys.includes(req.key)) return { ok: true, nextWpm: stored.state.status === "COMPLETE" ? null : stored.state.currentWpm, status: stored.state.status, replayed: true };
@@ -225,21 +245,21 @@ export class LearnerService {
       return fail(400, e instanceof Error ? e.message : "invalid attempt");
     }
     stored.keys.push(req.key);
-    this.deps.assessments.save(ctx.learnerId, stored);
-    this.checkpoint(ctx, "INITIAL_ASSESSMENT", stored.state.attempts.length, `assess:${req.key}`);
+    await this.deps.assessments.save(ctx.learnerId, stored);
+    await this.checkpoint(ctx, "INITIAL_ASSESSMENT", stored.state.attempts.length, `assess:${req.key}`);
     return { ok: true, nextWpm: stored.state.status === "COMPLETE" ? null : stored.state.currentWpm, status: stored.state.status, replayed: false };
   }
 
-  finalizeAssessment(ctx: Ctx): Ok<{ assessmentId: string; startingWpm: number; replayed: boolean }> | ServiceError {
-    const s = this.session(ctx); if ("ok" in s) return s;
-    const stored = this.deps.assessments.load(ctx.learnerId);
+  async finalizeAssessment(ctx: Ctx): Promise<Ok<{ assessmentId: string; startingWpm: number; replayed: boolean }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    const stored = await this.deps.assessments.load(ctx.learnerId);
     if (!stored) return fail(409, "assessment not started");
     if (stored.record) return { ok: true, assessmentId: stored.record.assessmentId, startingWpm: stored.record.startingWpm, replayed: true };
     if (stored.state.status !== "COMPLETE") return fail(409, "assessment is not complete");
     const record = toAssessmentRecord(stored.state, { assessmentId: stored.assessmentId, learnerId: ctx.learnerId }, this.now());
-    if (!this.deps.repo.load(ctx.learnerId)) this.deps.repo.create(newLearnerAggregate(ctx.learnerId, record.startingWpm));
+    if (!await this.deps.repo.load(ctx.learnerId)) await this.deps.repo.create(newLearnerAggregate(ctx.learnerId, record.startingWpm));
     stored.record = record;
-    this.deps.assessments.save(ctx.learnerId, stored);
+    await this.deps.assessments.save(ctx.learnerId, stored);
     return { ok: true, assessmentId: record.assessmentId, startingWpm: record.startingWpm, replayed: false };
   }
 
@@ -254,8 +274,9 @@ export class LearnerService {
   }
 
   /** Deterministic scheduler. Domain evidence rules are preserved by never choosing outside the allowed set. */
-  nextActivity(ctx: Ctx): Activity | ServiceError {
-    const snap = this.deps.repo.load(ctx.learnerId);
+  async nextActivity(ctx: Ctx): Promise<Activity | ServiceError> {
+    await this.hydrate(ctx.learnerId);
+    const snap = await this.deps.repo.load(ctx.learnerId);
     if (!snap) return { activity: "INITIAL_ASSESSMENT" };
     const learner = snap.learner;
     const session = this.deps.sessions.active(ctx.learnerId, this.now());
@@ -283,10 +304,10 @@ export class LearnerService {
 
   // ---- APP-API-004 passage completion ------------------------------------------------------------------
 
-  completePassage(ctx: Ctx, req: PassageCompletionRequest): Ok<{ feedback: ChildFeedback; replayed: boolean }> | ServiceError {
-    const s = this.session(ctx); if ("ok" in s) return s;
+  async completePassage(ctx: Ctx, req: PassageCompletionRequest): Promise<Ok<{ feedback: ChildFeedback; replayed: boolean }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
     if (attemptRulesForSession(s.kind).attemptType !== "NEW_PROGRESSION") return fail(409, "a review session cannot record new-progression evidence");
-    const snap = this.deps.repo.load(ctx.learnerId);
+    const snap = await this.deps.repo.load(ctx.learnerId);
     if (!snap) return fail(409, "initial assessment required");
     if (!req.attemptId || !req.passageId) return fail(400, "attemptId and passageId are required");
     if (!(req.displayedWpm > 0)) return fail(400, "displayedWpm must be positive");
@@ -332,9 +353,9 @@ export class LearnerService {
       // an invalid record is rejected as a request problem, never a crash and never stored (APP-DATA-002 validation)
       return fail(422, e instanceof Error ? e.message : "invalid attempt");
     }
-    const committed = this.deps.repo.commit(ctx.learnerId, out.learner, { expectedVersion: snap.version, idempotencyKey: key });
+    const committed = await this.deps.repo.commit(ctx.learnerId, out.learner, { expectedVersion: snap.version, idempotencyKey: key });
     if (!committed.ok) return fail(committed.reason === "VERSION_CONFLICT" ? 409 : 500, committed.reason);
-    this.checkpoint(ctx, "PASSAGE_COMPLETE", out.learner.canonicalPointer, key);
+    await this.checkpoint(ctx, "PASSAGE_COMPLETE", out.learner.canonicalPointer, key);
     return { ok: true, feedback: this.feedbackFor(out.record, snap.learner.baselineWpm), replayed: committed.replayed };
   }
 
@@ -354,9 +375,9 @@ export class LearnerService {
 
   // ---- familiar practice (APP-PRAC) -------------------------------------------------------------------
 
-  completePractice(ctx: Ctx, req: { attemptId: string; passageId: string; displayedWpm: number }): Ok<{ feedback: LearnerFeedback; replayed: boolean }> | ServiceError {
-    const s = this.session(ctx); if ("ok" in s) return s;
-    const snap = this.deps.repo.load(ctx.learnerId);
+  async completePractice(ctx: Ctx, req: { attemptId: string; passageId: string; displayedWpm: number }): Promise<Ok<{ feedback: LearnerFeedback; replayed: boolean }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    const snap = await this.deps.repo.load(ctx.learnerId);
     if (!snap) return fail(409, "initial assessment required");
     const learner = snap.learner;
     if ((learner.practiceLog ?? []).some((p) => p.attemptId === req.attemptId)) return { ok: true, feedback: buildLearnerFeedback({ attemptId: req.attemptId, score: null, classification: null }), replayed: true };
@@ -367,9 +388,9 @@ export class LearnerService {
       practiceServedSinceLastNew: true,
       practiceLog: [...(learner.practiceLog ?? []), { attemptId: req.attemptId, passageId: req.passageId, wpm: req.displayedWpm, attemptType: "FAMILIAR_PRACTICE", sessionId: ctx.sessionId, recordedAt: this.now() }]
     };
-    const committed = this.deps.repo.commit(ctx.learnerId, next, { expectedVersion: snap.version, idempotencyKey: `practice:${req.attemptId}` });
+    const committed = await this.deps.repo.commit(ctx.learnerId, next, { expectedVersion: snap.version, idempotencyKey: `practice:${req.attemptId}` });
     if (!committed.ok) return fail(committed.reason === "VERSION_CONFLICT" ? 409 : 500, committed.reason);
-    this.checkpoint(ctx, "PRACTICE_COMPLETE", next.practiceLog!.length, `practice:${req.attemptId}`);
+    await this.checkpoint(ctx, "PRACTICE_COMPLETE", next.practiceLog!.length, `practice:${req.attemptId}`);
     const feedback = { message: "Nice reading! Here is another story to enjoy.", celebration: "NONE" as const, showBestPossibleComprehension: false };
     assertNoInternalLeak(feedback);
     return { ok: true, feedback, replayed: committed.replayed };
@@ -377,8 +398,8 @@ export class LearnerService {
 
   // ---- APP-API-006 BPC ---------------------------------------------------------------------------------
 
-  bpc(ctx: Ctx, attemptId: string): Ok<{ text: string; version: string }> | ServiceError {
-    const snap = this.deps.repo.load(ctx.learnerId);
+  async bpc(ctx: Ctx, attemptId: string): Promise<Ok<{ text: string; version: string }> | ServiceError> {
+    const snap = await this.deps.repo.load(ctx.learnerId);
     if (!snap) return fail(409, "initial assessment required");
     const record = snap.learner.ledger.find((r) => r.attemptId === attemptId);
     // no committed, scored-or-technically-resolved record means scoring is not locked: nothing is released
@@ -394,24 +415,24 @@ export class LearnerService {
 
   // ---- APP-API-007 News Reader -------------------------------------------------------------------------
 
-  newsReaderStart(ctx: Ctx, passageId: string, platform: Platform = "web"): Ok<{ passageId: string; delivery: ReturnType<typeof resolveReferenceDelivery> }> | ServiceError {
-    const s = this.session(ctx); if ("ok" in s) return s;
-    const snap = this.deps.repo.load(ctx.learnerId);
+  async newsReaderStart(ctx: Ctx, passageId: string, platform: Platform = "web"): Promise<Ok<{ passageId: string; delivery: ReturnType<typeof resolveReferenceDelivery> }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    const snap = await this.deps.repo.load(ctx.learnerId);
     if (!snap) return fail(409, "initial assessment required");
     return { ok: true, passageId, delivery: resolveReferenceDelivery(this.deps.referenceAudio ?? [], passageId, platform) };
   }
 
-  newsReaderSubmit(ctx: Ctx, attempt: NewsReaderAttempt): Ok<{ coaching: ReturnType<typeof twoReadCoaching> }> | ServiceError {
-    const s = this.session(ctx); if ("ok" in s) return s;
-    const snap = this.deps.repo.load(ctx.learnerId);
+  async newsReaderSubmit(ctx: Ctx, attempt: NewsReaderAttempt): Promise<Ok<{ coaching: ReturnType<typeof twoReadCoaching> }> | ServiceError> {
+    const s = await this.session(ctx); if ("ok" in s) return s;
+    const snap = await this.deps.repo.load(ctx.learnerId);
     if (!snap) return fail(409, "initial assessment required");
     let state;
     try { state = recordNewsReaderAttempt(snap.learner.newsReader, attempt); } catch (e) { return fail(400, e instanceof Error ? e.message : "invalid attempt"); }
     if (state !== snap.learner.newsReader) {
       // only the News Reader namespace changes: core WPM, pointer and ledger are carried over untouched
-      const committed = this.deps.repo.commit(ctx.learnerId, { ...snap.learner, newsReader: state }, { expectedVersion: snap.version, idempotencyKey: `nr:${attempt.attemptId}` });
+      const committed = await this.deps.repo.commit(ctx.learnerId, { ...snap.learner, newsReader: state }, { expectedVersion: snap.version, idempotencyKey: `nr:${attempt.attemptId}` });
       if (!committed.ok) return fail(committed.reason === "VERSION_CONFLICT" ? 409 : 500, committed.reason);
-      this.checkpoint(ctx, "NEWS_READER", state.attempts.length, `nr:${attempt.attemptId}`);
+      await this.checkpoint(ctx, "NEWS_READER", state.attempts.length, `nr:${attempt.attemptId}`);
     }
     return { ok: true, coaching: twoReadCoaching(state, attempt.passageId) };
   }
@@ -419,8 +440,8 @@ export class LearnerService {
   // ---- APP-API-008 progress ----------------------------------------------------------------------------
 
   /** Child-safe progress: the earned WPM and canonical progress, nothing internal. */
-  progress(ctx: Ctx): Ok<{ currentWpm: number; startingWpm: number; storiesRead: number }> | ServiceError {
-    const snap = this.deps.repo.load(ctx.learnerId);
+  async progress(ctx: Ctx): Promise<Ok<{ currentWpm: number; startingWpm: number; storiesRead: number }> | ServiceError> {
+    const snap = await this.deps.repo.load(ctx.learnerId);
     if (!snap) return fail(409, "initial assessment required");
     const view = { currentWpm: snap.learner.core.wpm, startingWpm: snap.learner.baselineWpm, storiesRead: snap.learner.canonicalPointer - 1 };
     assertNoInternalLeak(view);
@@ -428,9 +449,9 @@ export class LearnerService {
   }
 
   /** Parent/internal detail: only when the caller has been separately authorized by the transport layer. */
-  parentProgress(learnerId: string, authorized: boolean): Ok<{ report: ParentReport }> | ServiceError {
+  async parentProgress(learnerId: string, authorized: boolean): Promise<Ok<{ report: ParentReport }> | ServiceError> {
     if (!authorized) return fail(403, "parent detail requires separate authorization");
-    const snap = this.deps.repo.load(learnerId);
+    const snap = await this.deps.repo.load(learnerId);
     if (!snap) return fail(404, "unknown learner");
     return { ok: true, report: buildParentReport({ learner: snap.learner, readiness: this.deps.readiness?.(learnerId) }) };
   }
@@ -438,7 +459,7 @@ export class LearnerService {
   // ---- APP-API-010 calibration / ops -------------------------------------------------------------------
 
   /** Aggregate-only operational metrics for authorized internal callers; never child-facing. */
-  opsSummary(snapshots: readonly StoredSnapshot[], authorized: boolean): Ok<{ learners: number; attempts: number; levelUps: number; unresolvedTechnical: number }> | ServiceError {
+  async opsSummary(snapshots: readonly StoredSnapshot[], authorized: boolean): Promise<Ok<{ learners: number; attempts: number; levelUps: number; unresolvedTechnical: number }> | ServiceError> {
     if (!authorized) return fail(403, "internal authorization required");
     let attempts = 0; let levelUps = 0; let unresolved = 0;
     for (const s of snapshots) {
