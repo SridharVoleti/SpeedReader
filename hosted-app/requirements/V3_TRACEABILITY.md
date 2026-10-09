@@ -120,14 +120,14 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-ORAL-007 | No cross-RS raw comparison | TODO | | | |
 | APP-ORAL-008 | Competency timelines | TODO | | | |
 | APP-ORAL-009 | Baseline strength | TODO | | | |
-| APP-READY-001 | Controlled readiness forms | TODO | | | |
-| APP-READY-002 | Identity separation | TODO | | | |
-| APP-READY-003 | Attempt outcome ontology | TODO | | | |
-| APP-READY-004 | Attempt roles | TODO | | | |
-| APP-READY-005 | Initial confirmation cannot be skipped | TODO | | | |
-| APP-READY-006 | No retry lottery | TODO | | | |
-| APP-READY-007 | Technical replacement preserves lifecycle phase | TODO | | | |
-| APP-READY-008 | Core progression precedence | TODO | | | |
+| APP-READY-001 | Controlled readiness forms | IMPLEMENTED_TESTED | lib/v2/readiness-forms.ts | v2/fr-044-readiness-forms.test.ts | Pre-generated QA-approved equivalent forms only; independent reviewer. |
+| APP-READY-002 | Identity separation | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts | Five separate identifiers required; canonical position consumption refused. DB persistence under APP-DB-008. |
+| APP-READY-003 | Attempt outcome ontology | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts |  |
+| APP-READY-004 | Attempt roles | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts | Roles per this spec; must be re-checked against the approved scoring contract when it exists. |
+| APP-READY-005 | Initial confirmation cannot be skipped | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts |  |
+| APP-READY-006 | No retry lottery | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts | Remediation gate + no form reuse + nextForm withheld. |
+| APP-READY-007 | Technical replacement preserves lifecycle phase | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts | v2/app-ready-lifecycle.test.ts |  |
+| APP-READY-008 | Core progression precedence | IMPLEMENTED_TESTED | lib/v2/readiness-lifecycle.ts; lib/v2/world1-completion.ts | v2/app-ready-lifecycle.test.ts; v2/fr-043-news-reader-no-world-block.test.ts | Static import-isolation test. |
 | APP-RECENCY-001 | Current evidence principle | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
 | APP-RECENCY-002 | Versioned configurable clocks | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
 | APP-RECENCY-003 | Current pilot defaults | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
@@ -136,10 +136,10 @@ Status values: `TODO` (not evaluated) | `NOT_IMPLEMENTED` | `PARTIAL` | `IMPLEME
 | APP-RECENCY-006 | Version invalidation has precedence | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
 | APP-RECENCY-007 | Revalidation pass/fail | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
 | APP-RECENCY-008 | Audit | IMPLEMENTED_TESTED | lib/v2/evidence-recency.ts; lib/v2/threshold-lifecycle.ts | tests/unit/v2/fr-045-evidence-recency.test.ts | Domain layer verified (cae4c05). Persisting the audit record is tracked under APP-DATA/APP-DB. |
-| APP-CLOSE-001 | P1500 alone is not mastery | TODO | | | |
-| APP-CLOSE-002 | 150 WPM is not required | TODO | | | |
-| APP-CLOSE-003 | Level Ups are not readiness certification | TODO | | | |
-| APP-CLOSE-004 | News Reader cannot block core World progression | TODO | | | |
+| APP-CLOSE-001 | P1500 alone is not mastery | IMPLEMENTED_TESTED | lib/v2/world1-completion.ts | v2/fr-040-p1500-not-sufficient.test.ts |  |
+| APP-CLOSE-002 | 150 WPM is not required | IMPLEMENTED_TESTED | lib/v2/world1-completion.ts | v2/fr-041-150-not-mandatory.test.ts |  |
+| APP-CLOSE-003 | Level Ups are not readiness certification | IMPLEMENTED_TESTED | lib/v2/world1-completion.ts | v2/fr-042-levelups-not-readiness.test.ts |  |
+| APP-CLOSE-004 | News Reader cannot block core World progression | IMPLEMENTED_TESTED | lib/v2/world1-completion.ts | v2/fr-043-news-reader-no-world-block.test.ts |  |
 | APP-DATA-001 | Explicit attempt type | TODO | | | |
 | APP-DATA-002 | Required attempt fields | TODO | | | |
 | APP-DATA-003 | Immutable evidence | TODO | | | |
