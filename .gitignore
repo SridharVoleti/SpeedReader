@@ -40,3 +40,6 @@ dist/
 .venv/
 .data/
 .sr-e2e/
+
+# narrated local browser tests
+/watch-results/
