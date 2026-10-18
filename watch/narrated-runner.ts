@@ -6,6 +6,7 @@ export type WatchRequirement = {
   title: string;
   expected: string;
   scope: "DOMAIN DEMONSTRATION" | "REAL LEARNER UI";
+  chapter?: string;
 };
 
 const pause = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -50,7 +51,7 @@ async function introduction(page: Page, req: WatchRequirement): Promise<void> {
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 60% 25%,#1b3661,#08111f 65%);color:#fff;font-family:Segoe UI,Arial,sans-serif;display:grid;place-items:center;height:100vh}
 main{width:min(950px,90vw)}.top{font-size:18px;letter-spacing:.2em;color:#9bd8ff;text-transform:uppercase}h1{font-size:66px;margin:22px 0 12px}h2{font-size:33px;margin:0 0 28px;color:#f8cf67}.expected{border-left:8px solid #f8cf67;padding:18px 24px;background:#14263d;font-size:28px;line-height:1.5}footer{margin-top:36px;font-size:20px;color:#abc2dc}
 </style></head><body><main><div class="top">Babysteps Speed Reader · ${escapeHtml(req.scope)}</div>
-<h1>${escapeHtml(req.id)}</h1><h2>${escapeHtml(req.title)}</h2><div class="expected"><b>EXPECTED OUTCOME</b><p>${escapeHtml(req.expected)}</p></div><footer>${process.env.WATCH_NARRATE === "off" ? "Narration manually disabled — diagnostic mode" : "🔊 Narrating the requirement before the test begins"}</footer></main></body></html>`);
+<h1>${escapeHtml(req.id)}${req.chapter ? ` <span style="font-size:24px;color:#a5dfff">${escapeHtml(req.chapter)}</span>` : ""}</h1><h2>${escapeHtml(req.title)}</h2><div class="expected"><b>EXPECTED OUTCOME</b><p>${escapeHtml(req.expected)}</p></div><footer>${process.env.WATCH_NARRATE === "off" ? "Narration manually disabled — diagnostic mode" : "🔊 Narrating the requirement before the test begins"}</footer></main></body></html>`);
   await pause(pace);
   await say(`Requirement ${req.id}. ${req.title}. Expected outcome: ${req.expected}. Now beginning the test.`);
   await pause(pace);
@@ -73,7 +74,7 @@ async function hud(page: Page, req: WatchRequirement, message: string, status: s
       e.textContent = label + value;
       node!.appendChild(e);
     };
-    line("", req.id + " · " + req.scope, "18px", "#9bd8ff");
+    line("", req.id + (req.chapter ? " · " + req.chapter : "") + " · " + req.scope, "18px", "#9bd8ff");
     line("", req.title, "23px");
     line("EXPECT: ", req.expected, "16px", "#ffdf96");
     line("NOW: ", message, "16px");
@@ -108,10 +109,11 @@ export async function watched(
   try {
     await action();
     await hud(page, req, "All specified assertions succeeded.", "PASS");
-    await pause(pace * 3);
+    await say(`${req.id} demonstration complete. All specified assertions passed. This verifies ${req.scope === "DOMAIN DEMONSTRATION" ? "the domain demonstration, not the real learner interface" : "the tested real learner interaction"}.`);
+    await pause(pace * 2);
   } catch (error) {
     const message = error instanceof Error ? error.message.split("\n")[0] : String(error);
-    try { await hud(page, req, message.slice(0, 170), "FAIL"); await pause(pace * 4); } catch { /* preserve first error */ }
+    try { await hud(page, req, message.slice(0, 170), "FAIL"); await say(`${req.id}. Test failed. Check the displayed error and trace report.`); await pause(pace * 4); } catch { /* preserve first error */ }
     throw error;
   }
 }
