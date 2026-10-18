@@ -36,7 +36,7 @@ test("[LIVE] FR-001 five-world requirement on actual learner home screen", async
 test("[LIVE] SR-E2E-001 complete approved passage through typed fallback", async ({ page }) => {
   const req: WatchRequirement = {
     id: "SR-E2E-001", title: "Real child completes an approved passage",
-    expected: "Approved passage is displayed. All four answers and a typed explanation are required. A correct first attempt produces persisted feedback and separate readiness statuses.",
+    expected: "Approved passage is displayed. All four answers and a typed explanation are required. A correct first attempt produces feedback and separate readiness statuses. Persistence must be verified by an additional dedicated test.",
     scope: "REAL LEARNER UI"
   };
   await watched(page, req, async () => {
