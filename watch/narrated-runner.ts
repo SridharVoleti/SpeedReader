@@ -79,7 +79,7 @@ async function hud(page: Page, req: WatchRequirement, message: string, status: s
     line("EXPECT: ", req.expected, "16px", "#ffdf96");
     line("NOW: ", message, "16px");
     line("RESULT: ", status, "22px", status === "PASS" ? "#65e9a5" : status === "FAIL" ? "#ff8282" : "#fff");
-  }, { req, message, status });
+  }, { req: { id: req.id, title: req.title, expected: req.expected, scope: req.scope, chapter: req.chapter }, message, status });
 }
 
 export async function highlight(page: Page, locator: Locator, message: string, req: WatchRequirement): Promise<void> {
