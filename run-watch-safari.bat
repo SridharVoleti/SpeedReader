@@ -16,8 +16,10 @@ echo Close other Speed Reader servers on port 3003 before running.
 call npx playwright test --config=watch/playwright.watch.config.ts
 set "TEST_EXIT=%errorlevel%"
 node watch/generate-coverage.mjs safari
+if exist "watch-results\safari\scorecard.html" start "" "watch-results\safari\scorecard.html"
 if exist "watch-results\safari\html\index.html" start "" "watch-results\safari\html\index.html"
 echo.
+echo Visual scorecard: watch-results\safari\scorecard.html
 echo WebKit watch report: watch-results\safari\coverage.md
 echo Video and traces: watch-results\safari\artifacts
 pause
