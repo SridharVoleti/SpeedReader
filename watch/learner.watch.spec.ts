@@ -122,3 +122,45 @@ test("[LIVE] FR-029 private numeric comprehension on real learner screen", async
     await expect(feedback).not.toContainText(/\b\d+ of \d+\b/);
   });
 });
+
+
+test("[LIVE] FR-024 speech recognition failure is never child failure", async ({ page }) => {
+  const req: WatchRequirement = {
+    id: "FR-024", title: "Speech-recognition failure has a safe fallback",
+    expected: "When automatic speech recognition fails, the learner is offered typing and can complete the passage without a false comprehension failure.",
+    scope: "REAL LEARNER UI"
+  };
+  await watched(page, req, async () => {
+    await page.addInitScript(() => {
+      class BrokenRecognition {
+        onresult: ((e: unknown) => void) | null = null;
+        onerror: (() => void) | null = null;
+        onend: (() => void) | null = null;
+        lang = "en-IN";
+        continuous = false;
+        interimResults = false;
+        start() {
+          setTimeout(() => {
+            this.onerror?.();
+            this.onend?.();
+          }, 30);
+        }
+        stop() {}
+      }
+      Object.defineProperty(window, "SpeechRecognition", { configurable: true, value: BrokenRecognition });
+      Object.defineProperty(window, "webkitSpeechRecognition", { configurable: true, value: BrokenRecognition });
+    });
+    await page.goto(packageUrl);
+    await expect(page.getByTestId("sr-speak")).toBeVisible();
+    await highlight(page, page.getByTestId("sr-speak"), "Attempting speech recording with a simulated microphone/transcription failure.", req);
+    await page.getByTestId("sr-speak").click();
+    const fallback = page.getByTestId("sr-typed-note");
+    await highlight(page, fallback, "The app must offer a usable alternative instead of blaming the learner.", req);
+    await expect(fallback).toContainText("couldn't hear");
+    await answerAll(page, req, 0);
+    await page.getByTestId("sr-transcript").fill(goodExplanation);
+    await page.getByTestId("sr-submit").click();
+    await expect(page.getByTestId("sr-feedback")).toBeVisible();
+    await expect(page.getByTestId("sr-continue")).toBeVisible();
+  });
+});
