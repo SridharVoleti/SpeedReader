@@ -18,15 +18,27 @@ Speech uses Windows System.Speech PowerShell TTS. Audio is **blocking and mandat
 
 Optional: `set WATCH_PACE_MS=1000` in a Command Prompt before calling a launcher to slow down highlights.
 
+## Movie-style playback
+
+1. Full-screen title chapter with the frozen requirement and exact expected outcome.
+2. Windows speaks that introduction **before** opening or interacting with any Speed Reader UI for that test.
+3. The real browser renders and highlights the relevant output or child-facing controls.
+4. Assertions execute against observable browser state.
+5. PASS or FAIL is shown and spoken before the next chapter begins.
+6. After the run, the launch script opens the 49-requirement HTML scorecard and the Playwright movie/trace report.
+
+Browser watch mode is single-worker/serial so chapters do not overlap. Slow it down using `WATCH_PACE_MS`. All videos show the screen but do **not** contain Windows TTS audio.
+
 ## What gets tested now
 
-1. **14 frozen requirement domain demonstrations** checked against explicit expected results, including worlds, passage structure, stamina, WPM rules, comprehension boundaries, and speech uncertainty. These check `/frozen-v2-demo`; they are **not** real-child journey passes.
+1. **49 frozen requirement domain demonstrations** checked against explicit expected results, including worlds, passage structure, stamina, WPM rules, comprehension boundaries, and speech uncertainty. These check `/frozen-v2-demo`; they are **not** real-child journey passes.
 2. **Five actual learner UI cases**: frozen five-world contract visible on the learner home page, approved passage completion, struggling learner retry, unavailable content rejection, and private numeric comprehension feedback. Tests that expose known old UI mismatches should FAIL — that's meaningful evidence, not a test-runner error.
 
-For every requirement in the frozen document, `watch-results/<browser>/coverage.md` identifies whether this increment executed a check, and whether the result was a domain-demo-only or real-UI assertion. Remaining requirements are listed as **NOT AUTOMATED**. All acceptance criteria and independent human QA gates are **not** covered by this initial increment.
+For all 49 functional requirements in the frozen document, `watch-results/<browser>/coverage.md` identifies whether this increment executed a check, and whether the result was a domain-demo-only or real-UI assertion. Remaining requirements are listed as **NOT AUTOMATED**. All acceptance criteria and independent human QA gates are **not** covered by this initial increment.
 
 ## Reports
 
+- `watch-results/<browser>/scorecard.html` — visual 49-FR scorecard, separated into domain and live UI verdicts.
 - `watch-results/<browser>/html/index.html` — interactive test report.
 - `watch-results/<browser>/results.json` — machine-readable results.
 - `watch-results/<browser>/coverage.md` and `coverage.json` — honest frozen-FR coverage inventory.
