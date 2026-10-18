@@ -12,8 +12,10 @@ echo Close other Speed Reader servers on port 3003 before running.
 call npx playwright test --config=watch/playwright.watch.config.ts
 set "TEST_EXIT=%errorlevel%"
 node watch/generate-coverage.mjs edge
+if exist "watch-results\edge\scorecard.html" start "" "watch-results\edge\scorecard.html"
 if exist "watch-results\edge\html\index.html" start "" "watch-results\edge\html\index.html"
 echo.
+echo Visual scorecard: watch-results\edge\scorecard.html
 echo Edge watch report: watch-results\edge\coverage.md
 echo Video and traces: watch-results\edge\artifacts
 pause
