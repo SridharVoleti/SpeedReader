@@ -32,7 +32,7 @@ For every requirement in the frozen document, `watch-results/<browser>/coverage.
 - `watch-results/<browser>/coverage.md` and `coverage.json` — honest frozen-FR coverage inventory.
 - `watch-results/<browser>/artifacts/` — movies, screenshots, and trace archives.
 
-Videos are one clip per case, not a single concatenated movie. The headed browser is the live viewing experience.
+Videos are one clip per case, not a single concatenated movie. The headed browser is the live viewing experience. **Playwright videos do not capture the spoken audio**; narration is heard from the Windows system while watching live. To archive a combined audiovisual movie, use a separate screen recorder.
 
 ## Why we expect some red tests
 
