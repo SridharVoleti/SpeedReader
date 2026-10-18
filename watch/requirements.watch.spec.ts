@@ -549,7 +549,8 @@ const cases: Array<WatchRequirement & { verify: (page: import("@playwright/test"
   },
 ];
 
-for (const requirement of cases) {
+for (const [index, requirement] of cases.entries()) {
+  requirement.chapter = `Requirement ${index + 1} of ${cases.length}`;
   test(`[DOMAIN] ${requirement.id} ${requirement.title}`, async ({ page }) => {
     await watched(page, requirement, async () => {
       await page.goto("/frozen-v2-demo");
