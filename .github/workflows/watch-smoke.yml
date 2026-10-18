@@ -1,10 +1,14 @@
-name: Speed Reader Watch QA — diagnostic smoke
+name: Speed Reader Watch QA — cross-browser smoke
 
 on:
   push:
     branches:
       - feature/narrated-real-user-qa
   workflow_dispatch:
+
+concurrency:
+  group: speedreader-visual-watch-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   webkit-smoke:
@@ -22,20 +26,63 @@ jobs:
         run: npx tsc --noEmit
       - name: Install Playwright WebKit and Linux dependencies
         run: npx playwright install --with-deps webkit
-      - name: Run isolated learner smoke cases (CI speech disabled)
-        run: xvfb-run -a npx playwright test --config=watch/playwright.watch.config.ts --grep "DOMAIN|SR-E2E-001|SR-E2E-003"
+      - name: Run domain demonstrations and learner smoke in WebKit
+        run: xvfb-run -a npx playwright test --config=watch/playwright.watch.config.ts --grep "DOMAIN|CONTROL|SR-E2E-001|SR-E2E-003"
         env:
           WATCH_BROWSER: safari
           WATCH_NARRATE: off
           CI: "true"
           WATCH_PACE_MS: "100"
-      - name: Generate honest frozen requirement coverage
+      - name: Generate frozen requirement scorecard
         if: always()
         run: node watch/generate-coverage.mjs safari
-      - name: Archive videos, traces and coverage
+      - name: Archive movies, traces and coverage
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: speedreader-webkit-watch-smoke
           path: watch-results/safari/
+          if-no-files-found: warn
+
+  windows-browser-smoke:
+    name: Windows ${{ matrix.browser }} browser smoke
+    runs-on: windows-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [edge, chrome]
+    env:
+      WATCH_BROWSER: ${{ matrix.browser }}
+      WATCH_NARRATE: off
+      WATCH_PACE_MS: "100"
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install requested Windows browser channel
+        shell: pwsh
+        run: |
+          if ("${{ matrix.browser }}" -eq "edge") {
+            npx playwright install msedge
+          } else {
+            npx playwright install chrome
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify browser can execute narrated-watch assertions
+        run: npx playwright test --config=watch/playwright.watch.config.ts --grep "FR-013|SR-E2E-003"
+      - name: Generate frozen requirement scorecard
+        if: always()
+        run: node watch/generate-coverage.mjs ${{ matrix.browser }}
+      - name: Archive Windows browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: speedreader-${{ matrix.browser }}-watch-smoke
+          path: watch-results/${{ matrix.browser }}/
           if-no-files-found: warn
