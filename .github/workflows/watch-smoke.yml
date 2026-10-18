@@ -1,0 +1,38 @@
+name: Speed Reader Watch QA — diagnostic smoke
+
+on:
+  push:
+    branches:
+      - feature/narrated-real-user-qa
+  workflow_dispatch:
+
+jobs:
+  webkit-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright WebKit and Linux dependencies
+        run: npx playwright install --with-deps webkit
+      - name: Run isolated learner smoke cases (CI speech disabled)
+        run: xvfb-run -a npx playwright test --config=watch/playwright.watch.config.ts --grep "SR-E2E-001|SR-E2E-003"
+        env:
+          WATCH_BROWSER: safari
+          WATCH_NARRATE: off
+          CI: "true"
+      - name: Generate honest frozen requirement coverage
+        if: always()
+        run: node watch/generate-coverage.mjs safari
+      - name: Archive videos, traces and coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: speedreader-webkit-watch-smoke
+          path: watch-results/safari/
+          if-no-files-found: warn
