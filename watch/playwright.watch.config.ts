@@ -26,7 +26,7 @@ export default defineConfig({
   ],
   use: {
     baseURL: "http://127.0.0.1:3003",
-    headless: false,
+    headless: process.env.CI === "true",
     viewport: { width: 1450, height: 900 },
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
