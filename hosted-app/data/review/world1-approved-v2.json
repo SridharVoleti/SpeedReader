@@ -1,0 +1,2431 @@
+{
+  "source": "world 1/Approved_v2",
+  "sessions": "1-49",
+  "missingSessions": [
+    44
+  ],
+  "passages": [
+    {
+      "session": 1,
+      "id": "W1-0001",
+      "sourceFile": "W1-P0001.json",
+      "sourceSha256": "d8bf396a1ebd4087306e2cb06ed0682f64b2279122d67df55d999ba9d77104d0",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Red Umbrella",
+      "strand": "Self & Character",
+      "rs": "RS01",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Mira was walking home when a bright red umbrella caught her eye. It stood beside a small shop, but nobody was holding it. Mira looked around. The street was busy, and people hurried past. She carried the umbrella inside and asked the shopkeeper if someone had forgotten it. He shook his head. Then Mira noticed a name written neatly on the handle: Asha. The shopkeeper smiled. Asha lived above the bakery next door. Mira took the umbrella there and rang the bell. A woman opened the door, saw the umbrella, and smiled. “I was looking for this!” she said happily.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0001-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "What colour was the umbrella?",
+          "options": null,
+          "answer": "Red.",
+          "primary": false,
+          "hint": "Read again the part that starts “Mira was walking…”.",
+          "explanation": "The story says: “Mira was walking home when a bright red umbrella caught her eye.” So the umbrella was red."
+        },
+        {
+          "id": "W1-0001-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After Mira read the name Asha on the handle, where did she take the umbrella?",
+          "options": null,
+          "answer": "To the home above the bakery.",
+          "primary": false,
+          "hint": "Read again the part that starts “Then Mira noticed a name…”.",
+          "explanation": "The story says: “Asha lived above the bakery next door. Mira took the umbrella there and rang the bell.” So, after reading the name, Mira took the umbrella to the home above the bakery."
+        }
+      ]
+    },
+    {
+      "session": 2,
+      "id": "W1-0011",
+      "sourceFile": "W1-P0002.json",
+      "sourceSha256": "41f14ebb02fc9b3f098f9b53837b72475c5b977bb6043bb343174c72b1c36b73",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "Why Ravi Did Not Wave",
+      "strand": "Family & Friendship",
+      "rs": "RS02",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "On Monday morning, Sam waved at Ravi across the school yard. Ravi did not wave back. He walked straight past with his head down. Sam felt hurt. At break, he told Nina, “Ravi ignored me.” “Let us ask him,” said Nina. They found Ravi by the staff table. He was holding a very full, heavy steel jug. “Sorry,” he said. “Miss Rao asked me to carry this. I could not wave without spilling.” Sam laughed. He held the door open while Nina fetched cups. Ravi poured the cool water carefully. Soon all three friends were happily helping Miss Rao together.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0011-Q1",
+          "dimension": "Direct Recall",
+          "type": "MULTIPLE_CHOICE",
+          "question": "At the staff table, who was holding the very full, heavy steel jug?",
+          "options": [
+            "Sam",
+            "Ravi",
+            "Nina"
+          ],
+          "answer": "Ravi",
+          "primary": false,
+          "hint": "Read again the part that starts “They found…”.",
+          "explanation": "The story says they found Ravi by the staff table, and “He was holding a very full, heavy steel jug.” So the answer is Ravi."
+        },
+        {
+          "id": "W1-0011-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "At the end of the story, who did the three friends happily help together?",
+          "options": null,
+          "answer": "Miss Rao.",
+          "primary": false,
+          "hint": "Read again the very last sentence of the story.",
+          "explanation": "The story ends: “Soon all three friends were happily helping Miss Rao together.” So they helped Miss Rao."
+        }
+      ]
+    },
+    {
+      "session": 3,
+      "id": "W1-0021",
+      "sourceFile": "W1-P0003.json",
+      "sourceSha256": "dd9ab6f4d042ed5e92ef60e8852029513f2207870d0c61f8cc02c8f6882a9cac",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Pile of Notebooks",
+      "strand": "School & Learning",
+      "rs": "RS03",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "After the last class, Dev saw Arun on the stairs holding a huge pile of notebooks. The top book slid and fell. Dev had a tiny choice. His friends were already running to the playground, calling his name. Dev looked at the stairs, then at the playground. He picked up the fallen book and took half the pile. “Where do these go?” he asked. “The staff room,” said Arun. They climbed the stairs together and put the notebooks on Mr Das’s table. Arun smiled and thanked him. Then both boys ran out to the sunny playground to find their friends.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0021-Q1",
+          "dimension": "Direct Recall",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Dev asked, “Where do these go?” Which place did Arun name?",
+          "options": [
+            "The playground",
+            "The stairs",
+            "The staff room"
+          ],
+          "answer": "The staff room",
+          "primary": false,
+          "hint": "Read again what Arun said back to Dev.",
+          "explanation": "Dev asked where the things go, and Arun answered, “The staff room.” So the answer is the staff room."
+        },
+        {
+          "id": "W1-0021-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After the last class, what was Arun holding on the stairs?",
+          "options": null,
+          "answer": "A huge pile of notebooks.",
+          "primary": false,
+          "hint": "Read again the very first sentence of the story.",
+          "explanation": "The story begins: “After the last class, Dev saw Arun on the stairs holding a huge pile of notebooks.” So Arun was holding a huge pile of notebooks."
+        }
+      ]
+    },
+    {
+      "session": 4,
+      "id": "W1-0031",
+      "sourceFile": "W1-P0004.json",
+      "sourceSha256": "4354a3df6979d9d7cbeec9bc6ad00a7b26e557271c9a453e078171eb69335fac",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Last Ball",
+      "strand": "Play, Games & Sports",
+      "rs": "RS04",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Tara's team needed two runs from the last ball. The other players shouted ideas, but Tara kept watching the field. She chose not to swing as hard as she could because the ball might go straight to a fielder. Tara took one breath. She saw an open space near the side and chose a careful shot. The ball rolled past one player. Tara and her partner ran once, turned, and ran again. Two runs. Their team cheered loudly. Tara smiled as everyone gathered around. She had not chosen the biggest hit. She had chosen the safest shot for her team.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0031-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After Tara saw an open space near the side, what kind of shot did she choose?",
+          "options": null,
+          "answer": "A careful shot.",
+          "primary": false,
+          "hint": "Read again what Tara does after she sees the open space near the side.",
+          "explanation": "The story says: “She saw an open space near the side and chose a careful shot.” So she chose a careful shot."
+        },
+        {
+          "id": "W1-0031-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "Tara chose not to swing as hard as she could. What reason does the story give?",
+          "options": null,
+          "answer": "The ball might go straight to a fielder.",
+          "primary": false,
+          "hint": "Read again the sentence that begins “She chose not to swing…”. The reason is in that same sentence.",
+          "explanation": "The story says: “She chose not to swing as hard as she could because the ball might go straight to a fielder.” So the ball might go straight to a fielder."
+        }
+      ]
+    },
+    {
+      "session": 5,
+      "id": "W1-0041",
+      "sourceFile": "W1-P0005.json",
+      "sourceSha256": "17fb5d03c868c359c4dcc108417ce5e94366c1d1e21ce9c1e8dd913e2bbd85d9",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Clever Ant",
+      "strand": "Animals & Living World",
+      "rs": "RS05",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Ria sat by a garden path and watched a small ant pull a crumb. The crumb looked almost as big as the ant. It moved slowly until a dry leaf blocked the way. The ant pushed once, then stopped. Ria leaned closer. The ant turned toward the corner of the leaf and tried a new way. That path was blocked too. It went around the other side, moved under a small stick, and kept going. At last, the ant reached clear ground with the crumb. Ria smiled as the ant carried it into the soft green grass near its home.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0041-Q1",
+          "dimension": "Direct Recall",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Where did Ria sit when she watched the ant?",
+          "options": [
+            "By a garden path",
+            "Under a big tree",
+            "On a green bench"
+          ],
+          "answer": "By a garden path",
+          "primary": false,
+          "hint": "Read again the very first sentence of the story.",
+          "explanation": "The story says: “Ria sat by a garden path and watched a small ant pull a crumb.” So Ria sat by a garden path."
+        },
+        {
+          "id": "W1-0041-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "What first blocked the ant's way?",
+          "options": null,
+          "answer": "A dry leaf.",
+          "primary": false,
+          "hint": "Read again the part that starts “It moved slowly…”.",
+          "explanation": "The story says: “It moved slowly until a dry leaf blocked the way.” So a dry leaf blocked the ant first."
+        }
+      ]
+    },
+    {
+      "session": 6,
+      "id": "W1-0051",
+      "sourceFile": "W1-P0006.json",
+      "sourceSha256": "f05a71e2c8d553778a106f881f42702d5a36984d2dbff7fc570838b8f1672dc8",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Thirsty Plant",
+      "strand": "Nature & Environment",
+      "rs": "RS06",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Ria stepped onto the balcony and stopped. One small plant looked tired, with its leaves hanging low. The other plants stood tall. Ria touched the dry soil and gave the plant some water. By evening, the leaves looked a little better. Ria wanted to pour in more water. But her father said a plant needs the right amount again and again, not one huge drink. So Ria checked the soil each morning and watered it when it felt dry. After a few days, the plant looked brighter and stronger. Ria smiled when she saw a new green leaf growing there.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0051-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "When Ria first stepped onto the balcony, how did one small plant look?",
+          "options": null,
+          "answer": "It looked tired, with its leaves hanging low.",
+          "primary": false,
+          "hint": "Read again the sentence right after Ria stopped on the balcony.",
+          "explanation": "The story says: “One small plant looked tired, with its leaves hanging low.” So the plant looked tired and its leaves hung low."
+        },
+        {
+          "id": "W1-0051-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After her father spoke, what did Ria do each morning?",
+          "options": null,
+          "answer": "She checked the soil and watered the plant when it felt dry.",
+          "primary": false,
+          "hint": "Read again the part that starts “So Ria…”.",
+          "explanation": "The story says: “So Ria checked the soil each morning and watered it when it felt dry.” So she checked the soil and watered the plant when it felt dry."
+        }
+      ]
+    },
+    {
+      "session": 7,
+      "id": "W1-0061",
+      "sourceFile": "W1-P0007.json",
+      "sourceSha256": "dd32f00c4b6a8d0359efe3a0e0b2e172e865e447686e560abbee7baa6f1e66dd",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "Why the Spoon Felt Cold",
+      "strand": "Science & How Things Work",
+      "rs": "RS07",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Leo picked up a metal spoon and a wooden spoon from the kitchen table. He touched both and blinked. The metal spoon felt much colder. “Why?” he asked. Both spoons had been in the same room all morning. His father explained that metal carries heat away from warm fingers faster than wood does. That can make metal feel colder, even when both spoons start at about the same temperature. Leo touched them again. The difference was still easy to notice. He smiled and placed them back on the table. One small touch had given him a brand-new question to explore.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0061-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After Leo touched both spoons, which spoon felt colder to him?",
+          "options": null,
+          "answer": "The metal spoon.",
+          "primary": false,
+          "hint": "Read again what happened right after Leo touched both and blinked.",
+          "explanation": "The story says: “The metal spoon felt much colder.” So the metal spoon is the one that felt colder."
+        },
+        {
+          "id": "W1-0061-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After the metal spoon felt colder, what did Leo ask?",
+          "options": null,
+          "answer": "He asked why the metal spoon felt colder.",
+          "primary": false,
+          "hint": "Read again what happens right after Leo blinked.",
+          "explanation": "The story says the metal spoon felt much colder, and then: “Why?” he asked. So Leo asked why the metal spoon felt colder."
+        }
+      ]
+    },
+    {
+      "session": 8,
+      "id": "W1-0071",
+      "sourceFile": "W1-P0008.json",
+      "sourceSha256": "42528850f9b60ae54a2ce0071f0033e8d02ac6cd9ebd3b9554fc640c82e6db43",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Paper Bridge",
+      "strand": "Making, Building & Inventing",
+      "rs": "RS08",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Maya placed one sheet of paper across two small books. “Can this be a bridge?” she wondered. She put one coin in the middle. The paper bent down at once. Maya tried again. This time, she folded the long sides upward before laying the paper across the books. She added one coin, then another, then three more. The paper stayed up. Maya grinned and kept counting. Her simple bridge held seven coins before it bent. She looked at the folded sides and smiled. The same sheet of paper had become much stronger just because she had changed the paper's shape.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0071-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "At the start, where did Maya place one sheet of paper?",
+          "options": null,
+          "answer": "Across two small books.",
+          "primary": false,
+          "hint": "Read again the very first sentence of the story.",
+          "explanation": "The story begins: “Maya placed one sheet of paper across two small books.” So she put the paper across two small books."
+        },
+        {
+          "id": "W1-0071-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After Maya folded the long sides upward and laid the paper across the books, how many coins did her bridge hold before it bent?",
+          "options": null,
+          "answer": "Seven coins.",
+          "primary": false,
+          "hint": "Read again the part that starts “Her simple bridge…”.",
+          "explanation": "The story says: “Her simple bridge held seven coins before it bent.” So the bridge held seven coins."
+        }
+      ]
+    },
+    {
+      "session": 9,
+      "id": "W1-0081",
+      "sourceFile": "W1-P0009.json",
+      "sourceSha256": "d26c1220213bc7d73a6085267eae626c775b770b8d708e7a49236be2342c04ba",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "Morning at the Railway Station",
+      "strand": "India Around Us",
+      "rs": "RS09",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Neel stood at the railway station with his mother and watched the busy morning. Porters carried bags, families checked tickets, and a voice announced arriving trains. An older traveller looked around and asked, “Where is Platform Four?” Neel knew the way because he had heard the announcement. He pointed to the bridge over the tracks and walked with the traveller toward Platform Four. On the way, they passed a tea stall and another family waiting with suitcases. Soon, the traveller saw the platform sign and smiled. “Thank you,” he said. Neel hurried back, pleased that listening carefully had helped someone.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0081-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After the older traveller asked where Platform Four was, what did Neel do to help him?",
+          "options": null,
+          "answer": "He pointed to the bridge over the tracks and walked with the traveller toward Platform Four.",
+          "primary": false,
+          "hint": "Read again the part right after we learn that Neel knew the way.",
+          "explanation": "The story says: “He pointed to the bridge over the tracks and walked with the traveller toward Platform Four.” That is how Neel helped."
+        },
+        {
+          "id": "W1-0081-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "Why did Neel know the way?",
+          "options": null,
+          "answer": "Because he had heard the announcement.",
+          "primary": false,
+          "hint": "Read again the sentence about Neel knowing the way. Look for the reason that comes after the word “because”.",
+          "explanation": "The story says: “Neel knew the way because he had heard the announcement.” That is the reason."
+        }
+      ]
+    },
+    {
+      "session": 10,
+      "id": "W1-0091",
+      "sourceFile": "W1-P0010.json",
+      "sourceSha256": "17af6bffdc2639290e0fc576d341426b6ca80578d1afc0b0b030f9ad800479dc",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "A Postcard from the Sea",
+      "strand": "Our World & Journeys",
+      "rs": "RS10",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Sara found a postcard from her aunt on the table. The picture showed a tall lighthouse beside a blue sea. On the back her aunt wrote that she had travelled by train, then by boat to reach an island. Sara traced the lighthouse with her finger and imagined the trip. She pictured the train leaving the city and the boat crossing water. At home, her own street suddenly seemed like one tiny part of a much bigger world. She placed the postcard beside her bed. Later she wondered how the lighthouse looked when its light shone across the dark sea.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0091-Q1",
+          "dimension": "Direct Recall",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Who was the postcard from?",
+          "options": [
+            "Her teacher",
+            "Her aunt",
+            "Her friend"
+          ],
+          "answer": "Her aunt",
+          "primary": false,
+          "hint": "Read again the first sentence of the story.",
+          "explanation": "The story says: “Sara found a postcard from her aunt on the table.” So the postcard was from her aunt."
+        },
+        {
+          "id": "W1-0091-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "What was shown in the picture on the postcard?",
+          "options": null,
+          "answer": "A tall lighthouse beside a blue sea.",
+          "primary": false,
+          "hint": "Read again the part that starts “The picture showed…”.",
+          "explanation": "The story says: “The picture showed a tall lighthouse beside a blue sea.” So that is what was in the picture."
+        }
+      ]
+    },
+    {
+      "session": 11,
+      "id": "W1-0101",
+      "sourceFile": "W1-P0011.json",
+      "sourceSha256": "343bf0376b107630194bda7de9a35bbf8a995af8e5e9e8dc7dfdf72f31af3b45",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Clean Park Bench",
+      "strand": "Community & Civic Life",
+      "rs": "RS11",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Maya and Leo raced to their favourite bench in the park. But paper wrappers lay all around it. A little breeze lifted one wrapper and sent it under a bush. The children stopped. Leo picked up the wrappers near the path while Maya asked a park worker for help with the one under the bush. Together they put every wrapper in a bin. The worker thanked them and went back to watering the flowers. Maya and Leo sat down at last. From their clean bench, they could see two birds hopping across the green grass. The park felt welcoming again.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0101-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "When Maya and Leo raced to their favourite bench, what was lying all around it?",
+          "options": null,
+          "answer": "Paper wrappers.",
+          "primary": false,
+          "hint": "Read again the sentence right after they raced to their favourite bench.",
+          "explanation": "The story says: “But paper wrappers lay all around it.” So paper wrappers were around the bench."
+        },
+        {
+          "id": "W1-0101-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After Leo picked up the wrappers and Maya asked for help, what did Maya and Leo do with every wrapper?",
+          "options": null,
+          "answer": "They put them in a bin.",
+          "primary": false,
+          "hint": "Read again the part that starts “Together they…”.",
+          "explanation": "The story says: “Together they put every wrapper in a bin.” So they put the wrappers in a bin."
+        }
+      ]
+    },
+    {
+      "session": 12,
+      "id": "W1-0111",
+      "sourceFile": "W1-P0012.json",
+      "sourceSha256": "9439971eb89e6a20a9fd4d13621a58c004877b59603f5be5acc761de9a381e76",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "Three Coins",
+      "strand": "Money, Resources & Choices",
+      "rs": "RS12",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Ravi held three coins in his palm outside the small shop. A sweet cost three coins. The toy boat in the window cost six. Ravi had wanted that boat since Monday, but the sweet looked good right now. He stepped toward the counter, then stopped. His sister was waiting beside him. Ravi asked her to help him count the coins once more. Three today, perhaps three next week. He put the coins back in his pocket and walked home with her. On the way, they watched a real paper boat glide along a rain puddle. Ravi grinned and followed it.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0111-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "At the start of the story, what did Ravi hold in his palm outside the small shop?",
+          "options": null,
+          "answer": "Three coins.",
+          "primary": false,
+          "hint": "Read again the very first sentence of the story.",
+          "explanation": "The story says: “Ravi held three coins in his palm outside the small shop.” So Ravi held three coins."
+        },
+        {
+          "id": "W1-0111-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After Ravi and his sister counted the coins once more, what did Ravi do with the coins?",
+          "options": null,
+          "answer": "He put them back in his pocket.",
+          "primary": false,
+          "hint": "Read again the sentence that comes after “Three today, perhaps three next week.”",
+          "explanation": "The story says: “He put the coins back in his pocket and walked home with her.” So he put the coins back in his pocket."
+        }
+      ]
+    },
+    {
+      "session": 13,
+      "id": "W1-0121",
+      "sourceFile": "W1-P0013.json",
+      "sourceSha256": "97500cd2363bc54d38a0d350a85f32031b6900c1e767875ec9afa15b569d9e04",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Water Bottle",
+      "strand": "Health, Body & Safety",
+      "rs": "RS13",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Ana was tying her shoes when the school bus sounded its horn. She grabbed her bag and ran to the door. Then she saw her empty water bottle on the table. Yesterday, she had forgotten it and felt thirsty after playtime. The bus was still waiting outside with her father. Ana quickly filled the bottle with filtered water and put it in her bag. Her father checked that the lid was tight. They walked to the bus together. At school, Ana took a drink after playing. The bottle was there when she needed it, cool and smooth against her hand.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0121-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "After Ana ran to the door, where did she see her empty water bottle?",
+          "options": null,
+          "answer": "On the table.",
+          "primary": false,
+          "hint": "Read again the sentence that begins “Then she saw…”.",
+          "explanation": "The story says: “Then she saw her empty water bottle on the table.” So Ana saw her bottle on the table."
+        },
+        {
+          "id": "W1-0121-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "Right after Ana saw her empty bottle, what did she do with it?",
+          "options": null,
+          "answer": "She filled it with water and put it in her bag.",
+          "primary": false,
+          "hint": "Read again the part that starts “The bus was still waiting…” and the sentence right after it.",
+          "explanation": "The story says: “Ana quickly filled the bottle with filtered water and put it in her bag.” So she filled it with water and put it in her bag."
+        }
+      ]
+    },
+    {
+      "session": 14,
+      "id": "W1-0131",
+      "sourceFile": "W1-P0014.json",
+      "sourceSha256": "484134eee4665491b084b9d955db58443aae5acc59626ac374275240e80116af",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Footprints Near the Gate",
+      "strand": "Mystery, Logic & Observation",
+      "rs": "RS14",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Kiran found muddy footprints beside the front gate. They led to the door, then vanished. Had a stray dog come into the yard? He looked closer and saw straight lines across one print. Dogs did not wear shoes. Then his mother opened the door. She said a delivery worker had brought a parcel while Kiran was in the garden. The worker's shoes were muddy because the path outside was wet. Kiran looked at the parcel on the table, then at the prints. The mystery had a simple answer. He smiled and went to wash the mud from his own shoes.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0131-Q1",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "Kiran's mother said someone had brought a parcel while Kiran was in the garden. Who was it?",
+          "options": null,
+          "answer": "A delivery worker.",
+          "primary": false,
+          "hint": "Read again what Kiran's mother said after she opened the door.",
+          "explanation": "The story says: “She said a delivery worker had brought a parcel while Kiran was in the garden.” So the parcel was brought by a delivery worker."
+        },
+        {
+          "id": "W1-0131-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "Why were the delivery worker's shoes muddy?",
+          "options": null,
+          "answer": "Because the path outside was wet.",
+          "primary": false,
+          "hint": "Read again the sentence that tells about the worker's shoes.",
+          "explanation": "The story says: “The worker's shoes were muddy because the path outside was wet.” So the shoes were muddy because the path outside was wet."
+        }
+      ]
+    },
+    {
+      "session": 15,
+      "id": "W1-0141",
+      "sourceFile": "W1-P0015.json",
+      "sourceSha256": "4c8b0d389b76f6e58f6a61090595113ad699b681e010daef06dce902e117b67a",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Cloud That Looked Like a Whale",
+      "strand": "Imagination, Art & Wonder",
+      "rs": "RS15",
+      "pLevel": "P1",
+      "wordCount": 100,
+      "text": "Mira pointed at a white cloud above the field. \"It looks like a whale,\" she told Sam. Sam tilted his head. \"I see a giant shoe,\" he said. Mira laughed and showed him the tail she could see. Sam showed her the round toe of his shoe. A breeze pushed the cloud across the sky. Its edges changed. Now Mira could see the shoe too, and Sam could see the whale. They drew both shapes in the dirt with a stick. Then the cloud grew thin and drifted away. Their two drawings stayed beside each other until the next rain.",
+      "primaryDimension": "Direct Recall",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0141-Q1",
+          "dimension": "Direct Recall",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What did Mira and Sam use to draw in the dirt?",
+          "options": [
+            "A stone",
+            "Their fingers",
+            "A stick"
+          ],
+          "answer": "A stick",
+          "primary": false,
+          "hint": "Read again the part about drawing in the dirt.",
+          "explanation": "The story says: “They drew both shapes in the dirt with a stick.” So they used a stick."
+        },
+        {
+          "id": "W1-0141-Q2",
+          "dimension": "Direct Recall",
+          "type": "TEXT",
+          "question": "At first, Mira saw one thing in the cloud and Sam saw another. What were the two things?",
+          "options": null,
+          "answer": "A whale and a giant shoe.",
+          "primary": false,
+          "hint": "Read again what Mira says about the cloud and what Sam says he sees.",
+          "explanation": "The story says: “It looks like a whale,” and “I see a giant shoe.” So Mira saw a whale and Sam saw a giant shoe."
+        }
+      ]
+    },
+    {
+      "session": 16,
+      "id": "W1-0002",
+      "sourceFile": "W1-P0016.json",
+      "sourceSha256": "666cd1c903a172d3162af08b16f1608dd9d1e1386943c1317a24ada3605a693c",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "Two Seats on the Bus",
+      "strand": "Family & Friendship",
+      "rs": "RS01",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Dev climbed onto the bus and found two empty seats together. He sat in one and kept the other for his friend Arun. At the next stop, Arun got on. Before he reached Dev, an older woman stepped aboard with a heavy bag. She held the rail and looked for a seat. Dev called to her and offered the saved seat. Arun saw what had happened and stood near Dev instead. The woman sat down with a smile. When another seat opened farther back, Arun took it. From there, he gave Dev a wave. Their ride went on as before.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0002-Q1",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Dev offered the seat he had saved for Arun to the older woman. What happened just before that?",
+          "options": [
+            "The older woman looked for a seat.",
+            "Arun took a seat farther back.",
+            "The woman sat down."
+          ],
+          "answer": "The older woman looked for a seat.",
+          "primary": false,
+          "hint": "Find the sentence where Dev calls to the woman. Then look at the sentence just before it.",
+          "explanation": "The story says: “She held the rail and looked for a seat.” Then: “Dev called to her and offered the saved seat.” So the woman looked for a seat just before Dev offered the seat he had saved."
+        },
+        {
+          "id": "W1-0002-Q2",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What did Arun do right after Dev offered the saved seat to the woman?",
+          "options": [
+            "He climbed onto the bus.",
+            "He stood near Dev.",
+            "He got off the bus."
+          ],
+          "answer": "He stood near Dev.",
+          "primary": false,
+          "hint": "Find the sentence where Dev offers the saved seat. Then read the very next sentence about Arun.",
+          "explanation": "The story says: “Dev called to her and offered the saved seat.” Then: “Arun saw what had happened and stood near Dev instead.” So Arun stood near Dev."
+        }
+      ]
+    },
+    {
+      "session": 17,
+      "id": "W1-0012",
+      "sourceFile": "W1-P0017.json",
+      "sourceSha256": "6970476b65f12181ebfc84466008efbde6ae9e3553344b02075f830cecc4315a",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Library Stamp",
+      "strand": "School & Learning",
+      "rs": "RS02",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Nina had never borrowed a book from the school library. She chose a story about a fox and took it to the desk. The librarian showed her a card inside the book. First, Nina wrote her name on the card. Next, the librarian stamped the return date beside it. Then Nina put the card back in its pocket. She carried the book to her classroom and showed it to her friend. At home, she opened to the first page. A fox was peering from behind a tree. Nina read the line aloud, eager to find out where it was going.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0012-Q1",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "Put these events in order: Nina put the card back; Nina wrote her name; the librarian stamped the date.",
+          "options": null,
+          "answer": "Wrote name → date stamped → card put back.",
+          "primary": false,
+          "hint": "Look for the little words that tell the order, like First, Next and Then, in the part about the card.",
+          "explanation": "The story says: “First, Nina wrote her name on the card. Next, the librarian stamped the return date beside it. Then Nina put the card back in its pocket.” So the order is: wrote name, date stamped, card put back."
+        },
+        {
+          "id": "W1-0012-Q2",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "Put these events in order: Nina showed the book to her friend; Nina opened the book at home; Nina chose the fox book.",
+          "options": null,
+          "answer": "Chose book → showed friend → opened book at home.",
+          "primary": false,
+          "hint": "Find where each of the three things happens in the story. Which part comes earlier, and which comes later?",
+          "explanation": "The story says: “She chose a story about a fox and took it to the desk.” Later, “She carried the book to her classroom and showed it to her friend.” After that, “At home, she opened to the first page.” So the order is: chose book, showed friend, opened book at home."
+        }
+      ]
+    },
+    {
+      "session": 18,
+      "id": "W1-0022",
+      "sourceFile": "W1-P0018.json",
+      "sourceSha256": "bafa3caa97f731a28d3a5a55e1fe2f89acf4f6cd208ddcc28febff5358fad3f2",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Friendly Match",
+      "strand": "Play, Games & Sports",
+      "rs": "RS03",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "The score was close when the ball landed near the line. One team said it was in. The other team thought it was out. Nobody had seen it clearly, so the players stopped the game. Their teacher suggested playing the point again. First, both teams moved back to their places. Then Ravi served the ball. After a long rally, Maya hit it over the net and won the new point. The teams counted that point and went on playing. At the end, they shook hands. Ravi laughed about the hard rally, and Maya asked if they could play again tomorrow.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0022-Q1",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "After the teacher said to play the point again, what did both teams do first?",
+          "options": null,
+          "answer": "They moved back to their places.",
+          "primary": false,
+          "hint": "Find the word that tells what came first, right after the teacher's idea.",
+          "explanation": "The story says: “Their teacher suggested playing the point again. First, both teams moved back to their places.” So the teams moved back to their places first."
+        },
+        {
+          "id": "W1-0022-Q2",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "Ravi served the ball, and then came a long rally. What did Maya do after the rally?",
+          "options": null,
+          "answer": "She hit the ball over the net and won the new point.",
+          "primary": false,
+          "hint": "Find the long rally in the story. Then read what Maya did after it.",
+          "explanation": "The story says: “Then Ravi served the ball. After a long rally, Maya hit it over the net and won the new point.” So after the rally, Maya hit the ball over the net and won the new point."
+        }
+      ]
+    },
+    {
+      "session": 19,
+      "id": "W1-0032",
+      "sourceFile": "W1-P0019.json",
+      "sourceSha256": "0af0310aad16fde7211b3463d61f04bb253f246fec018a89afcf7647976f8a8f",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Puppy and the Slipper",
+      "strand": "Animals & Living World",
+      "rs": "RS04",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Nina looked down and saw that one slipper was missing. Her puppy was pulling it across the room. Nina followed him, but he slipped under a chair with his prize. She called him once. He stayed there and chewed the strap. Nina found his toy beside the sofa and held it where he could see it. The puppy came out, dropped the slipper, and took the toy instead. Nina checked the strap. It was wet but still whole. She set the slippers on a high shelf. The puppy settled beside her feet, busy with something made for him to chew.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0032-Q1",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "First, the puppy slipped under a chair with the slipper. Last, the puppy dropped the slipper. What happened in between?",
+          "options": [
+            "Nina gave the puppy a bath.",
+            "Nina put the slippers on a high shelf.",
+            "Nina held his toy where he could see it."
+          ],
+          "answer": "Nina held his toy where he could see it.",
+          "primary": false,
+          "hint": "Find the two events named in the question. Then look at what happens in the part between them.",
+          "explanation": "The story says: “Nina found his toy beside the sofa and held it where he could see it.” This happened after he slipped under the chair and before he dropped the slipper."
+        },
+        {
+          "id": "W1-0032-Q2",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "First, Nina saw that one slipper was missing. Last, the puppy slipped under a chair. What happened in between?",
+          "options": [
+            "The puppy pulled the slipper across the room.",
+            "The puppy chewed the strap.",
+            "Nina called the puppy for dinner."
+          ],
+          "answer": "The puppy pulled the slipper across the room.",
+          "primary": false,
+          "hint": "Find the two events named in the question. Then look at the part of the story that comes between them.",
+          "explanation": "The story says: “Her puppy was pulling it across the room.” This came after Nina saw the missing slipper and before he slipped under a chair."
+        }
+      ]
+    },
+    {
+      "session": 20,
+      "id": "W1-0042",
+      "sourceFile": "W1-P0020.json",
+      "sourceSha256": "90c2064f33956205c8f5974a186483ef412908b1050286a76cf828a5847620d2",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The First Monsoon Puddle",
+      "strand": "Nature & Environment",
+      "rs": "RS05",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Rain had left a wide puddle beside the school path. Tara wanted to splash in it before going home. She looked at her schoolbag. Her books would get wet if she kept it on her back. First, she asked her father to hold the bag under the covered gate. Then she walked with him to the shallow edge of the puddle. Tara jumped once. Water sprayed over her shoes, and she laughed. Her father stepped back, smiling. When they were ready to leave, Tara wiped her feet on the mat. Her books were dry, and she had enjoyed the rain.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0042-Q1",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "Tara's books would get wet if she kept her bag on her back. What did she do first about it?",
+          "options": null,
+          "answer": "She asked her father to hold the bag under the covered gate.",
+          "primary": false,
+          "hint": "Find the sentence that says what Tara did about her bag. Look for the word that tells what came first.",
+          "explanation": "The story says: “Her books would get wet if she kept it on her back. First, she asked her father to hold the bag under the covered gate.” So the first thing she did was ask her father to hold the bag under the covered gate."
+        },
+        {
+          "id": "W1-0042-Q2",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "After Tara asked her father to hold her bag, what did she do next?",
+          "options": null,
+          "answer": "She walked with him to the shallow edge of the puddle.",
+          "primary": false,
+          "hint": "Find the sentence that tells what Tara asked her father. Then read the sentence right after it for what came next.",
+          "explanation": "The story says: “First, she asked her father to hold the bag under the covered gate. Then she walked with him to the shallow edge of the puddle.” So next, she walked with her father to the shallow edge of the puddle."
+        }
+      ]
+    },
+    {
+      "session": 21,
+      "id": "W1-0052",
+      "sourceFile": "W1-P0021.json",
+      "sourceSha256": "e868cfd8eb449acbff2fe0103a55d8ed0bc2770a9bdb2bd2553d4c4f064caa7a",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Dancing Pepper",
+      "strand": "Science & How Things Work",
+      "rs": "RS06",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Sam watched his teacher fill a shallow bowl with water. She let him shake a little pepper onto the surface. The black bits spread out and floated there. \"Will they move?\" Sam asked. The teacher dipped one finger into a drop of soap. When she touched the middle of the water, the pepper rushed toward the edge. Sam blinked and asked to watch it again. His teacher poured water and sprinkled more pepper. This time Sam watched her soapy finger closely. The pepper moved away again. He sketched the bowl in his notebook, with the black bits near its rim.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0052-Q1",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What did the teacher do immediately before the pepper rushed toward the edge?",
+          "options": [
+            "She drew a bowl.",
+            "She touched the water with a soapy finger.",
+            "She closed the notebook."
+          ],
+          "answer": "She touched the water with a soapy finger.",
+          "primary": false,
+          "hint": "Find the sentence about the pepper rushing. Then look at what happened just before it.",
+          "explanation": "The story says: “When she touched the middle of the water, the pepper rushed toward the edge.” So right before the pepper rushed, the teacher touched the water with her soapy finger."
+        },
+        {
+          "id": "W1-0052-Q2",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "After Sam watched the pepper move away the second time, what did he do?",
+          "options": [
+            "He filled the bowl.",
+            "He went outside.",
+            "He sketched the bowl in his notebook."
+          ],
+          "answer": "He sketched the bowl in his notebook.",
+          "primary": false,
+          "hint": "Find the sentence about the pepper moving away again. Then look at what Sam did after it.",
+          "explanation": "The story says: “The pepper moved away again. He sketched the bowl in his notebook, with the black bits near its rim.” So after the second try, Sam sketched the bowl in his notebook."
+        }
+      ]
+    },
+    {
+      "session": 22,
+      "id": "W1-0062",
+      "sourceFile": "W1-P0022.json",
+      "sourceSha256": "573eb9ced2d603d189e6a34e83f16f461a772b2133d3778a65d698232df29aac",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Tallest Paper Tower",
+      "strand": "Making, Building & Inventing",
+      "rs": "RS07",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Ria stacked paper cups to make a tower. Each cup made the tower taller, and she grinned at the top. Then a wobble grew into a fall. The cups rolled across the table. Ria picked them up and looked at the narrow base she had made. She spread three cups farther apart at the bottom and tried again. The tower stood while she added the last cup. Her friend Leo held a ruler beside it. It was taller than the first tower. Ria left it on the table so the others could see the wide base that held it up.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0062-Q1",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "Put these three things in order from first to last: Ria spread the cups farther apart; the tower fell; Ria stacked paper cups.",
+          "options": null,
+          "answer": "Stacked paper cups → tower fell → spread cups farther apart.",
+          "primary": false,
+          "hint": "Read the story again from the start. Think about which thing happened first, which came next and which came last.",
+          "explanation": "First, “Ria stacked paper cups to make a tower.” Then “a wobble grew into a fall.” Last, “She spread three cups farther apart at the bottom and tried again.” So the order is: stacked paper cups, the tower fell, spread the cups farther apart."
+        },
+        {
+          "id": "W1-0062-Q2",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "Put these three things in order from first to last: Leo held a ruler beside the tower; Ria spread three cups farther apart; Ria added the last cup.",
+          "options": null,
+          "answer": "Spread cups farther apart → added the last cup → Leo held a ruler.",
+          "primary": false,
+          "hint": "Read the story again from the part where Ria tries a second time. Think about which thing happened first, which came next and which came last.",
+          "explanation": "First, “She spread three cups farther apart at the bottom and tried again.” Next, “The tower stood while she added the last cup.” Last, “Her friend Leo held a ruler beside it.” So the order is: spread the cups apart, added the last cup, Leo held the ruler."
+        }
+      ]
+    },
+    {
+      "session": 23,
+      "id": "W1-0072",
+      "sourceFile": "W1-P0023.json",
+      "sourceSha256": "f657f38548c9a3d483e2bd0c283e44aa6544e38cfa0c561809b6615827b82510",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "Mangoes for the Journey",
+      "strand": "India Around Us",
+      "rs": "RS08",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Neel's family had a train to catch. The night before, his mother washed two mangoes and wrapped them in a clean cloth. Neel filled their water bottles while his father packed bread and fruit in a bag. In the morning, they checked their tickets and walked to the station together. On the train, Neel watched fields pass the window. Later, when everyone felt hungry, his father opened the food bag. The mangoes were still safe inside their cloth. They shared the fruit and bread while the train rolled on. Neel saved one mango slice for his sister, who was sleeping.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0072-Q1",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "In the morning, what did Neel's family do first?",
+          "options": [
+            "They checked their tickets.",
+            "They opened the food bag.",
+            "They shared the mangoes."
+          ],
+          "answer": "They checked their tickets.",
+          "primary": false,
+          "hint": "Read again the part about the morning, before the family left for the station.",
+          "explanation": "The story says: “In the morning, they checked their tickets and walked to the station together.” They checked their tickets first, so that is the answer."
+        },
+        {
+          "id": "W1-0072-Q2",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "After Neel's father opened the food bag on the train, what did the family do while the train rolled on?",
+          "options": null,
+          "answer": "They shared the fruit and bread.",
+          "primary": false,
+          "hint": "Read again the sentences that come after the mangoes were found inside their cloth.",
+          "explanation": "The story says: “Later, when everyone felt hungry, his father opened the food bag.” Then “They shared the fruit and bread while the train rolled on.” So the family shared the fruit and bread."
+        }
+      ]
+    },
+    {
+      "session": 24,
+      "id": "W1-0082",
+      "sourceFile": "W1-P0024.json",
+      "sourceSha256": "bb4cc7f84e78b8a3096bb0431302f21891c75b2bec80292928b8b16888fa40a7",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Tiny Map",
+      "strand": "Our World & Journeys",
+      "rs": "RS09",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Leo wanted to see the model ship at the museum. A map showed a ship beside a blue star. First, he and his aunt walked past the room of old clocks. At the next door, Leo turned the map to match the hall. The blue star was beside a staircase. They went up together and found a room full of boats. The model ship stood in the middle, with sails and a painted deck. Leo stood beside the rail to study it. On the way out, he folded the map carefully. He could now show his aunt the route back.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0082-Q1",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Leo and his aunt walked past the room of old clocks. Then Leo saw that the blue star was beside a staircase. What did Leo do in between?",
+          "options": [
+            "Leo folded the map on the way out.",
+            "Leo turned the map to match the hall.",
+            "Leo stood beside the rail to study the ship."
+          ],
+          "answer": "Leo turned the map to match the hall.",
+          "primary": false,
+          "hint": "Read again what happens right after Leo and his aunt walk past the old clocks.",
+          "explanation": "The story says they walked past the clocks. Then “At the next door, Leo turned the map to match the hall.” After that, “The blue star was beside a staircase.” So turning the map came in between."
+        },
+        {
+          "id": "W1-0082-Q2",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Leo saw that the blue star was beside a staircase. Later he stood beside the rail to study the ship. What happened in between?",
+          "options": [
+            "They left the museum.",
+            "They went back to the room of old clocks.",
+            "They went up and found a room full of boats."
+          ],
+          "answer": "They went up and found a room full of boats.",
+          "primary": false,
+          "hint": "Read again what happens right after the blue star is beside a staircase.",
+          "explanation": "The story says: “The blue star was beside a staircase.” Then “They went up together and found a room full of boats.” After that, Leo stood by the rail. So going up to the boat room came in between."
+        }
+      ]
+    },
+    {
+      "session": 25,
+      "id": "W1-0092",
+      "sourceFile": "W1-P0025.json",
+      "sourceSha256": "18d880ce2cbdb39a8dacaf908aa5014bdbc5b347d7a1b62c58e042cb9d3de778",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Lost Key at the Community Hall",
+      "strand": "Community & Civic Life",
+      "rs": "RS10",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "The children had finished their game at the community hall, but the cupboard key was gone. Maya checked the table, and Ravi checked the floor. Neither found it. Their teacher asked them to remember where they had been. First, they went back to the game room. Then they walked to the noticeboard, where they had read a poster before playing. A small silver key lay beside the board. Ravi picked it up and gave it to the teacher. She locked the cupboard, and the group went home. Maya looked back once at the board, glad they had followed their steps.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0092-Q1",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "After their teacher asked them to remember where they had been, where did the children go first?",
+          "options": null,
+          "answer": "The game room.",
+          "primary": false,
+          "hint": "Read again what the children did right after the teacher spoke to them.",
+          "explanation": "The story says: “Their teacher asked them to remember where they had been.” Then “First, they went back to the game room.” So the game room was the first place."
+        },
+        {
+          "id": "W1-0092-Q2",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "After the children went back to the first place, where did they walk next?",
+          "options": null,
+          "answer": "The noticeboard.",
+          "primary": false,
+          "hint": "Read again the sentence that begins with the word “Then”.",
+          "explanation": "The story says: “First, they went back to the game room.” After that, “Then they walked to the noticeboard, where they had read a poster before playing.” So the noticeboard was next."
+        }
+      ]
+    },
+    {
+      "session": 26,
+      "id": "W1-0102",
+      "sourceFile": "W1-P0026.json",
+      "sourceSha256": "c2e425b95d6e304a32f37f66c1e31fded1db3d619de255d529b3b5693b04ac49",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Ten-Rupee Choice",
+      "strand": "Money, Resources & Choices",
+      "rs": "RS11",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Neel had ten rupees in his pocket for the bus ride home. He stopped at a snack stall with his father after school. A large bun cost ten rupees. A banana cost two. Neel was hungry, but he still needed his bus fare. First, he asked his father to check the fare with him. Then he bought the banana and kept the rest of his money safe. They walked to the bus stop together. When the bus came, Neel paid his fare and found a seat beside his father. He ate the banana as the shops slipped past the window.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0102-Q1",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What did Neel do right before he bought his snack?",
+          "options": [
+            "He asked his father to check the fare with him.",
+            "He got on the bus.",
+            "He ate the banana."
+          ],
+          "answer": "He asked his father to check the fare with him.",
+          "primary": false,
+          "hint": "Read again the sentence that begins with the word “First”.",
+          "explanation": "The story says: “First, he asked his father to check the fare with him.” Then “he bought the banana.” So asking his father came right before buying the banana."
+        },
+        {
+          "id": "W1-0102-Q2",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "After Neel bought his snack, where did he and his father go?",
+          "options": [
+            "Back to school.",
+            "To the bus stop.",
+            "To buy the bun."
+          ],
+          "answer": "To the bus stop.",
+          "primary": false,
+          "hint": "Read again what happens right after Neel buys the banana.",
+          "explanation": "The story says: “Then he bought the banana and kept the rest of his money safe.” After that, “They walked to the bus stop together.” So they went to the bus stop."
+        }
+      ]
+    },
+    {
+      "session": 27,
+      "id": "W1-0112",
+      "sourceFile": "W1-P0027.json",
+      "sourceSha256": "ec2cc283af14c3bf1e141fa26f7bf952eb5699991e4bfb6e747a4c65a572251f",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Helmet Reminder",
+      "strand": "Health, Body & Safety",
+      "rs": "RS12",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Sara was ready for a short bicycle ride with her mother. She rolled her bicycle to the gate, then touched her head. Her helmet was still on the shelf inside. \"We're late,\" she said, looking at the clock. Her mother waited by the gate while Sara went back for it. Sara put on the helmet and asked her mother to check the strap. Then they started together along the path. At the park, her friend waved from beside the swings. Sara parked her bicycle and joined her. The game had begun, but there was still room for Sara to play.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0112-Q1",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "At the start of the story, in which order did Sara do these three things?",
+          "options": [
+            "First Sara said they were late, then she rolled her bicycle to the gate, then she touched her head.",
+            "First Sara rolled her bicycle to the gate, then she touched her head, then she said they were late.",
+            "First Sara touched her head, then she said they were late, then she rolled her bicycle to the gate."
+          ],
+          "answer": "First Sara rolled her bicycle to the gate, then she touched her head, then she said they were late.",
+          "primary": false,
+          "hint": "Think of the story as a line from the beginning to the end. Find each of the three things in the story and ask which one the story tells about first.",
+          "explanation": "The story says Sara rolled her bicycle to the gate, then touched her head. After that she said, \"We're late.\" So that is the right order."
+        },
+        {
+          "id": "W1-0112-Q2",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Near the middle of the story, in which order did these three things happen?",
+          "options": [
+            "First they started along the path, then Sara went back for the helmet, then she put it on.",
+            "First Sara put on the helmet, then she went back for it, then they started along the path.",
+            "First Sara went back for the helmet, then she put it on, then they started along the path."
+          ],
+          "answer": "First Sara went back for the helmet, then she put it on, then they started along the path.",
+          "primary": false,
+          "hint": "Think of the story as a line from the beginning to the end. Find each of the three things in the story and ask which one comes first and which one comes last.",
+          "explanation": "Her mother waited while Sara went back for the helmet. Then Sara put on the helmet. After that, they started together along the path."
+        }
+      ]
+    },
+    {
+      "session": 28,
+      "id": "W1-0122",
+      "sourceFile": "W1-P0028.json",
+      "sourceSha256": "6dd0596a414c68921076f159e9a2576034afce4d977c9ec70599cd138c2168d2",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Four Clues",
+      "strand": "Mystery, Logic & Observation",
+      "rs": "RS13",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Mira found a water bottle on the classroom shelf after lunch. Four clues might help her find its owner. The bottle was blue. A small star was drawn on its lid. It held a paper name tag, but the writing had rubbed away. Finally, Mira noticed a green ribbon tied to its handle. She remembered seeing that ribbon on Ana's bag that morning. Mira asked Ana to describe her bottle before showing it to her. Ana named the blue colour and the star. Then Mira gave it back. Ana smiled and tied the ribbon more tightly so it would stay.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0122-Q1",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "In which order did Mira do these three things?",
+          "options": [
+            "First Mira noticed the green ribbon, then she remembered the ribbon on Ana's bag, then she asked Ana to describe the bottle.",
+            "First Mira remembered the ribbon on Ana's bag, then she noticed the green ribbon, then she asked Ana to describe the bottle.",
+            "First Mira asked Ana to describe the bottle, then she noticed the green ribbon, then she remembered the ribbon on Ana's bag."
+          ],
+          "answer": "First Mira noticed the green ribbon, then she remembered the ribbon on Ana's bag, then she asked Ana to describe the bottle.",
+          "primary": false,
+          "hint": "Think of the part near the end of the clues as a line of events. Find each of the three things and ask which one the story tells about first.",
+          "explanation": "Mira noticed the green ribbon first. Then she remembered it from Ana's bag. After that she asked Ana to describe her bottle."
+        },
+        {
+          "id": "W1-0122-Q2",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "Right after Mira gave the bottle back, what did Ana do?",
+          "options": null,
+          "answer": "Ana smiled and tied the ribbon more tightly.",
+          "primary": false,
+          "hint": "Read again the sentence that starts “Then Mira gave it back.” and the sentence that comes after it.",
+          "explanation": "The story says Mira gave the bottle back. Then “Ana smiled and tied the ribbon more tightly so it would stay.”"
+        }
+      ]
+    },
+    {
+      "session": 29,
+      "id": "W1-0132",
+      "sourceFile": "W1-P0029.json",
+      "sourceSha256": "d5cb068353610e1d8ff293955dbe8497907791779e8126c616e86690c9492668",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Drawing That Changed",
+      "strand": "Imagination, Art & Wonder",
+      "rs": "RS14",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "Ana began to draw a house on a hill. She made a straight roof and two square windows. Then her pencil slipped and left a long mark across the sky. Ana frowned at the line. She could erase it, but its shape gave her an idea. She added a small beak and two wings. The mark became a bird flying above the house. Next, she drew a second bird farther away. When her friend saw the picture, he pointed to the birds first. Ana smiled. She had meant to draw a house, but the sky had become her favourite part.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0132-Q1",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Ana's pencil slipped and left a long mark across the sky. Later, the mark became a bird. What did Ana do in between those two moments?",
+          "options": [
+            "Ana made a straight roof and two square windows.",
+            "Ana added a small beak and two wings.",
+            "Ana began to draw a house on a hill."
+          ],
+          "answer": "Ana added a small beak and two wings.",
+          "primary": false,
+          "hint": "Read again from the part that starts “Then her pencil slipped” to the part that starts “The mark became a bird.” Which choice happened in that part?",
+          "explanation": "After the pencil slipped, Ana had an idea. “She added a small beak and two wings.” Then the mark became a bird."
+        },
+        {
+          "id": "W1-0132-Q2",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "The mark became a bird flying above the house. Later, Ana's friend saw the picture. What did Ana do in between those two moments?",
+          "options": [
+            "Ana drew a second bird farther away.",
+            "Ana frowned at the line.",
+            "Ana's pencil slipped."
+          ],
+          "answer": "Ana drew a second bird farther away.",
+          "primary": false,
+          "hint": "Read again the sentence that starts “The mark became a bird” and the sentence that starts “When her friend saw the picture.” Look at what comes between them.",
+          "explanation": "First the mark became a bird. Next, “she drew a second bird farther away.” Then her friend saw the picture."
+        }
+      ]
+    },
+    {
+      "session": 30,
+      "id": "W1-0142",
+      "sourceFile": "W1-P0030.json",
+      "sourceSha256": "cd8d0c5beaa1516cc9cc6ddf0b5bb8f5fe50bc7299bd5b5a6f438701c46eda52",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Doorbell at Six",
+      "strand": "Self & Character",
+      "rs": "RS15",
+      "pLevel": "P2",
+      "wordCount": 100,
+      "text": "At six o'clock, the doorbell rang while Maya was setting the table. Her father was nearby. Maya looked through the window beside the door and saw their neighbour, Mrs Sen, holding a book. Maya told her father who was there. He opened the door, and Mrs Sen handed him the book she had borrowed last week. She had left a note inside to mark a page she liked. Maya's father thanked her and placed the book on the shelf. Then Maya finished setting the table. Later, she opened the book at the note and found a drawing of a bird.",
+      "primaryDimension": "Sequence",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0142-Q1",
+          "dimension": "Sequence",
+          "type": "TEXT",
+          "question": "After the doorbell rang, what was the first thing Maya did?",
+          "options": null,
+          "answer": "She looked through the window beside the door.",
+          "primary": false,
+          "hint": "Read again the part that starts “At six o'clock” and the two sentences that come after it.",
+          "explanation": "After the bell rang, “Maya looked through the window beside the door and saw their neighbour, Mrs Sen, holding a book.”"
+        },
+        {
+          "id": "W1-0142-Q2",
+          "dimension": "Sequence",
+          "type": "MULTIPLE_CHOICE",
+          "question": "After Maya told her father who was there, what did he do next?",
+          "options": [
+            "He called Mrs Sen on the phone.",
+            "He asked Maya to open the book.",
+            "He opened the door."
+          ],
+          "answer": "He opened the door.",
+          "primary": false,
+          "hint": "Read again the sentence that starts “Maya told her father” and the sentence that comes after it.",
+          "explanation": "Maya told her father who was there. Next, “He opened the door, and Mrs Sen handed him the book she had borrowed last week.”"
+        }
+      ]
+    },
+    {
+      "session": 31,
+      "id": "W1-0003",
+      "sourceFile": "W1-P0031.json",
+      "sourceSha256": "222779639591c14b29c0cdda85cb79b5f6a14468542d4cefcac24e9447c684db",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Question Nobody Asked",
+      "strand": "School & Learning",
+      "rs": "RS01",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "The class stared at a picture of a plant with arrows around it. Their teacher asked them to draw what the arrows showed. Sam did not understand one arrow, and nobody else had started drawing. He raised his hand. \"Does this arrow show where the water goes?\" he asked. Several children looked up. They wondered the same thing. The teacher explained that the arrow showed water moving from the roots toward the leaves. Now the children could start. Sam drew a blue line inside his plant. Across the room, pencils moved too. The quiet class had found its way forward.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0003-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Which cause-and-effect pair is supported by the story?",
+          "options": [
+            "Sam asked about the arrow, so the teacher explained it.",
+            "The teacher explained the arrow, so Sam raised his hand.",
+            "The children went outside, so Sam drew a blue line."
+          ],
+          "answer": "Sam asked about the arrow, so the teacher explained it.",
+          "primary": true,
+          "hint": "Read again from the part where Sam asked his question to the part where the teacher spoke. Which thing came first, and what did it lead to?",
+          "explanation": "Sam asked, \"Does this arrow show where the water goes?\" After that, “The teacher explained that the arrow showed water moving from the roots toward the leaves.” His question came first, so the teacher explained."
+        },
+        {
+          "id": "W1-0003-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What made Sam raise his hand?",
+          "options": [
+            "He wanted to go out and play.",
+            "He did not understand one arrow.",
+            "He could not find his pencil."
+          ],
+          "answer": "He did not understand one arrow.",
+          "primary": false,
+          "hint": "Read again the sentence just before Sam raised his hand.",
+          "explanation": "The story says, “Sam did not understand one arrow.” So he raised his hand to ask about it."
+        },
+        {
+          "id": "W1-0003-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "When Sam asked his question, several children looked up. Why did they look up?",
+          "options": [
+            "They heard a noise outside.",
+            "The teacher called their names.",
+            "They wondered the same thing."
+          ],
+          "answer": "They wondered the same thing.",
+          "primary": false,
+          "hint": "Read again the sentence that comes right after “Several children looked up.”",
+          "explanation": "The story says, “Several children looked up. They wondered the same thing.” They looked up because they had the same question as Sam."
+        }
+      ]
+    },
+    {
+      "session": 32,
+      "id": "W1-0013",
+      "sourceFile": "W1-P0032.json",
+      "sourceSha256": "2cf1eb6aeb9822e9c60b3b49cf7bb6b947b68d682b251e1b681ca2b7346fb048",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Kite That Would Not Rise",
+      "strand": "Play, Games & Sports",
+      "rs": "RS02",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "Mira ran across the field with her kite, but it dragged behind her. The air felt still. She ran faster, and the kite rose for a moment before falling again. Her uncle pointed to the trees. Their leaves were hardly moving. Mira sat beside him and waited. A few minutes later, the leaves began to shake. The wind lifted the loose end of her kite's tail. Mira stood, held the string, and walked forward. This time the kite climbed above the field. She stopped running and watched it pull gently at her hand. Her uncle smiled from the grass nearby.",
+      "primaryDimension": "Why/because",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0013-Q1",
+          "dimension": "Why/because",
+          "type": "MULTIPLE_CHOICE",
+          "question": "After the leaves began to shake, why did the kite climb above the field?",
+          "options": [
+            "The wind lifted its tail.",
+            "Mira's uncle pulled it up.",
+            "Mira's uncle held the string."
+          ],
+          "answer": "The wind lifted its tail.",
+          "primary": true,
+          "hint": "Read again the part right after “the leaves began to shake.”",
+          "explanation": "The story says, “The wind lifted the loose end of her kite's tail.” The kite climbed because of the wind."
+        },
+        {
+          "id": "W1-0013-Q2",
+          "dimension": "Why/because",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did Mira sit beside her uncle and wait?",
+          "options": [
+            "The kite string had broken.",
+            "The leaves were hardly moving.",
+            "Her uncle had asked her to stop."
+          ],
+          "answer": "The leaves were hardly moving.",
+          "primary": false,
+          "hint": "Read again what Mira's uncle pointed to, and what she did next.",
+          "explanation": "Her uncle pointed to the trees, and “Their leaves were hardly moving.” Then Mira sat down and waited, because there was no wind to lift her kite yet."
+        },
+        {
+          "id": "W1-0013-Q3",
+          "dimension": "Why/because",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did the kite rise for a moment before falling again?",
+          "options": [
+            "A strong wind came.",
+            "Her uncle let go of it.",
+            "Mira ran faster."
+          ],
+          "answer": "Mira ran faster.",
+          "primary": false,
+          "hint": "Read again the sentence that tells what Mira did when the kite first rose.",
+          "explanation": "The story says, “She ran faster, and the kite rose for a moment before falling again.” The kite rose because Mira ran faster."
+        }
+      ]
+    },
+    {
+      "session": 33,
+      "id": "W1-0023",
+      "sourceFile": "W1-P0033.json",
+      "sourceSha256": "bd598326d304fdd659f3ed9eac8c3393c24cbf966c728efa7f82592939277ac4",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Bird at the Window",
+      "strand": "Animals & Living World",
+      "rs": "RS03",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "A bird tapped the kitchen window and flew back to a branch. Soon it came again. Ana watched from inside with her father. The glass showed a clear picture of the bird, just like a mirror. Each time it moved toward the window, the bird in the glass seemed to move toward it. Her father said the visitor might be mistaking its reflection for another bird. Her father put paper shapes outside the glass to break up the image. The tapping stopped. Ana stayed inside and watched the real bird hop to a tree. It sang there for a while.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0023-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Her father said the bird might be mistaking its reflection for another bird. Which detail from the story best supports this?",
+          "options": [
+            "The bird sang in a tree for a little while.",
+            "The bird in the glass seemed to move toward it.",
+            "Ana watched from inside the kitchen with her father."
+          ],
+          "answer": "The bird in the glass seemed to move toward it.",
+          "primary": true,
+          "hint": "Read again the two sentences before the one that starts “Her father said”.",
+          "explanation": "The story says, “Each time it moved toward the window, the bird in the glass seemed to move toward it.” That looks like another bird, so it fits what her father said."
+        },
+        {
+          "id": "W1-0023-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "After the paper shapes were put outside the glass, what happened?",
+          "options": [
+            "The bird tapped harder.",
+            "The bird flew into the kitchen.",
+            "The tapping stopped."
+          ],
+          "answer": "The tapping stopped.",
+          "primary": false,
+          "hint": "Read again the sentence right after the paper shapes were put outside.",
+          "explanation": "The story says, “The tapping stopped.” It stopped after the paper shapes were put outside the glass."
+        },
+        {
+          "id": "W1-0023-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did her father put paper shapes outside the glass?",
+          "options": [
+            "To break up the image in the glass.",
+            "To make the window look pretty.",
+            "To keep the bird in the tree."
+          ],
+          "answer": "To break up the image in the glass.",
+          "primary": false,
+          "hint": "Read again the sentence about the paper shapes and look for the words that tell what they were for.",
+          "explanation": "The story says, “Her father put paper shapes outside the glass to break up the image.” That was the reason for the paper shapes."
+        }
+      ]
+    },
+    {
+      "session": 34,
+      "id": "W1-0033",
+      "sourceFile": "W1-P0034.json",
+      "sourceSha256": "49ffdf9e4bb2b75616d1b7b760a8672e0c0d60a8cb6b86afc99a5a50cd0bc1f9",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Dry Tap",
+      "strand": "Nature & Environment",
+      "rs": "RS04",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "Ravi turned the kitchen tap, but no water came out. His mother checked a water gauge inside the house. It showed that the tank on the roof was empty. She explained that the water supply would refill it later. Until then, they had a little water stored in a covered pot. Ravi noticed that his toothbrush cup was full. He used a little water, saved the rest, and closed the tap. Later, he helped his mother carry a jug to the plants. They gave each plant a little water. By evening the tank had refilled, and the tap ran again.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0033-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Ravi turned the kitchen tap, but no water came out. Why?",
+          "options": [
+            "The tap had been taken away.",
+            "His mother had closed the tap for him.",
+            "The tank on the roof was empty."
+          ],
+          "answer": "The tank on the roof was empty.",
+          "primary": true,
+          "hint": "Read again what Ravi's mother checked, and what it showed.",
+          "explanation": "His mother checked the gauge. The story says, “It showed that the tank on the roof was empty.” So no water came out of the tap."
+        },
+        {
+          "id": "W1-0033-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "By evening, the tap ran again. Why?",
+          "options": [
+            "The tank had refilled.",
+            "His mother fixed the gauge.",
+            "Ravi carried the jug to the plants."
+          ],
+          "answer": "The tank had refilled.",
+          "primary": false,
+          "hint": "Read again the last sentence of the story.",
+          "explanation": "The story says, “By evening the tank had refilled, and the tap ran again.” The tap ran because the tank was full again."
+        },
+        {
+          "id": "W1-0033-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did the family have a little water to use while the tap was dry?",
+          "options": [
+            "Rain was falling on the roof.",
+            "Some water was stored in a covered pot.",
+            "The jug was full of water."
+          ],
+          "answer": "Some water was stored in a covered pot.",
+          "primary": false,
+          "hint": "Read again the sentence that starts “Until then.”",
+          "explanation": "The story says, “Until then, they had a little water stored in a covered pot.” So they had some water to use."
+        }
+      ]
+    },
+    {
+      "session": 35,
+      "id": "W1-0043",
+      "sourceFile": "W1-P0035.json",
+      "sourceSha256": "e6bcaf12770160b3b9e7981629fc54dcf57acc6dcb51e998c5e768f45101ed95",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Shadow Race",
+      "strand": "Science & How Things Work",
+      "rs": "RS05",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "Tara drew a line beside her shadow in the morning. The shadow stretched far across the playground. At lunch, she returned to the line. Her shadow was shorter. She wondered if it had shrunk while she was inside. Her teacher asked her to think about the Sun's place in the sky. In the morning it had been low; now it stood higher. The changing angle of sunlight made the shadow change length. That afternoon, Tara came back once more. Her shadow was longer now, almost like morning. She walked beside it, watching her dark shape move over the warm ground.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0043-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "At lunch the Sun stood higher in the sky than in the morning. What happened to Tara's shadow because of this?",
+          "options": [
+            "It became shorter.",
+            "It became longer.",
+            "It became hidden."
+          ],
+          "answer": "It became shorter.",
+          "primary": true,
+          "hint": "Read again what Tara saw at lunch and what her teacher asked her to think about.",
+          "explanation": "At lunch the Sun “stood higher,” and the story says, “Her shadow was shorter.” The higher Sun went with a shorter shadow."
+        },
+        {
+          "id": "W1-0043-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What made Tara's shadow change length?",
+          "options": [
+            "Tara walking around the playground.",
+            "The changing angle of sunlight.",
+            "Her teacher drawing a new line."
+          ],
+          "answer": "The changing angle of sunlight.",
+          "primary": false,
+          "hint": "Read again the sentence that comes right after the one saying where the Sun was in the morning and where it was now.",
+          "explanation": "The story says, “The changing angle of sunlight made the shadow change length.” That is what made the shadow change."
+        },
+        {
+          "id": "W1-0043-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Tara drew a line beside her shadow in the morning. What was her shadow like then?",
+          "options": [
+            "The shadow was short and close to her feet.",
+            "The shadow was gone from the playground.",
+            "The shadow stretched far across the playground."
+          ],
+          "answer": "The shadow stretched far across the playground.",
+          "primary": false,
+          "hint": "Read again the first two sentences of the story.",
+          "explanation": "The story says, “The shadow stretched far across the playground.” That was her shadow in the morning, when the Sun was low."
+        }
+      ]
+    },
+    {
+      "session": 36,
+      "id": "W1-0053",
+      "sourceFile": "W1-P0036.json",
+      "sourceSha256": "84397860b07aea2b3cd3e883c37638e250abcd2d4d0c8b386353e5f46a286c6d",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Boat Made of Leaves",
+      "strand": "Making, Building & Inventing",
+      "rs": "RS06",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "Leo folded two leaves into boats and set them in a tub of water. One leaf was narrow. The other was wide and curved at the sides. Leo poured more water into the tub while his aunt watched. The narrow boat tipped when a small wave reached it. The wider boat rocked, but it stayed upright. Leo tried again with a gentle push of water. The same thing happened. He noticed that the wide leaf touched more of the water. His aunt helped him lift both boats out. Leo laid them side by side to see how their shapes differed.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0053-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Which cause-and-effect pair is supported by the story?",
+          "options": [
+            "The wider boat touched more water, so it tipped.",
+            "A small wave reached the narrow boat, so it tipped.",
+            "Leo's aunt lifted the boats, so the narrow boat tipped."
+          ],
+          "answer": "A small wave reached the narrow boat, so it tipped.",
+          "primary": true,
+          "hint": "Read again what happened to each boat when the water moved.",
+          "explanation": "The story says, “The narrow boat tipped when a small wave reached it.” The wave came first, so the narrow boat tipped."
+        },
+        {
+          "id": "W1-0053-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did Leo lay both boats side by side?",
+          "options": [
+            "To dry them in the sun.",
+            "To fold them into new boats.",
+            "To see how their shapes differed."
+          ],
+          "answer": "To see how their shapes differed.",
+          "primary": false,
+          "hint": "Read again the last sentence of the story.",
+          "explanation": "The story says, “Leo laid them side by side to see how their shapes differed.” That was his reason."
+        },
+        {
+          "id": "W1-0053-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Leo poured more water into the tub. What did the wider boat do?",
+          "options": [
+            "It rocked but stayed upright.",
+            "It tipped over.",
+            "It sank to the bottom."
+          ],
+          "answer": "It rocked but stayed upright.",
+          "primary": false,
+          "hint": "Read again the sentence right after the narrow boat tipped.",
+          "explanation": "The story says, “The wider boat rocked, but it stayed upright.” It moved a little but did not tip."
+        }
+      ]
+    },
+    {
+      "session": 37,
+      "id": "W1-0063",
+      "sourceFile": "W1-P0037.json",
+      "sourceSha256": "5d3272ba399552110abecc6f91dc853111c4a07a80384654c51cf890b02e2283",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Bus Stop in the Rain",
+      "strand": "India Around Us",
+      "rs": "RS07",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "Rain began just as Neel and his father reached the bus stop. People moved under the roof, and the dry space filled quickly. A woman with a bag stood at the edge where drops fell on her arm. Neel stepped closer to his father. His father moved their bag off the bench, and another person shifted aside to make room. The woman could now stand under the roof. Soon everyone had a little space. They waited there until the bus came. Neel and his father boarded together. Through the window, he saw the people still waiting, safe from the rain.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0063-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why could the woman now stand under the roof?",
+          "options": [
+            "The rain stopped for a while.",
+            "A person moved aside to make room.",
+            "The bus came to the stop."
+          ],
+          "answer": "A person moved aside to make room.",
+          "primary": true,
+          "hint": "Read again the sentence about Neel's father and the bench, and the one after it.",
+          "explanation": "The story says his father moved the bag and another person “shifted aside to make room.” After that, “The woman could now stand under the roof.”"
+        },
+        {
+          "id": "W1-0063-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did the dry space under the roof fill quickly?",
+          "options": [
+            "People moved under the roof.",
+            "The bus stop got much bigger.",
+            "Neel's father left the bench."
+          ],
+          "answer": "People moved under the roof.",
+          "primary": false,
+          "hint": "Read again the second sentence of the story.",
+          "explanation": "The story says, “People moved under the roof, and the dry space filled quickly.” People coming in made the space fill up."
+        },
+        {
+          "id": "W1-0063-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did Neel and his father board?",
+          "options": [
+            "The rain stopped.",
+            "The woman asked them to.",
+            "The bus came to the stop."
+          ],
+          "answer": "The bus came to the stop.",
+          "primary": false,
+          "hint": "Read again the sentence just before Neel and his father boarded.",
+          "explanation": "The story says, “They waited there until the bus came.” Then Neel and his father boarded together."
+        }
+      ]
+    },
+    {
+      "session": 38,
+      "id": "W1-0073",
+      "sourceFile": "W1-P0038.json",
+      "sourceSha256": "c92f637a31d69484fbcfbc5c6ec79b7c76479494d12d11d99bb971237768ba79",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Mountain Train",
+      "strand": "Our World & Journeys",
+      "rs": "RS08",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "Ana watched the train climb a hill through the window. On the flat land below, it had moved quickly. Now the track curved around steep slopes, and the train went slowly. Ana asked the guard why they had lost speed. He explained that the driver kept a careful pace on sharp bends so the train stayed under control. Ana looked ahead and saw another bend beside the trees. She held her seat as the train turned. Soon the track straightened, and the train moved faster again. From the window, the town below looked as small as a row of toys.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0073-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Ana asked the guard why they had lost speed. Which detail best shows the reason?",
+          "options": [
+            "On the flat land below, the train had moved quickly.",
+            "The town below looked as small as toys.",
+            "The driver kept a careful pace on sharp bends."
+          ],
+          "answer": "The driver kept a careful pace on sharp bends.",
+          "primary": true,
+          "hint": "Read again what the guard said after Ana asked him.",
+          "explanation": "The guard explained that “the driver kept a careful pace on sharp bends so the train stayed under control.” That is the reason the train lost speed."
+        },
+        {
+          "id": "W1-0073-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "When the track straightened, what did the train do?",
+          "options": [
+            "It stopped at the town.",
+            "It moved faster.",
+            "It went even slower."
+          ],
+          "answer": "It moved faster.",
+          "primary": false,
+          "hint": "Read again the sentence that starts “Soon the track”.",
+          "explanation": "The story says, “Soon the track straightened, and the train moved faster again.” The straight track let the train speed up."
+        },
+        {
+          "id": "W1-0073-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What was the track like when the train went slowly?",
+          "options": [
+            "It curved around steep slopes.",
+            "It ran straight across flat land.",
+            "It went through a long tunnel."
+          ],
+          "answer": "It curved around steep slopes.",
+          "primary": false,
+          "hint": "Read again the sentence that starts “Now the track”.",
+          "explanation": "The story says, “Now the track curved around steep slopes, and the train went slowly.” The track was curving when the train was slow."
+        }
+      ]
+    },
+    {
+      "session": 39,
+      "id": "W1-0083",
+      "sourceFile": "W1-P0039.json",
+      "sourceSha256": "fafbbdf33cc8b9275bce4152730a3160d8240332858f2d869cafbdecefc3a0fe",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Queue at the Water Counter",
+      "strand": "Community & Civic Life",
+      "rs": "RS09",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "At school, children gathered around the water counter after games. Each held a bottle. When they all reached forward together, nobody could fill one quickly. A teacher asked them to form a line. Maya stood first, and the others waited behind her. Now one child filled a bottle while the next got ready. Soon the line moved, and nobody had to push. Ravi counted five full bottles before the bell rang. Then it was his turn. He filled his bottle and stepped aside for the next child. The counter was busy, but the clear line gave everyone room to move.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0083-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why could nobody fill a bottle quickly at first?",
+          "options": [
+            "They all reached forward together.",
+            "The bottles were too big.",
+            "The bell rang too early."
+          ],
+          "answer": "They all reached forward together.",
+          "primary": true,
+          "hint": "Read again the sentence that tells when nobody could fill a bottle quickly.",
+          "explanation": "The story says, “When they all reached forward together, nobody could fill one quickly.” Reaching in together was the cause."
+        },
+        {
+          "id": "W1-0083-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What made the children wait behind Maya?",
+          "options": [
+            "Maya called out that she was first.",
+            "The counter was closed for a while.",
+            "A teacher asked them to form a line."
+          ],
+          "answer": "A teacher asked them to form a line.",
+          "primary": false,
+          "hint": "Read again the sentence about Maya and the sentence before it.",
+          "explanation": "The story says, “A teacher asked them to form a line.” Then Maya stood first and the others waited behind her."
+        },
+        {
+          "id": "W1-0083-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "The counter was busy. What gave everyone room to move?",
+          "options": [
+            "The school bell.",
+            "The clear line.",
+            "A second counter."
+          ],
+          "answer": "The clear line.",
+          "primary": false,
+          "hint": "Read again the last sentence of the story.",
+          "explanation": "The story says, “The counter was busy, but the clear line gave everyone room to move.”"
+        }
+      ]
+    },
+    {
+      "session": 40,
+      "id": "W1-0093",
+      "sourceFile": "W1-P0040.json",
+      "sourceSha256": "ee1df1fceb691e606fc944ce142f8da41d622b2019d5f481f442e0299cd9fb85",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Ice-Cream Budget",
+      "strand": "Money, Resources & Choices",
+      "rs": "RS10",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "After school, Sam and his friend Kabir stopped at an ice-cream cart. Sam had fifteen rupees, and the big cone cost fifteen. Kabir bought one, grinning. Sam wanted one too, but his class needed a new notebook tomorrow, and the notebook cost ten rupees. He looked at the small cone, which cost five. Then he chose it, paid, and saved the rest. Kabir licked his big cone while Sam ate slowly, enjoying every bite. At the stationery shop, Sam paid for a green notebook. The next morning, he opened it on his desk, ready to write on the first page.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0093-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Sam chose the small cone and saved the rest. What did this let him do at the stationery shop?",
+          "options": [
+            "Buy a second cone.",
+            "Pay for a notebook.",
+            "Give coins to Kabir."
+          ],
+          "answer": "Pay for a notebook.",
+          "primary": true,
+          "hint": "Read again the sentence about the stationery shop.",
+          "explanation": "Sam chose the small cone and “saved the rest.” Later, “At the stationery shop, Sam paid for a green notebook.”"
+        },
+        {
+          "id": "W1-0093-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Sam chose the small cone, which cost five rupees, and paid for it. How many rupees did he save?",
+          "options": [
+            "Ten rupees.",
+            "Five rupees.",
+            "Fifteen rupees."
+          ],
+          "answer": "Ten rupees.",
+          "primary": false,
+          "hint": "Read again how many rupees Sam had at the start and what the small cone cost.",
+          "explanation": "Sam had fifteen rupees and the small cone cost five. He paid five and saved the rest, so he saved ten rupees."
+        },
+        {
+          "id": "W1-0093-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "The next morning, at his desk, what was Sam ready to do on the first page?",
+          "options": [
+            "Draw Kabir's big cone.",
+            "Count his rupees.",
+            "Start to write."
+          ],
+          "answer": "Start to write.",
+          "primary": false,
+          "hint": "Read again the last sentence of the story.",
+          "explanation": "The story says, “The next morning, he opened it on his desk, ready to write on the first page.”"
+        }
+      ]
+    },
+    {
+      "session": 41,
+      "id": "W1-0103",
+      "sourceFile": "W1-P0041.json",
+      "sourceSha256": "b13f96c4fb2f52efb09b15a24c2f2b98bc1155400c26629a7324950ae16553b8",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Sleepy Morning",
+      "strand": "Health, Body & Safety",
+      "rs": "RS11",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "Nina stayed up late reading a funny book. In the morning, she felt sleepy at breakfast. At school, the teacher gave the class a short puzzle. Nina read the first clue twice, but her thoughts kept drifting back to bed. She asked the teacher to repeat the directions. Later, during playtime, she sat for a while instead of joining a game. At home, Nina put the book beside her bed. She wanted to finish it, yet she also wanted to feel ready for school. That evening, she read a few pages, closed the book, and went to sleep much earlier.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0103-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Which pair shows a cause and its effect in Nina's story?",
+          "options": [
+            "She stayed up late reading, so she felt sleepy at breakfast.",
+            "She felt sleepy at breakfast, so she stayed up late reading.",
+            "She read a funny book, so the teacher gave a puzzle."
+          ],
+          "answer": "She stayed up late reading, so she felt sleepy at breakfast.",
+          "primary": true,
+          "hint": "Read again the first two sentences of the story.",
+          "explanation": "Nina “stayed up late reading a funny book.” Then “In the morning, she felt sleepy at breakfast.” Staying up late is the cause, and feeling sleepy is the effect."
+        },
+        {
+          "id": "W1-0103-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Nina's thoughts kept drifting back to bed. What did she do next?",
+          "options": [
+            "She asked her friend to read the puzzle for her.",
+            "She asked the teacher to repeat the directions.",
+            "She put the puzzle away and went to play."
+          ],
+          "answer": "She asked the teacher to repeat the directions.",
+          "primary": false,
+          "hint": "Read again the sentence right after the one about the first clue.",
+          "explanation": "The story says her thoughts kept drifting, and then “She asked the teacher to repeat the directions.”"
+        },
+        {
+          "id": "W1-0103-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Nina wanted to feel ready for school. What did she do that evening?",
+          "options": [
+            "She read the whole book before bed.",
+            "She stayed up even later than before.",
+            "She went to sleep much earlier."
+          ],
+          "answer": "She went to sleep much earlier.",
+          "primary": false,
+          "hint": "Read again the last two sentences of the story.",
+          "explanation": "Nina wanted to feel ready for school. So that evening she read a few pages, closed the book, and “went to sleep much earlier.”"
+        }
+      ]
+    },
+    {
+      "session": 42,
+      "id": "W1-0113",
+      "sourceFile": "W1-P0042_old.json",
+      "sourceSha256": "3da1dca5fced22335fc593742c2c26fb80e6bb08868c941bd2be90aa303bcd9d",
+      "status": "PENDING_QA",
+      "superseded": true,
+      "title": "The Bell That Rang Twice",
+      "strand": "Mystery, Logic & Observation",
+      "rs": "RS12",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "At school, Kiran heard a high ding from the left and a low ding from the right. Then the low ding rang again. \"Find the bell that rang twice,\" said his teacher. Kiran stood in the corridor, the hall between the art room on his left and the music room on his right. He waited to hear both sounds again. The high bell stayed quiet, but the low bell rang once more. Kiran walked right, where the sound grew louder. Inside the music room, Tara held a small bell. \"You found my bell!\" she said, and gave it one ring.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0113-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did Kiran walk toward the music room instead of the art room?",
+          "options": [
+            "Because the high bell rang again from the art room.",
+            "Because the low bell kept ringing on the right, where the music room was.",
+            "Because his teacher told him to enter the music room first."
+          ],
+          "answer": "Because the low bell kept ringing on the right, where the music room was.",
+          "primary": true,
+          "hint": "Think about which sound rang again and which room was on that side.",
+          "explanation": "The low ding came from the right and rang again. The music room was on Kiran’s right, while the high bell on the left stayed quiet."
+        },
+        {
+          "id": "W1-0113-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did Kiran wait in the corridor?",
+          "options": [
+            "To hear whether the bells would sound again.",
+            "To ask Tara where the art room was.",
+            "To watch children walk down the hall."
+          ],
+          "answer": "To hear whether the bells would sound again.",
+          "primary": false,
+          "hint": "Find the sentence that tells you what Kiran was waiting to hear.",
+          "explanation": "Kiran waited to hear the sounds again, so he could check which one rang."
+        },
+        {
+          "id": "W1-0113-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Why did Kiran become more certain as he walked right?",
+          "options": [
+            "Because the low sound grew louder near the music room.",
+            "Because the high sound came from the art room behind him.",
+            "Because the teacher pointed at the bell."
+          ],
+          "answer": "Because the low sound grew louder near the music room.",
+          "primary": false,
+          "hint": "Notice what changed in the sound when Kiran moved to the right.",
+          "explanation": "The sound grew louder as Kiran walked right, toward the music room, where Tara held a small bell."
+        }
+      ]
+    },
+    {
+      "session": 43,
+      "id": "W1-0123",
+      "sourceFile": "W1-P0043_old.json",
+      "sourceSha256": "81df1a243e301c718d41156641f9646fb0720de6a5b432b704af5fd879faa966",
+      "status": "PENDING_QA",
+      "superseded": true,
+      "title": "The Story in the Stars",
+      "strand": "Imagination, Art & Wonder",
+      "rs": "RS13",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "Mira stood with Grandpa and gazed at the stars. There were so many! \"How did people remember which stars they had seen?\" she asked. Grandpa held up a star map. \"Long ago, people imagined pictures by drawing lines between stars,\" he said. Mira studied the dots, but saw no picture. Grandpa traced three stars, then two more. \"A bird!\" Mira said. \"A picture can help us find that pattern again,\" Grandpa explained. Mira looked up and found those same bright points. Then she spotted another group shaped like a kite. \"I have a sky picture of my own!\" she whispered.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0123-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Grandpa said pictures can help people find a star pattern again. Which detail best supports his idea?",
+          "options": [
+            "Mira looked up and found the same bright points after seeing the bird on the map.",
+            "Mira saw many stars before Grandpa showed her the map.",
+            "Grandpa held a map while Mira stood beside him."
+          ],
+          "answer": "Mira looked up and found the same bright points after seeing the bird on the map.",
+          "primary": true,
+          "hint": "Look for what Mira could find after she had seen the bird shape.",
+          "explanation": "Mira recognized a bird shape on the map, then looked up and found those same bright points. This shows how a picture helped her pick out the pattern."
+        },
+        {
+          "id": "W1-0123-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "At first, Mira saw only dots. Which detail best explains why she then saw a bird?",
+          "options": [
+            "Grandpa traced a few stars together on the map.",
+            "The stars moved into the shape of a bird.",
+            "Mira found a kite shape before looking at the map."
+          ],
+          "answer": "Grandpa traced a few stars together on the map.",
+          "primary": false,
+          "hint": "Think about what Grandpa did just before Mira called out the name of an animal.",
+          "explanation": "Mira could not see a picture until Grandpa traced a group of stars. His finger helped her imagine the bird shape."
+        },
+        {
+          "id": "W1-0123-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "Which detail best supports the idea that Mira began using the star-picture trick herself?",
+          "options": [
+            "She spotted another group of stars shaped like a kite.",
+            "She asked how people could remember so many stars.",
+            "Grandpa held up the star map for her."
+          ],
+          "answer": "She spotted another group of stars shaped like a kite.",
+          "primary": false,
+          "hint": "Look near the end for a picture that Mira found without Grandpa tracing it.",
+          "explanation": "After using Grandpa’s bird pattern, Mira noticed a different star group that looked like a kite. That was her own idea."
+        }
+      ]
+    },
+    {
+      "session": 45,
+      "id": "W1-0143",
+      "sourceFile": "W1-P0045.json",
+      "sourceSha256": "9cdb8bc98bc0d5b1034e8902795e9ce02098710d8013c3540575e095c629099d",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Broken Crayon Plan",
+      "strand": "Family & Friendship",
+      "rs": "RS15",
+      "pLevel": "P3",
+      "wordCount": 100,
+      "text": "Nina stared at a small box of broken crayons. \"Can these bits make one big crayon?\" she asked. Mom smiled. \"Let's try.\" Together they peeled off the paper and placed red, blue, and yellow pieces in a star mold. Mom put the mold in the oven while Nina watched from the doorway. Soon the wax melted into bright pools. Mom took out the hot mold and set it away to cool. Later, Nina pressed out one hard star. She used it to draw a line. Red, blue, and yellow marks appeared together. \"Our broken crayons made a rainbow!\" she cheered.",
+      "primaryDimension": "Cause/Effect",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0143-Q1",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What happened to the crayon pieces because Mom put the mold in the oven?",
+          "options": [
+            "The wax melted into bright pools.",
+            "The paper wrappers grew back.",
+            "The star mold became a box."
+          ],
+          "answer": "The wax melted into bright pools.",
+          "primary": false,
+          "hint": "Read what changed after Mom put the mold in the oven.",
+          "explanation": "The oven heated the wax, so it melted into bright pools."
+        },
+        {
+          "id": "W1-0143-Q2",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What happened after Mom left the hot mold to cool?",
+          "options": [
+            "The colors vanished from the crayons.",
+            "Nina could press out one hard star.",
+            "The crayon pieces turned into paper."
+          ],
+          "answer": "Nina could press out one hard star.",
+          "primary": false,
+          "hint": "Find the sentence after Mom set the mold away.",
+          "explanation": "After the wax cooled, Nina could press out one hard star."
+        },
+        {
+          "id": "W1-0143-Q3",
+          "dimension": "Cause/Effect",
+          "type": "MULTIPLE_CHOICE",
+          "question": "What appeared when Nina drew with the new star crayon?",
+          "options": [
+            "Only one red dot.",
+            "A torn page.",
+            "Red, blue, and yellow marks together."
+          ],
+          "answer": "Red, blue, and yellow marks together.",
+          "primary": false,
+          "hint": "Look at what appeared just after she drew a line.",
+          "explanation": "The new crayon drew red, blue, and yellow marks together."
+        }
+      ]
+    },
+    {
+      "session": 46,
+      "id": "W1-0004",
+      "sourceFile": "W1-P0046.json",
+      "sourceSha256": "bf192c61417868119d7573db85cdc3d10d75dc832a25b549bf3162d01fe4f94c",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Unfinished Race",
+      "strand": "Play, Games & Sports",
+      "rs": "RS01",
+      "pLevel": "P4",
+      "wordCount": 100,
+      "text": "The finish line was ten steps away when Maya heard a shout. Her teammate Ravi had fallen on the track. Maya slowed, though runners raced past her. Ravi sat up and rubbed his knee. Maya asked, \"Can you stand?\" Ravi nodded, but he held out his hand. Maya helped him up. They walked across the line together after the last runner. Near the finish, their coach brought Ravi a chair and water. \"Sit and rest,\" the coach said. Maya stayed beside him. Ravi glanced at the scoreboard, then at Maya. \"We finished last,\" he said. \"We finished together,\" Maya replied.",
+      "primaryDimension": "Prediction",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0004-Q1",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "If the story paused when Maya slowed, which prediction does NOT fit the clues?",
+          "options": [
+            "Maya will run away and leave Ravi on the track.",
+            "Maya may check whether Ravi can stand.",
+            "Maya may help Ravi get up."
+          ],
+          "answer": "Maya will run away and leave Ravi on the track.",
+          "primary": false,
+          "hint": "Reread what Maya did when she saw Ravi on the track.",
+          "explanation": "Maya slows, checks on Ravi and helps him; running away without checking does not fit those clues."
+        },
+        {
+          "id": "W1-0004-Q2",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "If the story paused when Ravi held out his hand, which prediction does NOT fit?",
+          "options": [
+            "Ravi may stand with Maya helping him.",
+            "Ravi will pull his hand back and run away alone.",
+            "They may cross the finish line together."
+          ],
+          "answer": "Ravi will pull his hand back and run away alone.",
+          "primary": false,
+          "hint": "Look at what Ravi does with his hand and what happens next.",
+          "explanation": "Ravi reaches for help and Maya raises him. His running away alone does not fit these clues."
+        },
+        {
+          "id": "W1-0004-Q3",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "If the story paused when the coach brought a chair, which prediction does NOT fit?",
+          "options": [
+            "Ravi may sit down and rest.",
+            "Maya may stay near Ravi.",
+            "The coach will send Ravi back to run right away."
+          ],
+          "answer": "The coach will send Ravi back to run right away.",
+          "primary": false,
+          "hint": "Check what the coach brings and says to Ravi.",
+          "explanation": "The coach offers a chair and tells Ravi to rest, so sending him back to run right away does not fit."
+        }
+      ]
+    },
+    {
+      "session": 47,
+      "id": "W1-0014",
+      "sourceFile": "W1-P0047.json",
+      "sourceSha256": "9a8f76426020b60168f22e5d6b8c32e55b99bef66494372948e8e907fd011cf9",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Monkey and the Bottle",
+      "strand": "Animals & Living World",
+      "rs": "RS02",
+      "pLevel": "P4",
+      "wordCount": 100,
+      "text": "From her window, Anu spotted a monkey beside a neem tree. A narrow bottle with peanuts lay on the ground. The monkey peered inside and slowly stretched its open hand toward the neck. It slipped its fingers inside and closed them around the peanuts. Now its fist would not come out. It pulled once, then twice. Still stuck! Anu stayed safely indoors. The monkey paused. Its fingers slowly opened, and most peanuts fell back. With one nut held lightly between two fingers, its hand slid free. The monkey glanced at a low branch. Up it climbed, carrying that single nut.",
+      "primaryDimension": "Prediction",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0014-Q1",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "The monkey has its open hand at the bottle neck. What is its most sensible next action?",
+          "options": [
+            "Slide its open fingers into the bottle.",
+            "Climb the tree without reaching for the peanuts.",
+            "Close its fist outside the bottle and walk away."
+          ],
+          "answer": "Slide its open fingers into the bottle.",
+          "primary": false,
+          "hint": "Look at where the monkey has pointed its open hand.",
+          "explanation": "The monkey has seen peanuts and moved its open hand toward the narrow neck, so sliding its fingers inside is the sensible next step."
+        },
+        {
+          "id": "W1-0014-Q2",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "The monkey keeps pulling, but its closed fist stays stuck. What should it try next?",
+          "options": [
+            "Keep its fingers tightly closed and pull again.",
+            "Open its fingers and let most of the peanuts fall.",
+            "Grip even more peanuts before trying again."
+          ],
+          "answer": "Open its fingers and let most of the peanuts fall.",
+          "primary": false,
+          "hint": "Read what happened to its closed fist when it tried to pull.",
+          "explanation": "Pulling the closed fist does not free it; opening its fingers and letting most peanuts fall allows the next move toward freedom."
+        },
+        {
+          "id": "W1-0014-Q3",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "The monkey is free with one nut and looks at a low branch. What is the most sensible next action?",
+          "options": [
+            "Put its hand back into the narrow bottle at once.",
+            "Remain by the bottle and try another tight fist.",
+            "Climb onto the low branch with its nut."
+          ],
+          "answer": "Climb onto the low branch with its nut.",
+          "primary": false,
+          "hint": "Look at where the monkey turns its eyes after freeing its hand.",
+          "explanation": "The monkey glances at a nearby branch and then climbs up carrying its nut, so climbing there is the natural next action."
+        }
+      ]
+    },
+    {
+      "session": 48,
+      "id": "W1-0024",
+      "sourceFile": "W1-P0048.json",
+      "sourceSha256": "9afedd68a6d29875e691e13cffa2aba555e5463ccbe5b9ac7c6bfa5ed238e1dc",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Dark Cloud Over the Field",
+      "strand": "Nature & Environment",
+      "rs": "RS03",
+      "pLevel": "P4",
+      "wordCount": 100,
+      "text": "A sudden cool wind made the paper scorecard jump on the bench. Nia reached for it, but the next gust blew it into the grass. She picked it up as Arun held their ball. A dark cloud crossed the sun, and the field grew dim. A low rumble rolled above them. Arun asked if they could play one more game. Their coach opened the hall door and waved them in. Nia put the card in her pocket, and both hurried inside. Rain tapped against the hall windows moments later. They watched the grass shine, their ball still dry beside them.",
+      "primaryDimension": "Prediction",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0024-Q1",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "A cool wind makes the loose paper scorecard jump on the bench. What will most likely happen next?",
+          "options": [
+            "The scorecard will stay on the bench despite the wind.",
+            "A gust will blow the scorecard into the grass.",
+            "Arun will put the scorecard away before it lifts."
+          ],
+          "answer": "A gust will blow the scorecard into the grass.",
+          "primary": false,
+          "hint": "Look at what the wind is already doing to the loose paper.",
+          "explanation": "Wind is moving the loose paper, and the next gust blows it into the grass."
+        },
+        {
+          "id": "W1-0024-Q2",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "A dark cloud covers the sun, the air turns cool, and a rumble sounds. What will most likely happen to the weather soon?",
+          "options": [
+            "The sky will clear, and the field will brighten at once.",
+            "The air will become hot and dry at once.",
+            "Rain will begin over the field."
+          ],
+          "answer": "Rain will begin over the field.",
+          "primary": false,
+          "hint": "Find the changes in the sky and the sound above the field.",
+          "explanation": "A dark cloud and a rumble are strong clues that rain may come soon; rain then taps the hall windows."
+        },
+        {
+          "id": "W1-0024-Q3",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "The coach opens the hall door and waves the children in. What will the children most likely do next?",
+          "options": [
+            "Carry their things and hurry into the hall.",
+            "Stay on the field for another game.",
+            "Sit on the bench and watch the sky."
+          ],
+          "answer": "Carry their things and hurry into the hall.",
+          "primary": false,
+          "hint": "Look at the coach’s open door and gesture.",
+          "explanation": "The coach opens the hall door and waves the children inside, and they hurry in with their things."
+        }
+      ]
+    },
+    {
+      "session": 49,
+      "id": "W1-0034",
+      "sourceFile": "W1-P0049.json",
+      "sourceSha256": "a9d51e31ebdb33d80594b8696b4106cd9ddb6997ca57038475646a1ec39c142d",
+      "status": "PENDING_QA",
+      "superseded": false,
+      "title": "The Balloon and the Warm Air",
+      "strand": "Science & How Things Work",
+      "rs": "RS04",
+      "pLevel": "P4",
+      "wordCount": 100,
+      "text": "Tara found a bottle and a limp balloon. Tara asked if air could fill it without anyone blowing. Her father stretched the balloon over the bottle's mouth. He gently placed the bottle in a bowl of warm water. At first, nothing changed, and Tara held her breath. Then the balloon slowly rose as the air inside the bottle grew warm. Dad moved the bottle into cool water. The balloon fell flat again when the bottle cooled. She pointed to the warm bowl and asked him to try once more. Back in warm water, the balloon rose again, and Tara grinned.",
+      "primaryDimension": "Prediction",
+      "requiredCorrect": 2,
+      "items": [
+        {
+          "id": "W1-0034-Q1",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "If the air inside the bottle keeps warming, what will most likely happen to the balloon?",
+          "options": [
+            "The balloon will begin to rise.",
+            "The balloon will fill with water from the bowl.",
+            "The balloon will stay flat even as the air warms."
+          ],
+          "answer": "The balloon will begin to rise.",
+          "primary": false,
+          "hint": "Reread what happens after Dad puts the bottle in warm water.",
+          "explanation": "The balloon begins to rise as the air inside the bottle becomes warm."
+        },
+        {
+          "id": "W1-0034-Q2",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "If Dad keeps the bottle in cool water, what will most likely happen to the balloon?",
+          "options": [
+            "The balloon will keep growing larger.",
+            "The balloon will fall flat.",
+            "The balloon will fill with cool water."
+          ],
+          "answer": "The balloon will fall flat.",
+          "primary": false,
+          "hint": "Read what the balloon does when Dad moves the bottle into cool water.",
+          "explanation": "When Dad moves the bottle into cool water, the balloon falls flat again."
+        },
+        {
+          "id": "W1-0034-Q3",
+          "dimension": "Prediction",
+          "type": "MULTIPLE_CHOICE",
+          "question": "If Dad puts the bottle back in warm water once more, what will most likely happen?",
+          "options": [
+            "The balloon will stay flat no matter what.",
+            "The balloon will fill with water from the bowl.",
+            "The balloon will rise again."
+          ],
+          "answer": "The balloon will rise again.",
+          "primary": false,
+          "hint": "Reread Tara’s request, and look for the result of trying the warm bowl again.",
+          "explanation": "The repeated warm-water trial makes the balloon rise again."
+        }
+      ]
+    }
+  ]
+}

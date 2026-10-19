@@ -39,8 +39,9 @@ every embedded app. See `../container/docs/app-launch-integration.md` for the fu
 `../.env.local.example` for the required `APP_LAUNCH_*` / `SESSION_SECRET` environment variables.
 The app works standalone (without any of this configured) exactly as before.
 
-Legacy 36-level demo only (diagnostics route `/legacy-demo`): level data lives in `data/progression.json`, passages in
-`data/passages/level-1.json`. The comprehension scorer exists twice by
+Legacy 36-level demo only (diagnostics route `/legacy-demo`): level data lives in `data/progression.json`, its six original passages were retired, so it has none; the owner-approved Approved_v2 set
+(sessions 1-49) is reviewed at `/review` from `data/review/world1-approved-v2.json`, rebuilt by
+`node tools/build-review-bundle.mjs`. The comprehension scorer exists twice by
 design — `backend/speed_reading/scoring.py` (source of truth, unit-tested)
 and `lib/scoring.ts` (browser port); keep their weights in sync.
 

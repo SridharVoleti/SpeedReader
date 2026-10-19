@@ -8,6 +8,8 @@ const learnerPages: AppManifest["pages"] = {};
 const diagnosticPages: AppManifest["pages"] = {
     // the legacy /explain journey shows question counts, correctness and readiness states (issue #18)
     "explain": () => import("./ui/explain/page"),
+    // owner content review: Approved_v2 sessions 1-49 in the real reader, with answers visible (read-only)
+    "review": () => import("./ui/review/page"),
     "legacy-demo": () => import("./ui/legacy-demo/page"),
     "adaptive-speed-demo": () => import("./ui/adaptive-speed-demo/page"),
     "book-mode-demo": () => import("./ui/book-mode-demo/page"),

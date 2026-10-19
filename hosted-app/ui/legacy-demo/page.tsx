@@ -1,11 +1,9 @@
 "use client";
 
-import passagesData from "../../data/passages/level-1.json";
 import { useEffect, useState } from "react";
 import LevelMap from "../components/LevelMap";
 import LevelPlayer from "../components/LevelPlayer";
 import { ProgressDashboard, SettingsPanel } from "../components/Dashboards";
-import { loadApprovedContent } from "../../lib/content-gate";
 import {
   levels,
   loadProgress,
@@ -21,9 +19,9 @@ import { PassageData } from "../../lib/scoring";
 import identity from "../../app.identity";
 import styles from "../page.module.css";
 
-// SR-R1-003: approved-file-only content - anything missing approval/version/schema validity is
-// blocked here, before it can ever reach a learner, and logged as CONTENT_INVALID.
-const passages = loadApprovedContent(passagesData as unknown as PassageData[]);
+// The six original demo passages were retired when the owner-approved Approved_v2 set replaced them (see /review).
+// This pre-V3 demo therefore has no passages to play; it is kept only as historical code.
+const passages: PassageData[] = [];
 
 type LaunchedLearner = { learnerId: string; displayName: string; avatarId: string | null };
 
