@@ -12,6 +12,7 @@ import { verifyBootstrapAssertion, type LearnerBootstrap } from "./bootstrap-ass
 import { mintSessionToken } from "./session";
 import { confirmUsableLaunch, type PlatformGrant } from "./platform-api";
 import type { AppLaunchConfig } from "./config";
+import { logLaunch } from "./log";
 
 export type HandleAppLaunchResult =
   | {
@@ -39,8 +40,19 @@ export async function handleAppLaunch(params: {
       throw new AppLaunchError("BAD_LAUNCH_REQUEST", "launchCode and launchAttemptId form fields are required.");
     }
 
+    logLaunch("info", "launch.received", { launchAttemptId, launchCodeLen: launchCode.length, formFields: [...form.keys()] });
     const exchange = await exchangeLaunchCode({ cfg, launchCode, launchAttemptId, fetchImpl, now });
     const learner = await verifyBootstrapAssertion({ cfg, token: exchange.bootstrapAssertion, now });
+    logLaunch("info", "launch.bootstrap-verified", {
+      launchAttemptId,
+      learnerId: learner.learnerId,
+      learnerSessionId: learner.learnerSessionId,
+      displayNameLen: learner.displayName.length,
+      deploymentId: learner.deploymentId,
+      releaseId: learner.releaseId,
+      locale: learner.locale,
+      learnerTimezone: learner.learnerTimezone
+    });
 
     // Activating the grant is what starts the learner's session clock on BabySteps' side, so
     // it belongs here - right as we're about to actually show them the app - not speculatively
@@ -52,16 +64,39 @@ export async function handleAppLaunch(params: {
       const provisional: PlatformGrant = { ...exchange.platformApiAccess, active: false };
       try {
         grant = await confirmUsableLaunch({ cfg, grant: provisional, learnerSessionId: learner.learnerSessionId, now, fetchImpl });
+        logLaunch("info", "launch.usable-launch-confirmed", { launchAttemptId, learnerSessionId: learner.learnerSessionId, grantId: grant.grantId, grantActive: grant.active });
       } catch (e) {
         console.error("[app-launch] usable-launch confirmation failed, progress sync disabled for this session:", e instanceof Error ? e.message : e);
+        logLaunch("error", "launch.usable-launch-failed", {
+          launchAttemptId,
+          learnerSessionId: learner.learnerSessionId,
+          grantId: provisional.grantId,
+          // the grant stays inactive, so every /api/v3 call will answer 403 ENTITLEMENT_INACTIVE
+          consequence: "grant inactive; /api/v3 will return 403 ENTITLEMENT_INACTIVE",
+          error: e,
+          stack: e instanceof Error ? e.stack : undefined
+        });
         grant = provisional;
       }
+    } else {
+      logLaunch("warn", "launch.no-platform-grant", { launchAttemptId, learnerSessionId: learner.learnerSessionId, note: "exchange returned no usable platformApiAccess; session has no grant" });
     }
 
     const { token, expiresAt } = await mintSessionToken(learner, {
       centralSessionExpiresAt: exchange.centralSessionExpiresAt,
       now,
       grant
+    });
+
+    logLaunch("info", "launch.session-minted", {
+      launchAttemptId,
+      learnerSessionId: learner.learnerSessionId,
+      sessionTokenChars: token.length,
+      sessionExpiresAt: expiresAt,
+      centralSessionExpiresAt: exchange.centralSessionExpiresAt,
+      grantPresent: grant !== undefined,
+      grantActive: grant?.active,
+      redirectTo: cfg.landingPath
     });
 
     return {
@@ -75,6 +110,7 @@ export async function handleAppLaunch(params: {
     const code: AppLaunchErrorCode = e instanceof AppLaunchError ? e.code : "PROVISION_FAILED";
     // Developer-facing detail to the server log; only the safe sentence goes to the browser.
     console.error("[app-launch] launch failed:", code, e instanceof Error ? e.message : e);
+    logLaunch("error", "launch.failed", { code, status: ERROR_STATUS[code] ?? 500, error: e, stack: e instanceof Error ? e.stack : undefined });
     return {
       ok: false,
       code,

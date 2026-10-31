@@ -22,6 +22,7 @@ import { AppLaunchError } from "./errors";
 import { mintAppAssertion, PLATFORM_API_AUDIENCE, GRANT_RENEW_AUDIENCE } from "./app-assertion";
 import type { AppLaunchConfig } from "./config";
 import type { PlatformApiAccess } from "./exchange";
+import { logLaunch, responseTrace } from "./log";
 
 export type PlatformGrant = PlatformApiAccess & {
   /** true once confirmUsableLaunch has succeeded - false means "don't bother calling progress
@@ -50,6 +51,19 @@ async function callPlatformApi(params: {
   const { cfg, grant, path, method, body, audience = PLATFORM_API_AUDIENCE, now, fetchImpl = fetch } = params;
   const assertion = await mintAppAssertion(cfg, { now, audience });
 
+  const callInfo = {
+    method,
+    url: `${platformOrigin(cfg)}${path}`,
+    grantId: grant.grantId,
+    grantActive: grant.active,
+    grantScopes: grant.scopes,
+    accessTokenExpiresAt: grant.accessTokenExpiresAt,
+    audience,
+    bodyKeys: body && typeof body === "object" ? Object.keys(body as object) : []
+  };
+  const startedAt = Date.now();
+  logLaunch("info", "platform-api.request", callInfo);
+
   let res: Response;
   try {
     res = await fetchImpl(`${platformOrigin(cfg)}${path}`, {
@@ -64,15 +78,25 @@ async function callPlatformApi(params: {
       cache: "no-store"
     });
   } catch (e) {
+    logLaunch("error", "platform-api.network-error", { ...callInfo, ms: Date.now() - startedAt, error: e });
     throw new AppLaunchError("EXCHANGE_FAILED", `Platform API request to ${path} failed: ${e instanceof Error ? e.message : "network error"}`);
   }
 
   let parsed: Record<string, unknown> = {};
+  let rawBody = "";
   try {
-    parsed = res.status === 204 ? {} : await res.json();
+    rawBody = res.status === 204 ? "" : await res.text();
+    parsed = rawBody ? JSON.parse(rawBody) : {};
   } catch {
     // fall through to the !res.ok check below with an empty body
   }
+  logLaunch(res.ok ? "info" : "error", res.ok ? "platform-api.response" : "platform-api.rejected", {
+    path,
+    ms: Date.now() - startedAt,
+    ...responseTrace(res),
+    // a rejected call's body is the whole diagnosis (BabySteps error code + any detail)
+    body: res.ok ? Object.keys(parsed) : rawBody.slice(0, 2000)
+  });
 
   if (!res.ok) {
     const code = typeof parsed.error === "string" ? parsed.error : `HTTP_${res.status}`;
@@ -152,7 +176,13 @@ export async function renewGrant(params: {
     throw new AppLaunchError("EXCHANGE_FAILED", `Grant renewal failed: ${e instanceof Error ? e.message : "network error"}`);
   }
 
-  const body = await res.json().catch(() => ({}) as Record<string, unknown>);
+  const bodyText = await res.text().catch(() => "");
+  const body = (() => { try { return JSON.parse(bodyText) as Record<string, unknown>; } catch { return {} as Record<string, unknown>; } })();
+  logLaunch(res.ok ? "info" : "error", res.ok ? "grant-renew.response" : "grant-renew.rejected", {
+    grantId: grant.grantId,
+    ...responseTrace(res),
+    body: res.ok ? Object.keys(body) : bodyText.slice(0, 2000)
+  });
   if (!res.ok || typeof body.accessToken !== "string" || typeof body.accessTokenExpiresAt !== "string") {
     throw new AppLaunchError("EXCHANGE_FAILED", `Grant renewal returned ${res.status}`);
   }

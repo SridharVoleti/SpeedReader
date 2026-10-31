@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { appLaunchConfig } from "../launch/config";
 import { handleAppLaunch } from "../launch/handle-app-launch";
 import { SESSION_COOKIE, LEARNER_COOKIE, learnerCookieValue } from "../launch/session";
+import { logLaunch } from "../launch/log";
 
 // POST /launch - the BabySteps browser handoff (container/docs/app-launch-integration.md).
 // An auto-submitting form arrives with `launchCode` + `launchAttemptId`; we exchange them
@@ -27,6 +28,17 @@ export async function POST(req: NextRequest): Promise<Response> {
   // 303 so the parent's browser re-issues the follow-up as GET (it POSTed to get here).
   const res = NextResponse.redirect(new URL(result.redirectTo, req.nextUrl.origin), 303);
   const expires = new Date(result.sessionExpiresAt);
+  logLaunch("info", "launch.cookie-set", {
+    redirectOrigin: new URL(result.redirectTo, req.nextUrl.origin).origin,
+    requestHost: req.headers.get("host"),
+    forwardedHost: req.headers.get("x-forwarded-host"),
+    forwardedProto: req.headers.get("x-forwarded-proto"),
+    cookieName: SESSION_COOKIE,
+    sessionTokenChars: result.sessionToken.length,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    expires: result.sessionExpiresAt
+  });
   const isProd = process.env.NODE_ENV === "production";
 
   res.cookies.set(SESSION_COOKIE, result.sessionToken, {

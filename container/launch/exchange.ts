@@ -6,6 +6,7 @@ import { randomUUID } from "crypto";
 import { AppLaunchError } from "./errors";
 import { mintAppAssertion } from "./app-assertion";
 import type { AppLaunchConfig } from "./config";
+import { logLaunch, responseTrace } from "./log";
 
 /** The provisional app-session grant returned alongside the bootstrap assertion - only
  *  `session.usable_launch` scoped until confirmUsableLaunch() activates it (see
@@ -41,6 +42,16 @@ export async function exchangeLaunchCode(params: {
   }
 
   const assertion = await mintAppAssertion(cfg, { now });
+  const startedAt = Date.now();
+  logLaunch("info", "exchange.request", {
+    url: cfg.exchangeUrl,
+    launchAttemptId,
+    launchCodeLen: launchCode.length,
+    clientId: cfg.clientId,
+    appId: cfg.appId,
+    environment: cfg.environment,
+    deploymentId: cfg.deploymentId
+  });
 
   let res: Response;
   try {
@@ -59,11 +70,13 @@ export async function exchangeLaunchCode(params: {
       cache: "no-store"
     });
   } catch (e) {
+    logLaunch("error", "exchange.network-error", { url: cfg.exchangeUrl, launchAttemptId, ms: Date.now() - startedAt, error: e });
     throw new AppLaunchError("EXCHANGE_FAILED", `Exchange request failed: ${e instanceof Error ? e.message : "network error"}`);
   }
 
   if (!res.ok) {
     const detail = await safeText(res);
+    logLaunch("error", "exchange.rejected", { launchAttemptId, ms: Date.now() - startedAt, ...responseTrace(res), body: detail });
     throw new AppLaunchError("EXCHANGE_FAILED", `Exchange endpoint returned ${res.status}${detail ? `: ${detail}` : ""}`);
   }
 
@@ -78,11 +91,27 @@ export async function exchangeLaunchCode(params: {
     throw new AppLaunchError("EXCHANGE_FAILED", "Exchange response did not include a bootstrapAssertion.");
   }
 
+  const platformApiAccess = parsePlatformApiAccess(body.platformApiAccess);
+  logLaunch("info", "exchange.accepted", {
+    launchAttemptId,
+    ms: Date.now() - startedAt,
+    ...responseTrace(res),
+    responseKeys: Object.keys(body),
+    bootstrapExpiresAt: body.bootstrapExpiresAt,
+    centralSessionExpiresAt: body.centralSessionExpiresAt,
+    platformApiAccessPresent: body.platformApiAccess !== undefined,
+    platformApiAccessParsed: platformApiAccess !== undefined,
+    grantId: platformApiAccess?.grantId,
+    grantScopes: platformApiAccess?.scopes,
+    accessTokenExpiresAt: platformApiAccess?.accessTokenExpiresAt,
+    apiContractVersion: platformApiAccess?.apiContractVersion
+  });
+
   return {
     bootstrapAssertion: body.bootstrapAssertion,
     bootstrapExpiresAt: typeof body.bootstrapExpiresAt === "string" ? body.bootstrapExpiresAt : undefined,
     centralSessionExpiresAt: typeof body.centralSessionExpiresAt === "string" ? body.centralSessionExpiresAt : undefined,
-    platformApiAccess: parsePlatformApiAccess(body.platformApiAccess)
+    platformApiAccess
   };
 }
 

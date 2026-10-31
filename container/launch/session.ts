@@ -118,6 +118,18 @@ export async function verifySessionToken(token: string): Promise<(LearnerSession
   }
 }
 
+/** Why a session token that verifySessionToken rejected was rejected - a jose error code or a
+ *  shape problem. For server logs only; never returned to the browser. */
+export async function sessionTokenProblem(token: string): Promise<string> {
+  try {
+    await jwtVerify(token, secretKey(), { algorithms: ["HS256"] });
+    return "TOKEN_SHAPE_INVALID";
+  } catch (e) {
+    if (e instanceof AppLaunchError) return "SESSION_SECRET_MISSING";
+    return (e as { code?: string }).code ?? "TOKEN_UNREADABLE";
+  }
+}
+
 function isPlatformGrant(value: unknown): value is PlatformGrant {
   if (!value || typeof value !== "object") return false;
   const v = value as Record<string, unknown>;
